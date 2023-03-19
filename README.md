@@ -30,6 +30,7 @@
 - Summary: If you pull, this commit will...
 - Erlaubte Verben in Summary:
     * Add: Programmierer/USer kann jetzt etwas machen was man vorher nicht konnte
+    * Fix: Bug wurde gefixed
     * Remove/Drop: Programmierer/User kann etwas nicht mehr machen was vorher ging
     * Refactor: Es wurde etwas verändert, was Experience nicht verändert
     * Document: Was kommentiert, was ins README, was ins CHANGELOG
@@ -60,7 +61,8 @@
 ## Android Studio
 1. Download Android Studio https://developer.android.com/studio?gclid=CjwKCAjw5dqgBhBNEiwA7PryaDp3iobEElUQNejkYfuenjy1r9zsPfH_0quwyFSSsRB_u0fxDfpn1xoCYKIQAvD_BwE&gclsrc=aw.ds
 2. Beim Setup Wizard die Standardeinstellungen verwenden
-3. Dann unter Projects > more Actions > Virtual Device Manager ein Emulator hinzufügen
-4. Pixel 5 auswählen, System-Image "R" herunterladen und Emulator starten
-5. In der commandline zum \flutter ordner navigieren und "flutter doctor" ausführen
-6. "flutter doctor --android-licenses" ausführen und alles bestätigen
+3. Unter "Costumize" > all Settings nach "SDK" suchen, in der Naviagtion auf "Andriod SDK" klicken, Tab zu "SDK Tools" wechseln und "Android SDK Command-line Tools" installieren
+4. Dann unter Projects > more Actions > Virtual Device Manager ein Emulator hinzufügen
+5. Pixel 5 auswählen, System-Image "R" herunterladen und Emulator starten
+6. In der commandline zum \flutter ordner navigieren und "flutter doctor" ausführen
+7. "flutter doctor --android-licenses" ausführen und alles bestätigen
