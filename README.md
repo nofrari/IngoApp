@@ -64,3 +64,9 @@
 4. Pixel 5 auswählen, System-Image "R" herunterladen und Emulator starten
 5. In der commandline zum \flutter ordner navigieren und "flutter doctor" ausführen
 6. "flutter doctor --android-licenses" ausführen und alles bestätigen
+
+## Verbindung Datenbank
+1. https://mysqlsvradmin.world4you.com/
+2. Benutzername sql1238164
+3. Passwort ff@mb349
+4. Server mysqlsvr69.world4you.com auswählen
