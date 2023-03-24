@@ -72,3 +72,19 @@
 2. Benutzername sql1238164
 3. Passwort ff@mb349
 4. Server mysqlsvr69.world4you.com auswählen
+
+## Server Verbindung
+### Putty (nur bei Windows benötigt, Linux/MacOS geht glaub ich über terminal)
+1. Putty herunterladen https://www.chiark.greenend.org.uk/~sgtatham/putty/latest.html
+2. PuttyGEN öffnen und "RSA" auswählen, bit-Länge auf 4096 und generate
+3. Save public key, irgendeinen Ordner auswählen und "public" als Namen vergeben, ohne Dateiendung
+4. Save private key, Passwort braucht man nicht
+
+### jetzt wieder für alle
+1. Zu jemanden gehen der SSH Verbindungen bereits eingerichtet hat
+2. Am Server ins Directory /root/.ssh/ gehen und in authorized_keys den OpenSSH public key aus puttyGEN kopieren
+3. Download mobaXterm https://mobaxterm.mobatek.net/download-home-edition.html
+4. Entpacken und .exe öffnen
+5. Auf "Session" und auf "user Session", dann IP adresse und "root" eingeben
+6. Unter Advanced den private key auswählen
+7. Auf Verbinden und fertig
