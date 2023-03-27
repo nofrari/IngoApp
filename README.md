@@ -67,11 +67,7 @@
 6. In der commandline zum \flutter ordner navigieren und "flutter doctor" ausführen
 7. "flutter doctor --android-licenses" ausführen und alles bestätigen
 
-## Verbindung Datenbank
-1. https://mysqlsvradmin.world4you.com/
-2. Benutzername sql1238164
-3. Passwort ff@mb349
-4. Server mysqlsvr69.world4you.com auswählen
+# Setup Backend
 
 ## Server Verbindung
 ### Putty (nur bei Windows benötigt, Linux/MacOS geht glaub ich über terminal)
@@ -88,3 +84,34 @@
 5. Auf "Session" und auf "user Session", dann IP adresse und "root" eingeben
 6. Unter Advanced den private key auswählen
 7. Auf Verbinden und fertig
+
+## Programm commands
+1. npm init --yes
+2. npm install express
+3. npm i -D typescript @types/express @types/node
+4. npx tsc --init
+5. npm i prisma --save
+6. npx prisma
+7. npx prisma init
+8. npm install @prisma/client
+9. npm i zod
+10. npm i bcryrpt
+11. npm i --save-dev @types/bcrypt
+12. npm i ts-node
+13. npm i ts-node-dev
+
+## Setup für lokale Datenbank
+1. schema.prisma auf mysql ändern
+2. Docker installieren https://www.docker.com/products/docker-desktop/
+3. "docker pull mysql" ausführen
+4. "docker run --name ingo -p 3306:3306 --env MYSQL_ROOT_PASSWORD=dummypasswort -d mysql" ausführen
+5. In docker auf den ingo container gehen, terminal öffnen, "mysql -u root -p" ausführen und passwort eingeben"
+6. Nacheinander ausführen: "CREATE DATABASE ingodb;" "CREATE USER 'ingouser' IDENTIFIED BY 'dummypasswort';" "GRANT ALL PRIVILEGES ON ingodb.* TO 'ingouser';"
+7. env database url ändern auf "mysql://root:dummypasswort@localhost:3306/ingodb?schema=public"
+8. in package json "start": "ts-node --transpile-only src/index.ts" als script hinzufügen
+9. mit npx prisma db push das schema zur datenbank pushen
+9. mit npm run start den server starten
+10. postman herunterladen https://www.postman.com/downloads/
+11. mit localhost/ testen ob verbindung funktioniert
+12. in docker "USE ingodb" eingeben und mit SELECT * from User schauen ob ein post an localhost/users einen user erzeugt
+
