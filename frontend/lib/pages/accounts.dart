@@ -1,0 +1,19 @@
+import 'package:flutter/material.dart';
+
+class Accounts extends StatefulWidget {
+  const Accounts({super.key});
+
+  @override
+  State<Accounts> createState() => _AccountsState();
+}
+
+class _AccountsState extends State<Accounts> {
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      body: const Center(
+        child: Text('Accounts Screen'),
+      ),
+    );
+  }
+}
