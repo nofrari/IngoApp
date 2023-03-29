@@ -14,9 +14,9 @@ model User {
   user_id      String     @id @unique @default(cuid())
   user_name    String
   user_sirname String
-  email        String
+  email        String     @unique
   password     String
-  pin          Int
+  pin          Int?
   accounts     Account[]
   categories   Category[]
   budgets      Budget[]

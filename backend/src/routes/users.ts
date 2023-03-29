@@ -5,16 +5,26 @@ import bcrypt from 'bcrypt';
 
 const prisma = new PrismaClient();
 const router = express.Router();
-const inputSchema = z.object({
-    username: z.string(),
+//is used to check the parameters of the request body
+const registerSchema = z.object({
+    user_name: z.string(),
+    user_sirname: z.string(),
+    email: z.string(),
     password: z.string()
 });
-type InputSchema = z.infer<typeof inputSchema>;
+type RegisterSchema = z.infer<typeof registerSchema>;
+
+const loginSchema = z.object({
+    email: z.string(),
+    password: z.string()
+});
+type LoginSchema = z.infer<typeof loginSchema>;
+
 
 //create new user (register)
-router.post('/users', async (req, res) => {
-    const body = <InputSchema>req.body;
-    const validationResult = inputSchema.safeParse(body);
+router.post('/users/register', async (req, res) => {
+    const body = <RegisterSchema>req.body;
+    const validationResult = registerSchema.safeParse(body);
 
     if (!validationResult.success) {
         res.status(400).send();
@@ -24,26 +34,31 @@ router.post('/users', async (req, res) => {
     const hash = await bcrypt.hash(body.password, 10);
     const user = await prisma.user.create({
         data: {
-            username: body.username,
+            user_name: body.user_name,
+            user_sirname: body.user_sirname,
+            email: body.email,
             password: hash
         }
     });
-    res.send({ id: user.id, username: user.username });
+    res.send({ user_id: user.user_id, username: user.user_name });
 });
 
-router.get('/users', async (req, res) => {
-    const users = await prisma.user.findMany();
-    res.send(users);
-});
+//Get all users, not really needed in our case
+// router.get('/users', async (req, res) => {
+//     const users = await prisma.user.findMany();
+//     res.send(users);
+// });
 
+//get one user by id
 router.get('/users/:id', async (req, res) => {
-    const user = await prisma.user.findUnique({ where: { id: req.params.id } });
+    const user = await prisma.user.findUnique({ where: { user_id: req.params.id } });
     res.send(user);
 });
 
+//user login
 router.post('/users/login', async (req, res) => {
-    const body = <InputSchema>req.body;
-    const validationResult = inputSchema.safeParse(body);
+    const body = <LoginSchema>req.body;
+    const validationResult = loginSchema.safeParse(body);
 
     if (!validationResult.success) {
         res.status(400).send();
@@ -52,7 +67,7 @@ router.post('/users/login', async (req, res) => {
 
     const user = await prisma.user.findUnique({
         where: {
-            username: body.username
+            email: body.email
         }
     });
 
@@ -68,7 +83,12 @@ router.post('/users/login', async (req, res) => {
         return;
     }
 
-    res.status(200).send();
+    res.status(200).send({
+        user_id: user.user_id,
+        username: user.user_name,
+        user_sirname: user.user_sirname,
+        email: user.email
+    });
 });
 
 export default router;
