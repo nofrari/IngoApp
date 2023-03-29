@@ -101,6 +101,8 @@
 13. npm i ts-node-dev
 14. npm i jsonwebtoken
 15. npm i --save-dev @types/jsonwebtoken
+16. npm i --save-dev mocha chai
+17. npm i --save-dev @types/mocha @types/chai
 
 ## Setup für lokale Datenbank
 1. schema.prisma auf mysql ändern

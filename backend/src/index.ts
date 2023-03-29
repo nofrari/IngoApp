@@ -12,4 +12,11 @@ app.use(usersRouter);
 
 app.listen(3000);
 
+export function add(first: number, second: number) {
+    if (first === 0 || second === 0) {
+        throw new Error();
+    }
+    return first + second;
+}
+
 
