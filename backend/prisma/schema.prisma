@@ -87,7 +87,7 @@ model Budget {
 }
 
 model Icon {
-  icon_id  String     @id @unique @default(cuid())
-  icon_url String
-  category Category[]
+  icon_id   String     @id @unique @default(cuid())
+  icon_name String
+  category  Category[]
 }

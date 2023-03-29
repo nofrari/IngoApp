@@ -99,6 +99,8 @@
 11. npm i --save-dev @types/bcrypt
 12. npm i ts-node
 13. npm i ts-node-dev
+14. npm i jsonwebtoken
+15. npm i --save-dev @types/jsonwebtoken
 
 ## Setup für lokale Datenbank
 1. schema.prisma auf mysql ändern

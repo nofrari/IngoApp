@@ -1,6 +1,8 @@
 import express from 'express';
 import { PrismaClient } from '@prisma/client';
 import { z } from 'zod';
+import jwt from 'jsonwebtoken';
+import verifyToken from '../middleware/verifyToken';
 import bcrypt from 'bcrypt';
 
 const prisma = new PrismaClient();
@@ -50,7 +52,10 @@ router.post('/users/register', async (req, res) => {
 // });
 
 //get one user by id
-router.get('/users/:id', async (req, res) => {
+router.get('/users/:id', verifyToken, async (req, res) => {
+    if (res.locals.user.userId !== req.params.id) {
+        res.status(403).send();
+    }
     const user = await prisma.user.findUnique({ where: { user_id: req.params.id } });
     res.send(user);
 });
@@ -83,12 +88,20 @@ router.post('/users/login', async (req, res) => {
         return;
     }
 
-    res.status(200).send({
-        user_id: user.user_id,
-        username: user.user_name,
-        user_sirname: user.user_sirname,
-        email: user.email
-    });
+    const token = jwt.sign({
+        userId: user.user_id,
+        exp: Math.floor(Date.now() / 1000) + (60 * 60)
+    }, <string>process.env.JWT_SECRET);
+
+    //kann ich da nur den token schicken?
+    res.status(200).send({ accessToken: token });
+
+    // res.status(200).send({
+    //     user_id: user.user_id,
+    //     username: user.user_name,
+    //     user_sirname: user.user_sirname,
+    //     email: user.email
+    // });
 });
 
 export default router;
