@@ -110,12 +110,13 @@
 3. "docker pull mysql" ausführen
 4. "docker run --name ingo -p 3306:3306 --env MYSQL_ROOT_PASSWORD=dummypasswort -d mysql" ausführen
 5. In docker auf den ingo container gehen, terminal öffnen, "mysql -u root -p" ausführen und passwort eingeben"
-6. Nacheinander ausführen: "CREATE DATABASE ingodb;" "CREATE USER 'ingouser' IDENTIFIED BY 'dummypasswort';" "GRANT ALL PRIVILEGES ON ingodb.* TO 'ingouser';"
+6. Nacheinander ausführen: "CREATE DATABASE ingodb;" (Side note: ziemlich sicher, dass man nur den ersten braucht) "CREATE USER 'ingouser' IDENTIFIED BY 'dummypasswort';" "GRANT ALL PRIVILEGES ON ingodb.* TO 'ingouser';"
 7. env database url ändern auf "mysql://root:dummypasswort@localhost:3306/ingodb?schema=public"
-8. in package json "start": "ts-node --transpile-only src/index.ts" als script hinzufügen
-9. mit npx prisma db push das schema zur datenbank pushen
-9. mit npm run start den server starten
-10. postman herunterladen https://www.postman.com/downloads/
-11. mit localhost/ testen ob verbindung funktioniert
-12. in docker "USE ingodb" eingeben und mit SELECT * from User schauen ob ein post an localhost/users einen user erzeugt
+8. src/index.ts und src/routes/users.ts von ecampus-beispiel kopieren und jwt zeug rauslöschen
+9. in package json "start": "ts-node --transpile-only src/index.ts" als script hinzufügen
+10. mit npx prisma db push das schema zur datenbank pushen
+11. mit npm run start den server starten
+12. postman herunterladen https://www.postman.com/downloads/
+13. mit localhost/ testen ob verbindung funktioniert
+14. in docker "USE ingodb" eingeben und mit SELECT * from User schauen ob ein post an localhost/users einen user erzeugt
 
