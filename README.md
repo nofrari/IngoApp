@@ -111,7 +111,7 @@
 4. "docker run --name ingo -p 3306:3306 --env MYSQL_ROOT_PASSWORD=dummypasswort -d mysql" ausführen
 5. In docker auf den ingo container gehen, terminal öffnen, "mysql -u root -p" ausführen und passwort eingeben"
 6. Nacheinander ausführen: "CREATE DATABASE ingodb;" (Side note: ziemlich sicher, dass man nur den ersten braucht) "CREATE USER 'ingouser' IDENTIFIED BY 'dummypasswort';" "GRANT ALL PRIVILEGES ON ingodb.* TO 'ingouser';"
-7. env database url ändern auf "mysql://root:dummypasswort@localhost:3306/ingodb?schema=public"
+7. sample env auf ".env" umbenennen env database url ändern auf "mysql://root:dummypasswort@localhost:3306/ingodb?schema=public"
 8. src/index.ts und src/routes/users.ts von ecampus-beispiel kopieren und jwt zeug rauslöschen
 9. in package json "start": "ts-node --transpile-only src/index.ts" als script hinzufügen
 10. mit npx prisma db push das schema zur datenbank pushen
