@@ -54,7 +54,7 @@ class _ScannerState extends State<Scanner> {
     );
   }
 
-  _getFromGallery() async {
+  Future _getFromGallery() async {
     XFile? pickedFile = await _picker.pickImage(source: ImageSource.gallery);
 
     if (pickedFile != null) {
@@ -64,7 +64,7 @@ class _ScannerState extends State<Scanner> {
     }
   }
 
-  _uploadImage() async {
+  Future _uploadImage() async {
     var formData = FormData.fromMap(
       {
         "image": await MultipartFile.fromFile(imageFile!.path),
