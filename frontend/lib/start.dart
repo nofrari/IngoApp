@@ -41,6 +41,7 @@ class _StartState extends State<Start> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
+        elevation: 0,
         leading: GestureDetector(
           onTap: () {
             setState(() {
@@ -65,34 +66,36 @@ class _StartState extends State<Start> {
                 });
               },
               style: ElevatedButton.styleFrom(
-                backgroundColor: AppColor.transparant,
-                foregroundColor: AppColor.white,
-                elevation: 0,
-              ),
-              child: const Icon(
-                Icons.account_box_rounded,
-                size: Values.iconSize,
-              ),
+                  shape: const CircleBorder(),
+                  backgroundColor: AppColor.callToActionLight),
+              child: const Text("AH"),
             ),
           ),
         ],
-        backgroundColor: AppColor.appBarBackgroundColor,
+        backgroundColor: AppColor.background,
       ),
       body: PageStorage(
         bucket: bucket,
         child: currentScreen,
       ),
+      backgroundColor: AppColor.background,
       floatingActionButton: FloatingActionButton(
-        child: const Icon(Icons.add),
+        backgroundColor: AppColor.neutral100,
         onPressed: () {
           setState(() {
             currentScreen = const Scanner();
           });
         },
+        //Icon of Scanner
+        child: const Icon(
+          Icons.add,
+          color: AppColor.neutral600,
+        ),
       ),
       floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
       bottomNavigationBar: BottomAppBar(
         shape: const CircularNotchedRectangle(),
+        color: AppColor.neutral500,
         notchMargin: Values.notchMargin,
         child: SizedBox(
           height: Values.menuBarHeight,
@@ -116,13 +119,13 @@ class _StartState extends State<Start> {
                         Icon(
                           Icons.chat,
                           color: currentTab == 0
-                              ? AppColor.currentTab
-                              : AppColor.defaultTab,
+                              ? AppColor.activeMenu
+                              : AppColor.neutral100,
                         ),
                         const Text(
                           Strings.menuHome,
                           style: TextStyle(
-                            color: AppColor.defaultTab,
+                            color: AppColor.neutral100,
                           ),
                         )
                       ],
@@ -133,7 +136,7 @@ class _StartState extends State<Start> {
                     onPressed: () {
                       setState(() {
                         currentTab = 1;
-                        currentScreen = const Accounts();
+                        currentScreen = const Finances();
                       });
                     },
                     child: Column(
@@ -142,13 +145,13 @@ class _StartState extends State<Start> {
                         Icon(
                           Icons.chat,
                           color: currentTab == 1
-                              ? AppColor.currentTab
-                              : AppColor.defaultTab,
+                              ? AppColor.activeMenu
+                              : AppColor.neutral100,
                         ),
                         const Text(
-                          Strings.menuAccounts,
+                          Strings.menuFinance,
                           style: TextStyle(
-                            color: AppColor.defaultTab,
+                            color: AppColor.neutral100,
                           ),
                         )
                       ],
@@ -164,7 +167,7 @@ class _StartState extends State<Start> {
                     onPressed: () {
                       setState(() {
                         currentTab = 2;
-                        currentScreen = const Budget();
+                        currentScreen = const Accounts();
                       });
                     },
                     child: Column(
@@ -173,13 +176,13 @@ class _StartState extends State<Start> {
                         Icon(
                           Icons.chat,
                           color: currentTab == 2
-                              ? AppColor.currentTab
-                              : AppColor.defaultTab,
+                              ? AppColor.activeMenu
+                              : AppColor.neutral100,
                         ),
                         const Text(
-                          Strings.menuBudget,
+                          Strings.menuAccounts,
                           style: TextStyle(
-                            color: AppColor.defaultTab,
+                            color: AppColor.neutral100,
                           ),
                         )
                       ],
@@ -190,7 +193,7 @@ class _StartState extends State<Start> {
                     onPressed: () {
                       setState(() {
                         currentTab = 3;
-                        currentScreen = const Finances();
+                        currentScreen = const Budget();
                       });
                     },
                     child: Column(
@@ -199,13 +202,13 @@ class _StartState extends State<Start> {
                         Icon(
                           Icons.chat,
                           color: currentTab == 3
-                              ? AppColor.currentTab
-                              : AppColor.defaultTab,
+                              ? AppColor.activeMenu
+                              : AppColor.neutral100,
                         ),
                         const Text(
-                          Strings.menuFinance,
+                          Strings.menuBudget,
                           style: TextStyle(
-                            color: AppColor.defaultTab,
+                            color: AppColor.neutral100,
                           ),
                         )
                       ],
