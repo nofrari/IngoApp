@@ -31,6 +31,7 @@
 - Erlaubte Verben in Summary:
     * Add: Programmierer/USer kann jetzt etwas machen was man vorher nicht konnte
     * Fix: Bug wurde gefixed
+    * Edit: Etwas wurde geändert, das in die andren Kategorien nicht passt :D
     * Remove/Drop: Programmierer/User kann etwas nicht mehr machen was vorher ging
     * Refactor: Es wurde etwas verändert, was Experience nicht verändert
     * Document: Was kommentiert, was ins README, was ins CHANGELOG

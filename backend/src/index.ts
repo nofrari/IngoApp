@@ -45,7 +45,7 @@ app.post("/upload", upload.single("image"), (req, res) => {
 });
 
 app.listen(5432, () => {
-    console.log("Listening on Port 3000!");
+    console.log("Listening on Port 5432!");
 });
 
 //just for testing

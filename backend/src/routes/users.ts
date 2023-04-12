@@ -22,6 +22,101 @@ const loginSchema = z.object({
 });
 type LoginSchema = z.infer<typeof loginSchema>;
 
+const editSchema = z.object({
+    user_id: z.string(),
+    user_name: z.string().optional(),
+    user_sirname: z.string().optional(),
+    email: z.string(),
+    old_password: z.string().optional(),
+    new_password: z.string().optional(),
+});
+type EditSchema = z.infer<typeof editSchema>;
+
+//edit user
+router.post('/users/edit', async (req, res) => {
+    const body = <EditSchema>req.body;
+    const validationResult = editSchema.safeParse(body);
+
+    if (!validationResult.success) {
+        res.status(400).send();
+        return;
+    }
+
+    const user = await prisma.user.findUnique({
+        where: {
+            user_id: body.user_id
+        }
+    });
+
+    if (!user) {
+        res.status(404).send();
+        return;
+    }
+
+    //if blocks to check which parameter is sent in the request body and then update the database
+    if (body.user_name) {
+        await prisma.user.update({
+            where: {
+                user_id: body.user_id
+            },
+            data: {
+                user_name: body.user_name
+            }
+        });
+
+        res.status(200).send();
+
+    } else if (body.user_sirname) {
+        await prisma.user.update({
+            where: {
+                user_id: body.user_id
+            },
+            data: {
+                user_sirname: body.user_sirname
+            }
+        });
+
+        res.status(200).send();
+
+    } else if (body.email) {
+        await prisma.user.update({
+            where: {
+                user_id: body.user_id
+            },
+            data: {
+                email: body.email
+            }
+        });
+
+        res.status(200).send();
+
+    } else if (body.old_password && body.new_password) {
+        const match = await bcrypt.compare(body.old_password, user.password);
+
+        if (!match) {
+            res.status(401).send();
+            return;
+        }
+
+        const hash = await bcrypt.hash(body.new_password, 10);
+
+        await prisma.user.update({
+            where: {
+                user_id: body.user_id
+            },
+            data: {
+                password: hash
+            }
+        });
+
+        res.status(200).send();
+
+    } else {
+        res.status(406).send();
+        return;
+    }
+});
+
 
 //create new user (register)
 router.post('/users/register', async (req, res) => {
@@ -103,7 +198,7 @@ router.post('/users/login', async (req, res) => {
 
     const token = jwt.sign({
         userId: user.user_id,
-        exp: Math.floor(Date.now() / 1000) + (60 * 60)
+        exp: Math.floor(Date.now() / 1000) + (60 * 60 * 24 * 30)
     }, <string>process.env.JWT_SECRET);
 
     res.status(200).send({
