@@ -17,7 +17,7 @@ export default (req: Request, res: Response, next: NextFunction) => {
             res.status(401).send();
             return;
         }
-        //wieso is das user und nicht id?
+
         res.locals.user = decoded;
         next();
     });

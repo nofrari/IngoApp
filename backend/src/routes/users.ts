@@ -42,7 +42,19 @@ router.post('/users/register', async (req, res) => {
             password: hash
         }
     });
-    res.send({ user_id: user.user_id, username: user.user_name });
+
+    const token = jwt.sign({
+        userId: user.user_id,
+        exp: Math.floor(Date.now() / 1000) + (60 * 60)
+    }, <string>process.env.JWT_SECRET);
+
+    res.send({
+        accessToken: token,
+        user_id: user.user_id,
+        username: user.user_name,
+        user_sirname: user.user_sirname,
+        email: user.email
+    });
 });
 
 //Get all users, not really needed in our case
@@ -52,6 +64,7 @@ router.post('/users/register', async (req, res) => {
 // });
 
 //get one user by id
+//for testing: copy token from login or register and paste it in the authorization header under Bearer token
 router.get('/users/:id', verifyToken, async (req, res) => {
     if (res.locals.user.userId !== req.params.id) {
         res.status(403).send();
@@ -93,15 +106,14 @@ router.post('/users/login', async (req, res) => {
         exp: Math.floor(Date.now() / 1000) + (60 * 60)
     }, <string>process.env.JWT_SECRET);
 
-    //kann ich da nur den token schicken?
-    res.status(200).send({ accessToken: token });
-
-    // res.status(200).send({
-    //     user_id: user.user_id,
-    //     username: user.user_name,
-    //     user_sirname: user.user_sirname,
-    //     email: user.email
-    // });
+    res.status(200).send({
+        accessToken: token,
+        user_id: user.user_id,
+        username: user.user_name,
+        user_sirname: user.user_sirname,
+        email: user.email,
+        pin: user.pin
+    });
 });
 
 export default router;
