@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:frontend/models/transaction.dart';
 import '../../constants/colors.dart';
+import '../../constants/fonts.dart';
 
 class TransactionItem extends StatelessWidget {
   const TransactionItem({super.key, required this.transaction});
@@ -10,40 +11,63 @@ class TransactionItem extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      decoration: const BoxDecoration(
+      decoration: BoxDecoration(
         border: Border(
           top: BorderSide(width: 2, color: AppColor.neutral600),
         ),
       ),
       child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
+        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
         child: Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
             Container(
-              child: Text(
-                transaction.category,
-                style: TextStyle(color: AppColor.neutral100),
+              constraints: BoxConstraints(
+                maxWidth: 80,
+              ),
+              child: ElevatedButton(
+                onPressed: null,
+                style: ElevatedButton.styleFrom(
+                    shape: const CircleBorder(),
+                    backgroundColor: AppColor.callToActionLight,
+                    padding: const EdgeInsets.all(15)),
+                child: Text(transaction.category,
+                    style: TextStyle(color: AppColor.neutral100)),
               ),
             ),
-            Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  transaction.formattedDate,
-                  style: TextStyle(color: AppColor.neutral100, fontSize: 12),
+            Expanded(
+              child: Container(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      transaction.formattedDate,
+                      style: Fonts.textDateSmall,
+                    ),
+                    const SizedBox(
+                      height: 4,
+                    ),
+                    Row(
+                      children: [
+                        Text(
+                          transaction.name,
+                          style: Fonts.textTransactionName,
+                        ),
+                        Text(" - ", style: Fonts.textTransactionDescription),
+                        Text(
+                          transaction.name,
+                          style: Fonts.textTransactionDescription,
+                        )
+                      ],
+                    )
+                  ],
                 ),
-                Text(
-                  transaction.name,
-                  style: TextStyle(color: AppColor.neutral100),
-                )
-              ],
+              ),
             ),
             Container(
               child: Text(
                 '${transaction.amount.toStringAsFixed(2)} €',
-                style: TextStyle(
-                    color: AppColor.neutral100, fontWeight: FontWeight.w900),
+                style: Fonts.textHeadingBold,
               ),
             ),
           ],
