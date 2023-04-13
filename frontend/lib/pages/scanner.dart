@@ -71,7 +71,7 @@ class _ScannerState extends State<Scanner> {
       },
     );
     var response =
-        await dio.post("http://10.0.2.2:3000/upload", data: formData);
+        await dio.post("http://10.0.2.2:5432/scanner/upload", data: formData);
     debugPrint(response.toString());
   }
 }

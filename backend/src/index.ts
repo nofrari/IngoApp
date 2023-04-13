@@ -25,7 +25,13 @@ app.post('/', (req, res) => {
     res.status(201).send('Hello world');
 });
 
-app.post("/upload", upload.single("image"), (req, res) => {
+type Invoicedata = {
+    total_amount: number;
+    date: string;
+    supplier_name: string;
+}
+
+app.post("/scanner/upload", upload.single("image"), (req, res) => {
     if (req.file === undefined || req.file === null) {
         return res.status(422).send("Image cannot be empty");
     }
@@ -36,12 +42,24 @@ app.post("/upload", upload.single("image"), (req, res) => {
         .docFromPath("./src/uploads/" + file?.filename)
         .parse(mindee.InvoiceV4);
 
+    var invoicedata: Invoicedata = {
+        total_amount: 0,
+        date: "",
+        supplier_name: ""
+    };
 
     apiResponse.then((resp: { document: any; }) => {
+        invoicedata.total_amount = resp.document.totalAmount.value;
+        invoicedata.date = resp.document.date.value;
+        invoicedata.supplier_name = resp.document.supplierName.value;
         console.log(resp.document);
+        console.log(invoicedata);
+    }).then(() => {
+        res.status(200).send({ name: file?.filename, invoice_data: invoicedata });
     });
 
-    return res.status(200).send({ name: file?.filename });
+
+    return;
 });
 
 app.listen(5432, () => {
