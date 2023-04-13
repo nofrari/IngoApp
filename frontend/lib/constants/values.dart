@@ -9,4 +9,12 @@ class Values {
   static const double notchMargin = 5;
   static const double menuBarHeight = 60;
   static const double menuBarItemMinWidth = 40;
+  static const double buttonRadius = 30;
+  static const double cardRadius = 20;
+  static const EdgeInsets buttonPadding =
+      EdgeInsets.symmetric(vertical: 10, horizontal: 10);
+  static const EdgeInsets smallCardPadding =
+      EdgeInsets.symmetric(vertical: 20, horizontal: 60);
+  static const EdgeInsets bigCardPadding =
+      EdgeInsets.symmetric(vertical: 10, horizontal: 10);
 }

@@ -1,17 +1,18 @@
 import 'package:flutter/widgets.dart';
+import 'package:hexcolor/hexcolor.dart';
 
 class AppColor {
   // AppColor._() = private constructor --> prevents Class from being instantiated
   AppColor._();
-  static const Color background = Color.fromARGB(255, 18, 18, 18);
-  static const Color callToActionLight = Color.fromARGB(255, 72, 186, 191);
-  static const Color callToActionDark = Color.fromARGB(255, 49, 134, 137);
-  static const Color neutral100 = Color.fromARGB(255, 207, 207, 207);
-  static const Color neutral200 = Color.fromARGB(255, 211, 209, 206);
-  static const Color neutral300 = Color.fromARGB(255, 158, 158, 158);
-  static const Color neutral400 = Color.fromARGB(255, 98, 98, 98);
-  static const Color neutral500 = Color.fromARGB(255, 59, 59, 59);
-  static const Color neutral600 = Color.fromARGB(255, 18, 18, 18);
-  static const Color transparent = Color.fromARGB(0, 255, 255, 255);
-  static const Color activeMenu = Color.fromARGB(255, 72, 186, 191);
+  static Color background = HexColor("#121212");
+  static Color callToActionLight = HexColor("#48BABF");
+  static Color callToActionDark = HexColor("#318689");
+  static Color neutral100 = HexColor("#cfcfcf");
+  static Color neutral200 = HexColor("#d3d1ce");
+  static Color neutral300 = HexColor("#9e9e9e");
+  static Color neutral400 = HexColor("#626262");
+  static Color neutral500 = HexColor("#3b3b3b");
+  static Color neutral600 = HexColor("#121212");
+  static Color neutral700 = HexColor("#585550");
+  static Color activeMenu = HexColor("#48BABF");
 }
