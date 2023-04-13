@@ -86,7 +86,9 @@
 6. Unter Advanced den private key auswählen
 7. Auf Verbinden und fertig
 
-## Programm commands
+## Nach erstem Repo Pull
+
+### Programm commands
 1. npm init --yes
 2. npm install express
 3. npm i -D typescript @types/express @types/node
@@ -96,7 +98,7 @@
 7. npx prisma init
 8. npm install @prisma/client
 9. npm i zod
-10. npm i bcryrpt
+10. npm i bcrypt
 11. npm i --save-dev @types/bcrypt
 12. npm i ts-node
 13. npm i ts-node-dev
@@ -104,20 +106,26 @@
 15. npm i --save-dev @types/jsonwebtoken
 16. npm i --save-dev mocha chai
 17. npm i --save-dev @types/mocha @types/chai
+18. npm i mindee
+19. npm i multer
+20. npm i --save-dev @types/multer
 
-## Setup für lokale Datenbank
+### Setup für lokale Datenbank
 1. schema.prisma auf mysql ändern
 2. Docker installieren https://www.docker.com/products/docker-desktop/
 3. "docker pull mysql" ausführen
-4. "docker run --name ingo -p 3306:3306 --env MYSQL_ROOT_PASSWORD=dummypasswort -d mysql" ausführen
+4. "docker run --name ingo -p 3306:3306 --env MYSQL_ROOT_PASSWORD=dummypasswort -d mysql" ausführen --> es muss Port 3306 sein!
 5. In docker auf den ingo container gehen, terminal öffnen, "mysql -u root -p" ausführen und passwort eingeben"
-6. Nacheinander ausführen: "CREATE DATABASE ingodb;" (Side note: ziemlich sicher, dass man nur den ersten braucht) "CREATE USER 'ingouser' IDENTIFIED BY 'dummypasswort';" "GRANT ALL PRIVILEGES ON ingodb.* TO 'ingouser';"
+6. Nacheinander ausführen: "CREATE DATABASE ingodb;"
 7. sample env auf ".env" umbenennen env database url ändern auf "mysql://root:dummypasswort@localhost:3306/ingodb?schema=public"
-8. src/index.ts und src/routes/users.ts von ecampus-beispiel kopieren und jwt zeug rauslöschen
-9. in package json "start": "ts-node --transpile-only src/index.ts" als script hinzufügen
 10. mit npx prisma db push das schema zur datenbank pushen
 11. mit npm run start den server starten
 12. postman herunterladen https://www.postman.com/downloads/
 13. mit localhost/ testen ob verbindung funktioniert
 14. in docker "USE ingodb" eingeben und mit SELECT * from User schauen ob ein post an localhost/users einen user erzeugt
 
+## Code auf Server laden
+1. in scanner.dart "http://10.0.2.2:3000/upload" auf "https://data.ingoapp.at/upload" ändern
+2. Falls die .env kopiert werden muss, in der DATABASE_URL root auf ingouser ändern
+3. Backup der Ordnerstruktur am Server machen
+4. prisma ordner, src ordner, package-lock.json, package.json, eventuell .env, tsconfig.json auf den Server kopieren und Dateien überschreiben
