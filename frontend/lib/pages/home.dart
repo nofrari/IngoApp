@@ -1,11 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:frontend/widgets/transactions/latest_transactions_list.dart';
-//import constants
-import '../constants/colors.dart';
-import '../constants/strings.dart';
-import '../constants/values.dart';
+import 'package:frontend/widgets/home_overview_card.dart';
+import 'package:frontend/widgets/total_amount_card.dart';
 
-import '../models/transaction.dart';
+//import constants
 
 class Home extends StatefulWidget {
   const Home({super.key});
@@ -15,31 +12,17 @@ class Home extends StatefulWidget {
 }
 
 class _HomeState extends State<Home> {
-  final List<Transaction> _latestTransactions = [
-    Transaction(
-      id: 1,
-      name: "EBI",
-      amount: 20,
-      category: "Shop",
-      date: DateTime(2022, 9, 9),
-    ),
-    Transaction(
-      id: 2,
-      name: "EBI 2",
-      amount: 30.30,
-      category: "Shop",
-      date: DateTime(2021, 9, 9),
-    ),
-  ];
   @override
   Widget build(BuildContext context) {
     return Container(
-      margin: EdgeInsets.all(20),
-      color: AppColor.neutral500,
-      child: Column(
-        children: <Widget>[
-          LatestTransactionList(transactions: _latestTransactions),
-        ],
+      margin: const EdgeInsets.all(20),
+      child: SingleChildScrollView(
+        child: Column(
+          children: <Widget>[
+            TotalAmountCard(totalAmount: 2500),
+            HomeOverviewCard(),
+          ],
+        ),
       ),
     );
   }

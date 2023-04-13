@@ -95,7 +95,7 @@ class _StartState extends State<Start> {
           // });
         },
         //Icon of Scanner
-        child: const Icon(
+        child: Icon(
           Icons.add,
           color: AppColor.neutral600,
         ),
@@ -130,7 +130,7 @@ class _StartState extends State<Start> {
                               ? AppColor.activeMenu
                               : AppColor.neutral100,
                         ),
-                        const Text(
+                        Text(
                           Strings.menuHome,
                           style: TextStyle(
                             color: AppColor.neutral100,
@@ -156,7 +156,7 @@ class _StartState extends State<Start> {
                               ? AppColor.activeMenu
                               : AppColor.neutral100,
                         ),
-                        const Text(
+                        Text(
                           Strings.menuFinance,
                           style: TextStyle(
                             color: AppColor.neutral100,
@@ -187,7 +187,7 @@ class _StartState extends State<Start> {
                               ? AppColor.activeMenu
                               : AppColor.neutral100,
                         ),
-                        const Text(
+                        Text(
                           Strings.menuAccounts,
                           style: TextStyle(
                             color: AppColor.neutral100,
@@ -213,7 +213,7 @@ class _StartState extends State<Start> {
                               ? AppColor.activeMenu
                               : AppColor.neutral100,
                         ),
-                        const Text(
+                        Text(
                           Strings.menuBudget,
                           style: TextStyle(
                             color: AppColor.neutral100,
