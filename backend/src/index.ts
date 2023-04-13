@@ -1,3 +1,4 @@
+import { randomInt } from 'crypto';
 import express from 'express';
 import multer from 'multer';
 const mindee = require("mindee");
@@ -32,9 +33,13 @@ type Invoicedata = {
 }
 
 app.post("/scanner/upload", upload.single("image"), (req, res) => {
+    console.log("request made");
     if (req.file === undefined || req.file === null) {
         return res.status(422).send("Image cannot be empty");
     }
+    const foldername: string = Date.now().toString() + randomInt + "/";
+
+
     let file = req.file;
 
     //mindee parser
@@ -55,11 +60,8 @@ app.post("/scanner/upload", upload.single("image"), (req, res) => {
         console.log(resp.document);
         console.log(invoicedata);
     }).then(() => {
-        res.status(200).send({ name: file?.filename, invoice_data: invoicedata });
+        return res.status(200).send({ name: file?.filename, invoice_data: invoicedata });
     });
-
-
-    return;
 });
 
 app.listen(5432, () => {

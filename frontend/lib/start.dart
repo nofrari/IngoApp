@@ -12,6 +12,7 @@ import 'pages/budget.dart';
 import 'pages/finances.dart';
 import 'pages/profile.dart';
 import 'pages/scanner.dart';
+import 'pages/scanner/scannerCamera.dart';
 
 class Start extends StatefulWidget {
   const Start({super.key});
@@ -32,6 +33,7 @@ class _StartState extends State<Start> {
     const Finances(),
     const Profile(),
     const Scanner(),
+    const ScannerCamera(),
   ];
 
   final PageStorageBucket bucket = PageStorageBucket();
@@ -81,10 +83,16 @@ class _StartState extends State<Start> {
       backgroundColor: AppColor.background,
       floatingActionButton: FloatingActionButton(
         backgroundColor: AppColor.neutral100,
-        onPressed: () {
-          setState(() {
-            currentScreen = const Scanner();
-          });
+        onPressed: () async {
+          await Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (context) => const ScannerCamera(),
+            ),
+          );
+          // setState(() {
+          //   currentScreen = const ScannerCamera();
+          // });
         },
         //Icon of Scanner
         child: const Icon(
