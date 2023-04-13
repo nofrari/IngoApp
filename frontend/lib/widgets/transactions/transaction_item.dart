@@ -29,7 +29,7 @@ class TransactionItem extends StatelessWidget {
                 onPressed: null,
                 style: ElevatedButton.styleFrom(
                     shape: const CircleBorder(),
-                    backgroundColor: AppColor.callToActionLight,
+                    backgroundColor: AppColor.blueLight,
                     padding: const EdgeInsets.all(15)),
                 child: Text(transaction.category,
                     style: TextStyle(color: AppColor.neutral100)),

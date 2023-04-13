@@ -21,7 +21,7 @@ class Button extends StatelessWidget {
           padding: EdgeInsets.symmetric(vertical: 15, horizontal: 0),
           shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(Values.buttonRadius),
-              side: BorderSide(color: AppColor.callToActionLight, width: 2)),
+              side: BorderSide(color: AppColor.blueLight, width: 2)),
         ),
         child: Text(btnText, style: Fonts.button, textAlign: TextAlign.center),
       ),

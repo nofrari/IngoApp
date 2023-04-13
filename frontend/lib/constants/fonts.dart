@@ -36,7 +36,7 @@ class Fonts {
     fontWeight: FontWeight.normal,
   );
   static TextStyle button = GoogleFonts.josefinSans(
-    color: AppColor.callToActionLight,
+    color: AppColor.blueLight,
     fontSize: 16,
     fontWeight: FontWeight.bold,
   );

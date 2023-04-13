@@ -69,7 +69,7 @@ class _StartState extends State<Start> {
               },
               style: ElevatedButton.styleFrom(
                   shape: const CircleBorder(),
-                  backgroundColor: AppColor.callToActionLight),
+                  backgroundColor: AppColor.blueLight),
               child: const Text("AH"),
             ),
           ),

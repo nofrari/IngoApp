@@ -5,8 +5,8 @@ class AppColor {
   // AppColor._() = private constructor --> prevents Class from being instantiated
   AppColor._();
   static Color background = HexColor("#121212");
-  static Color callToActionLight = HexColor("#48BABF");
-  static Color callToActionDark = HexColor("#318689");
+  static Color blueLight = HexColor("#48BABF");
+  static Color blueDark = HexColor("#318689");
   static Color neutral100 = HexColor("#cfcfcf");
   static Color neutral200 = HexColor("#d3d1ce");
   static Color neutral300 = HexColor("#9e9e9e");
