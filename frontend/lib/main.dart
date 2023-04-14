@@ -1,8 +1,12 @@
 import 'package:flutter/material.dart';
 import 'start.dart';
+import 'package:provider/provider.dart';
 
 void main() {
-  runApp(const MyApp());
+  runApp(Provider(
+    create: (BuildContext context) {},
+    child: const MyApp(),
+  ));
 }
 
 class MyApp extends StatelessWidget {

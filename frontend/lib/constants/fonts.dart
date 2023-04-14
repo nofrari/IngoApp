@@ -35,7 +35,12 @@ class Fonts {
     fontSize: 13,
     fontWeight: FontWeight.normal,
   );
-  static TextStyle button = GoogleFonts.josefinSans(
+  static TextStyle primaryButton = GoogleFonts.josefinSans(
+    color: AppColor.neutral600,
+    fontSize: 16,
+    fontWeight: FontWeight.bold,
+  );
+  static TextStyle secondaryButton = GoogleFonts.josefinSans(
     color: AppColor.blueLight,
     fontSize: 16,
     fontWeight: FontWeight.bold,

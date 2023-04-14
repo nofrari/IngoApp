@@ -43,6 +43,7 @@ class _LatestTransactionListState extends State<LatestTransactionList> {
             child: Button(
               btnText: "MEHR ANZEIGEN",
               onTap: () {},
+              theme: ButtonColorTheme.primary,
             ),
           )
         ],
