@@ -15,6 +15,8 @@ import 'pages/profile.dart';
 import 'pages/scanner.dart';
 import 'pages/scanner/scannerCamera.dart';
 
+import 'package:frontend/models/user.dart';
+
 class Start extends StatefulWidget {
   const Start({super.key});
 
@@ -23,6 +25,11 @@ class Start extends StatefulWidget {
 }
 
 class _StartState extends State<Start> {
+  final User user = User(
+      id: 1,
+      firstName: "Klaus",
+      lastName: "Temper",
+      email: "klaustemper@gmail.com");
   //variable for current Tab
   int currentTab = 0;
 
@@ -76,7 +83,7 @@ class _StartState extends State<Start> {
                   shape: const CircleBorder(),
                   backgroundColor: AppColor.blueLight),
               child: Text(
-                "AH",
+                user.abreviationName,
                 style: Fonts.textNormalBlack18,
               ),
             ),
