@@ -17,7 +17,7 @@ class _AccountItemState extends State<AccountItem> {
   @override
   Widget build(BuildContext context) {
     return Container(
-      margin: EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+      margin: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
       decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(8), color: AppColor.neutral700),
       child: Padding(
@@ -25,15 +25,10 @@ class _AccountItemState extends State<AccountItem> {
         child: Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            Container(
-              child:
-                  Text(widget.account.name, style: Fonts.textTransactionName),
-            ),
-            Container(
-              child: Text(
-                widget.account.amount.toString(),
-                style: Fonts.textHeadingBold,
-              ),
+            Text(widget.account.name, style: Fonts.textTransactionName),
+            Text(
+              widget.account.formatedAmount(widget.account.amount),
+              style: Fonts.textHeadingBold,
             ),
           ],
         ),

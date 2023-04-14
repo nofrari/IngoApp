@@ -22,17 +22,23 @@ class TransactionItem extends StatelessWidget {
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
             Container(
-              constraints: BoxConstraints(
+              constraints: const BoxConstraints(
                 maxWidth: 80,
               ),
               child: ElevatedButton(
                 onPressed: null,
                 style: ElevatedButton.styleFrom(
-                    shape: const CircleBorder(),
-                    backgroundColor: AppColor.blueLight,
-                    padding: const EdgeInsets.all(15)),
-                child: Text(transaction.category,
-                    style: TextStyle(color: AppColor.neutral100)),
+                  shape: const CircleBorder(),
+                  foregroundColor: Colors.red,
+                  backgroundColor: Colors.blue,
+                  padding: const EdgeInsets.all(15),
+                  elevation: 5,
+                  shadowColor: Colors.red,
+                ),
+                child: Text(
+                  transaction.category,
+                  style: TextStyle(color: AppColor.neutral100),
+                ),
               ),
             ),
             Expanded(
@@ -66,7 +72,8 @@ class TransactionItem extends StatelessWidget {
             ),
             Container(
               child: Text(
-                '${transaction.amount.toStringAsFixed(2)} €',
+                transaction.formattedAmount(
+                    transaction.amount, transaction.transactionType.toString()),
                 style: Fonts.textHeadingBold,
               ),
             ),

@@ -20,9 +20,11 @@ class _HomeOverviewCardState extends State<HomeOverviewCard> {
     Transaction(
       id: 1,
       name: "EBI",
-      amount: 20,
+      amount: 20.00,
       category: "Shop",
       date: DateTime(2022, 9, 9),
+      description: "Description",
+      transactionType: 0,
     ),
     Transaction(
       id: 2,
@@ -30,6 +32,8 @@ class _HomeOverviewCardState extends State<HomeOverviewCard> {
       amount: 30.30,
       category: "Shop",
       date: DateTime(2021, 9, 9),
+      description: "Description",
+      transactionType: 1,
     ),
   ];
   final List<Account> _accounts = [

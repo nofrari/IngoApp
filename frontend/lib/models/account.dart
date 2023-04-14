@@ -8,4 +8,8 @@ class Account {
   final int id;
   final String name;
   final double amount;
+
+  String formatedAmount(double amount) {
+    return "$amount €";
+  }
 }
