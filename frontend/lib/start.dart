@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'constants/colors.dart';
 import 'constants/strings.dart';
 import 'constants/values.dart';
+import 'constants/fonts.dart';
 
 //menu-pages import
 import 'pages/home.dart';
@@ -51,9 +52,13 @@ class _StartState extends State<Start> {
               currentTab = 0;
             });
           }, // Image tapped
-          child: Image.asset(
-            'assets/images/logo.png',
-            fit: BoxFit.cover, // Fixes border issues
+          child: Container(
+            margin: const EdgeInsets.only(left: 10),
+            child: Image.asset(
+              'assets/images/logo.png',
+              fit: BoxFit.contain,
+              // Fixes border issues
+            ),
           ),
         ),
         leadingWidth: Values.leadingWidth,
@@ -70,7 +75,10 @@ class _StartState extends State<Start> {
               style: ElevatedButton.styleFrom(
                   shape: const CircleBorder(),
                   backgroundColor: AppColor.blueLight),
-              child: const Text("AH"),
+              child: Text(
+                "AH",
+                style: Fonts.textNormalBlack18,
+              ),
             ),
           ),
         ],

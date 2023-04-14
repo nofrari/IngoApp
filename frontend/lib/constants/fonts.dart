@@ -18,6 +18,9 @@ class Fonts {
   static TextStyle textHeadingBold = GoogleFonts.josefinSans(
       color: AppColor.neutral100, fontSize: 18, fontWeight: FontWeight.bold);
 
+  static TextStyle textNormalBlack18 = GoogleFonts.josefinSans(
+      color: AppColor.neutral600, fontSize: 18, fontWeight: FontWeight.normal);
+
   static TextStyle textDateSmall = GoogleFonts.josefinSans(
     color: AppColor.neutral100,
     fontSize: 10,
