@@ -4,7 +4,7 @@ import 'package:flutter/material.dart';
 import '../../constants/colors.dart';
 import '../../constants/strings.dart';
 import '../../constants/values.dart';
-import './scanner_camera.dart';
+import './scannerCamera.dart';
 
 class Start extends StatefulWidget {
   const Start({super.key});
