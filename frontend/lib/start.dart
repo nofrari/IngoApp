@@ -13,7 +13,7 @@ import 'pages/budget.dart';
 import 'pages/finances.dart';
 import 'pages/profile.dart';
 import 'pages/scanner.dart';
-import 'pages/scanner/scannerCamera.dart';
+import 'pages/scanner/scanner_camera.dart';
 
 import 'package:frontend/models/user.dart';
 
