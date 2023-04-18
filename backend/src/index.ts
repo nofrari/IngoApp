@@ -39,13 +39,14 @@ app.post("/scanner/upload", upload.single("image"), (req, res) => {
     }
     const foldername: string = Date.now().toString() + randomInt + "/";
 
-
     let file = req.file;
 
+    //Uncomment mindee code again when testing invoice data
+
     //mindee parser
-    const apiResponse = mindeeClient
-        .docFromPath("./src/uploads/" + file?.filename)
-        .parse(mindee.InvoiceV4);
+    // const apiResponse = mindeeClient
+    //     .docFromPath("./src/uploads/" + file?.filename)
+    //     .parse(mindee.InvoiceV4);
 
     var invoicedata: Invoicedata = {
         total_amount: 0,
@@ -53,15 +54,15 @@ app.post("/scanner/upload", upload.single("image"), (req, res) => {
         supplier_name: ""
     };
 
-    apiResponse.then((resp: { document: any; }) => {
-        invoicedata.total_amount = resp.document.totalAmount.value;
-        invoicedata.date = resp.document.date.value;
-        invoicedata.supplier_name = resp.document.supplierName.value;
-        console.log(resp.document);
-        console.log(invoicedata);
-    }).then(() => {
-        return res.status(200).send({ name: file?.filename, invoice_data: invoicedata });
-    });
+    // apiResponse.then((resp: { document: any; }) => {
+    //     invoicedata.total_amount = resp.document.totalAmount.value;
+    //     invoicedata.date = resp.document.date.value;
+    //     invoicedata.supplier_name = resp.document.supplierName.value;
+    //     console.log(resp.document);
+    //     console.log(invoicedata);
+    // }).then(() => {
+    return res.status(200).send({ name: file?.filename, invoice_data: invoicedata });
+    //});
 });
 
 app.listen(5432, () => {
