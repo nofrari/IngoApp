@@ -15,7 +15,7 @@ class ManualEntry extends StatefulWidget {
 class _ManualEntryState extends State<ManualEntry> {
   TextInputFormatter digits = FilteringTextInputFormatter.digitsOnly;
   TextInputFormatter letters =
-      FilteringTextInputFormatter.allow(RegExp(r"[a-zA-Z0-9#+:()&/|\s]"));
+      FilteringTextInputFormatter.allow(RegExp(r"[a-zA-Z0-9#+:()&/^\-{2}|\s]"));
 
   @override
   Widget build(BuildContext context) {
