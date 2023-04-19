@@ -50,8 +50,7 @@ class _ScannerPreviewState extends State<ScannerPreview>
         onTap: () {
           Navigator.pop(context);
         },
-        element: Container(
-          margin: const EdgeInsets.only(bottom: 20),
+        element: SizedBox(
           height: 50,
           // horizontal list of preview images with length of the list of images in the cache
           child: ListView.builder(

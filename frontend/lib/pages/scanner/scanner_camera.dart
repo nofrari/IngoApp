@@ -97,8 +97,7 @@ class _ScannerCameraState extends State<ScannerCamera>
                               children: [
                                 Expanded(
                                   child: Container(
-                                    margin: const EdgeInsets.symmetric(
-                                        vertical: 20, horizontal: 0),
+                                    margin: const EdgeInsets.only(bottom: 20),
                                     decoration: BoxDecoration(
                                       borderRadius: BorderRadius.circular(
                                           Values.cardRadius),

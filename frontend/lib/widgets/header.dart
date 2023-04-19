@@ -8,7 +8,7 @@ class Header extends StatefulWidget with PreferredSizeWidget {
   final void Function() onTap;
 
   @override
-  Size get preferredSize => const Size.fromHeight(kToolbarHeight);
+  Size get preferredSize => const Size.fromHeight(75);
 
   @override
   State<Header> createState() => _HeaderState();
@@ -18,6 +18,7 @@ class _HeaderState extends State<Header> {
   @override
   Widget build(BuildContext context) {
     return AppBar(
+      toolbarHeight: 75,
       elevation: 0,
       backgroundColor: AppColor.neutral600,
       title: widget.element,
