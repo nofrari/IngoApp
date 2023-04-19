@@ -30,14 +30,6 @@ class _ScannerPreviewState extends State<ScannerPreview>
     super.initState();
   }
 
-  Future<void> clearCache() async {
-    await DefaultCacheManager().emptyCache();
-    final directory = await getTemporaryDirectory();
-    final cacheDir = directory.path;
-    final cacheDirFile = Directory(cacheDir);
-    await cacheDirFile.delete(recursive: true);
-  }
-
   String? selectedImage;
   @override
   Widget build(BuildContext context) {
@@ -45,9 +37,22 @@ class _ScannerPreviewState extends State<ScannerPreview>
     if (selectedImage == null && images.isNotEmpty) {
       selectedImage = images.last;
     }
+
+    Future<void> clearCache() async {
+      if (context.mounted) {
+        context.read<ScannerService>().clearImages();
+      }
+      await DefaultCacheManager().emptyCache();
+      final directory = await getTemporaryDirectory();
+      final cacheDir = directory.path;
+      final cacheDirFile = Directory(cacheDir);
+      await cacheDirFile.delete(recursive: true);
+    }
+
     return Scaffold(
       appBar: Header(
-        onTap: () {
+        onTap: () async {
+          await clearCache();
           Navigator.pop(context);
         },
         element: SizedBox(
@@ -136,9 +141,6 @@ class _ScannerPreviewState extends State<ScannerPreview>
             child: Button(
                 btnText: "BESTÄTIGEN",
                 onTap: () async {
-                  if (context.mounted) {
-                    context.read<ScannerService>().clearImages();
-                  }
                   await clearCache();
                   await Navigator.push(
                     context,
