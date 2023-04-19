@@ -44,8 +44,9 @@ class Button extends StatelessWidget {
           backgroundColor: backgroundColor,
           padding: const EdgeInsets.fromLTRB(0, 16, 0, 16),
           shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(Values.buttonRadius),
-              side: BorderSide(color: borderColor, width: 2)),
+            borderRadius: BorderRadius.circular(Values.buttonRadius),
+            side: BorderSide(color: borderColor, width: 2),
+          ),
         ),
         child: TextGoogle(
             text: btnText, style: buttonText, align: TextAlign.center),
