@@ -1,8 +1,5 @@
-import 'package:flutter/src/widgets/framework.dart';
-
 import 'package:flutter/material.dart';
 import 'package:frontend/constants/colors.dart';
-import 'package:frontend/constants/fonts.dart';
 
 class Header extends StatefulWidget with PreferredSizeWidget {
   const Header({required this.onTap, required this.element, super.key});

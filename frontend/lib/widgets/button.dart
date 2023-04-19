@@ -39,18 +39,17 @@ class Button extends StatelessWidget {
     return Container(
       width: double.infinity,
       child: ElevatedButton(
-          onPressed: onTap,
-          style: ElevatedButton.styleFrom(
-            backgroundColor: backgroundColor,
-            padding: const EdgeInsets.fromLTRB(0, 20, 0, 20),
-            shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(Values.buttonRadius),
-                side: BorderSide(color: borderColor, width: 2)),
-          ),
-          child: TextGoogle(
-              text: btnText, style: buttonText, align: TextAlign.center)
-          // Text(btnText, style: buttonText, textAlign: TextAlign.center),
-          ),
+        onPressed: onTap,
+        style: ElevatedButton.styleFrom(
+          backgroundColor: backgroundColor,
+          padding: const EdgeInsets.fromLTRB(0, 16, 0, 16),
+          shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(Values.buttonRadius),
+              side: BorderSide(color: borderColor, width: 2)),
+        ),
+        child: TextGoogle(
+            text: btnText, style: buttonText, align: TextAlign.center),
+      ),
     );
   }
 }
