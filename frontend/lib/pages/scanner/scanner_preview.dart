@@ -5,6 +5,7 @@ import 'package:frontend/services/scanner_service.dart';
 import 'package:frontend/start.dart';
 import 'package:frontend/widgets/button.dart';
 import 'package:frontend/widgets/header.dart';
+import 'package:frontend/widgets/scanner/tiny_preview.dart';
 import 'package:provider/provider.dart';
 import 'dart:io';
 
@@ -25,9 +26,16 @@ class ScannerPreview extends StatefulWidget {
 
 class _ScannerPreviewState extends State<ScannerPreview>
     with WidgetsBindingObserver {
+  final ScrollController _controller = ScrollController();
+
   @override
   void initState() {
     super.initState();
+    //if list is so long it extends past the screen, scoll to the last position
+    //addPostFrameCallback is basically onLoad
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _controller.jumpTo(_controller.position.maxScrollExtent);
+    });
   }
 
   String? selectedImage;
@@ -59,6 +67,7 @@ class _ScannerPreviewState extends State<ScannerPreview>
           height: 50,
           // horizontal list of preview images with length of the list of images in the cache
           child: ListView.builder(
+            controller: _controller,
             scrollDirection: Axis.horizontal,
             itemCount: images.length,
             itemBuilder: ((context, index) {
@@ -70,51 +79,16 @@ class _ScannerPreviewState extends State<ScannerPreview>
                   });
                   debugPrint('Selcted Image: $selectedImage');
                 },
-                // if the image is selected, a border is added to the image
-                child: Container(
-                  decoration: (selectedImage == images.elementAt(index))
-                      ? BoxDecoration(
-                          borderRadius:
-                              BorderRadius.circular(Values.cardRadius - 15),
-                          border: Border.all(color: AppColor.blueLight),
-                        )
-                      : null,
-                  width: 50,
-                  margin: const EdgeInsets.symmetric(horizontal: 10),
-                  child: ClipRRect(
-                    borderRadius: BorderRadius.circular(Values.cardRadius - 15),
-                    child: Image.file(File(images.elementAt(index)),
-                        fit: BoxFit.cover),
-                  ),
+                child: TinyPreview(
+                  selectedImage: selectedImage!,
+                  images: images,
+                  index: index,
                 ),
               );
             }),
           ),
         ),
       ),
-      // AppBar(
-      //   elevation: 0,
-      //   leading: GestureDetector(
-      //     onTap: () {}, // Image tapped
-      //     child: BackButton(
-      //       color: AppColor.neutral100,
-      //     ),
-      //   ),
-      //   leadingWidth: Values.leadingWidth,
-      //   actions: [
-      //     SizedBox(
-      //       width: Values.actionsWidth,
-      //       child: ElevatedButton(
-      //         onPressed: () {},
-      //         style: ElevatedButton.styleFrom(
-      //             shape: const CircleBorder(),
-      //             backgroundColor: AppColor.blueLight),
-      //         child: const Text("AH"),
-      //       ),
-      //     ),
-      //   ],
-      //   backgroundColor: AppColor.background,
-      // ),
       body: Column(
         children: [
           Expanded(
