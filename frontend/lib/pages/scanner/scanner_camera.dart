@@ -13,6 +13,9 @@ import 'package:image_picker/image_picker.dart';
 import 'package:dio/dio.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:camera/camera.dart';
+import 'package:frontend/pages/scanner/scanner_preview.dart';
+import 'package:frontend/services/scanner_service.dart';
+import 'package:provider/provider.dart';
 
 class ScannerCamera extends StatefulWidget {
   const ScannerCamera({super.key});
@@ -97,7 +100,8 @@ class _ScannerCameraState extends State<ScannerCamera>
                                     margin: const EdgeInsets.symmetric(
                                         vertical: 20, horizontal: 0),
                                     decoration: BoxDecoration(
-                                      borderRadius: BorderRadius.circular(10),
+                                      borderRadius: BorderRadius.circular(
+                                          Values.cardRadius),
                                       color: Colors.transparent,
                                       border: Border.all(
                                         color: AppColor.blueLight,
@@ -114,7 +118,8 @@ class _ScannerCameraState extends State<ScannerCamera>
                                             width: double.infinity,
                                             child: ClipRRect(
                                               borderRadius:
-                                                  BorderRadius.circular(5),
+                                                  BorderRadius.circular(
+                                                      Values.cardRadius - 4),
                                               child: CameraPreview(
                                                   _cameraController!),
                                             ),
@@ -186,6 +191,10 @@ class _ScannerCameraState extends State<ScannerCamera>
     try {
       final pictureFile = await _cameraController!.takePicture();
 
+      if (context.mounted) {
+        context.read<ScannerService>().setImage(pictureFile.path);
+      }
+
       //not needed in the moment
       // if (pictureFile != null) {
       //   setState(() {
@@ -198,8 +207,14 @@ class _ScannerCameraState extends State<ScannerCamera>
           "image": await MultipartFile.fromFile(pictureFile.path),
         },
       );
-      var response =
-          await dio.post("http://10.0.2.2:5432/scanner/upload", data: formData);
+      var response;
+      try {
+        response = await dio.post("http://10.0.2.2:5432/scanner/upload",
+            data: formData);
+      } catch (e) {
+        response = await dio.post("https://data.ingoapp.at/scanner/upload",
+            data: formData);
+      }
       debugPrint(response.toString());
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(
@@ -209,7 +224,14 @@ class _ScannerCameraState extends State<ScannerCamera>
       );
     }
 
-    if (context.mounted) Navigator.pop(context);
+    if (context.mounted) {
+      Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (context) => const ScannerPreview(),
+        ),
+      );
+    }
   }
 
 //obsolete, functionality is in _scanImage()

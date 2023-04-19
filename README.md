@@ -129,3 +129,4 @@
 2. Falls die .env kopiert werden muss, in der DATABASE_URL root auf ingouser ändern
 3. Backup der Ordnerstruktur am Server machen
 4. prisma ordner, src ordner, package-lock.json, package.json, eventuell .env, tsconfig.json auf den Server kopieren und Dateien überschreiben
+5. pm2 restart node-server ausführen
