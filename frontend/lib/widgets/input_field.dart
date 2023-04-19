@@ -46,7 +46,7 @@ class _InputFieldState extends State<InputField> {
   Widget build(BuildContext context) {
     return Container(
       alignment: Alignment.center,
-      margin: const EdgeInsets.only(top: 20, bottom: 4),
+      margin: const EdgeInsets.only(top: 20),
       child: SizedBox(
         width: 350,
         height: 40,
