@@ -73,9 +73,11 @@ class _ScannerCameraState extends State<ScannerCamera>
             children: [
               Scaffold(
                 appBar: Header(
-                  onTap: () {},
+                  onTap: () {
+                    Navigator.pop(context);
+                  },
                   element: TextGoogle(
-                    style: Fonts.text500,
+                    style: Fonts.text400,
                     text: "SCANNER",
                     align: TextAlign.center,
                   ),
@@ -84,8 +86,7 @@ class _ScannerCameraState extends State<ScannerCamera>
                     _isPermissionGranted ? Colors.transparent : null,
                 body: _isPermissionGranted
                     ? Container(
-                        padding: const EdgeInsets.symmetric(
-                            vertical: 0, horizontal: 25),
+                        padding: Values.paddingHorizontal,
                         color: AppColor.background,
                         child: SafeArea(
                           child: Container(
@@ -93,8 +94,8 @@ class _ScannerCameraState extends State<ScannerCamera>
                               children: [
                                 Expanded(
                                   child: Container(
-                                    margin:
-                                        const EdgeInsets.fromLTRB(0, 20, 0, 20),
+                                    margin: const EdgeInsets.symmetric(
+                                        vertical: 20, horizontal: 0),
                                     decoration: BoxDecoration(
                                       borderRadius: BorderRadius.circular(10),
                                       color: Colors.transparent,
