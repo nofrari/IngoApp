@@ -71,6 +71,10 @@ class _ScannerCameraState extends State<ScannerCamera>
           return Stack(
             children: [
               Scaffold(
+                appBar: Header(
+                  onTap: () {},
+                  element: Text("Scanner"),
+                ),
                 backgroundColor:
                     _isPermissionGranted ? Colors.transparent : null,
                 body: _isPermissionGranted
@@ -82,16 +86,6 @@ class _ScannerCameraState extends State<ScannerCamera>
                           child: Container(
                             child: Column(
                               children: [
-                                Header(
-                                  onTap: () {
-                                    Navigator.pop(context);
-                                  },
-                                  element: Text(
-                                    "SCANNER",
-                                    style: Fonts.text500,
-                                    textAlign: TextAlign.center,
-                                  ),
-                                ),
                                 Expanded(
                                   child: Container(
                                     margin:
