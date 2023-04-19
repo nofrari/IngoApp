@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import '../constants/colors.dart';
 import '../constants/fonts.dart';
+import '../constants/values.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 class InputField extends StatefulWidget {
@@ -63,11 +64,12 @@ class _InputFieldState extends State<InputField> {
             filled: true,
             fillColor: AppColor.neutral400,
             border: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(6),
+                borderRadius: BorderRadius.circular(Values.inputRadius),
                 borderSide: BorderSide.none),
             focusedBorder: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(6),
-                borderSide: BorderSide(color: AppColor.blueLight, width: 3.0)),
+                borderRadius: BorderRadius.circular(Values.inputRadius),
+                borderSide: BorderSide(
+                    color: AppColor.blueLight, width: Values.inputBorder)),
           ),
           inputFormatters: [widget.formatter],
           //inputFormatters: [FilteringTextInputFormatter.digitsOnly]
