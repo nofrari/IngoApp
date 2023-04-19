@@ -187,7 +187,7 @@ class _ScannerCameraState extends State<ScannerCamera>
 
   Future<void> _scanImage() async {
     if (_cameraController == null) return;
-
+    debugPrint("scanImage");
     try {
       final pictureFile = await _cameraController!.takePicture();
 
@@ -207,16 +207,12 @@ class _ScannerCameraState extends State<ScannerCamera>
           "image": await MultipartFile.fromFile(pictureFile.path),
         },
       );
-      var response;
-      try {
-        response = await dio.post("http://10.0.2.2:5432/scanner/upload",
-            data: formData);
-      } catch (e) {
-        response = await dio.post("https://data.ingoapp.at/scanner/upload",
-            data: formData);
-      }
+      //var response = await dio.post("http://10.0.2.2:5432/scanner/upload",
+      var response = await dio.post("https://data.ingoapp.at/scanner/upload",
+          data: formData);
       debugPrint(response.toString());
     } catch (e) {
+      debugPrint("error2: $e");
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
           content: Text('An error occurred when scanning text'),
