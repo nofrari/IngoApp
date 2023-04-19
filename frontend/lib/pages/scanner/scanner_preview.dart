@@ -5,6 +5,7 @@ import 'package:frontend/services/scanner_service.dart';
 import 'package:frontend/start.dart';
 import 'package:frontend/widgets/button.dart';
 import 'package:frontend/widgets/header.dart';
+import 'package:frontend/widgets/round_button.dart';
 import 'package:frontend/widgets/scanner/tiny_preview.dart';
 import 'package:provider/provider.dart';
 import 'dart:io';
@@ -42,7 +43,13 @@ class _ScannerPreviewState extends State<ScannerPreview>
   @override
   Widget build(BuildContext context) {
     List<String> images = context.watch<ScannerService>().getImages();
-    if (selectedImage == null && images.isNotEmpty) {
+    //position used for redoing a scan
+    int? position = context.read<ScannerService>().getPosition();
+
+    if (position != null) {
+      selectedImage = images.elementAt(position);
+      context.read<ScannerService>().forgetPosition();
+    } else if (selectedImage == null && images.isNotEmpty) {
       selectedImage = images.last;
     }
 
@@ -92,20 +99,91 @@ class _ScannerPreviewState extends State<ScannerPreview>
       body: Column(
         children: [
           Expanded(
-            child: selectedImage != null
-                ? Container(
-                    decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(Values.cardRadius),
-                      border: Border.all(color: AppColor.blueLight, width: 4),
-                    ),
-                    child: ClipRRect(
-                        borderRadius:
-                            BorderRadius.circular(Values.cardRadius - 4),
-                        child: Image.file(File(selectedImage!))),
-                  )
-                : const Center(
-                    child: Text("No Images"),
+            child: Stack(
+              alignment: Alignment.center,
+              children: [
+                selectedImage != null
+                    ? Container(
+                        decoration: BoxDecoration(
+                          borderRadius:
+                              BorderRadius.circular(Values.cardRadius),
+                          border:
+                              Border.all(color: AppColor.blueLight, width: 4),
+                        ),
+                        child: ClipRRect(
+                            borderRadius:
+                                BorderRadius.circular(Values.cardRadius - 4),
+                            child: Image.file(File(selectedImage!))),
+                      )
+                    : const Center(
+                        child: Text("No Images"),
+                      ),
+// redo button
+                Positioned(
+                  top: 5,
+                  left: 1,
+                  child: RoundButton(
+                    icon: Icons.redo,
+                    onTap: () async {
+                      if (context.mounted) {
+                        context
+                            .read<ScannerService>()
+                            .rememberPosition(images.indexOf(selectedImage!));
+                      }
+                      Navigator.pop(context);
+                    },
                   ),
+                ),
+// delete button
+                Positioned(
+                  top: 5,
+                  right: 1,
+                  child: RoundButton(
+                    icon: Icons.delete,
+                    onTap: () {
+                      debugPrint("Length1: ${images.length}");
+                      if (context.mounted) {
+                        context
+                            .read<ScannerService>()
+                            .deleteImage(selectedImage!);
+                        images = context
+                            .read<ScannerService>()
+                            .getImages(); // Hier aktualisieren Sie die `images`-Liste
+                        selectedImage = images.isNotEmpty
+                            ? images.last
+                            : null; // Hier aktualisieren Sie die `selectedImage`-Variable
+                      }
+                      debugPrint("Length2: ${images.length}");
+
+                      setState(() {
+                        if (images.isNotEmpty) {
+                          selectedImage = images.last;
+                        } else {
+                          selectedImage = null;
+                        }
+                      });
+
+                      if (images.isNotEmpty) {
+                        _controller
+                            .jumpTo(_controller.position.maxScrollExtent);
+                      } else if (images.isEmpty) {
+                        Navigator.pop(context);
+                      }
+                    },
+                  ),
+                ),
+                // add button
+                Positioned(
+                  bottom: 5,
+                  child: RoundButton(
+                    icon: Icons.add,
+                    onTap: () async {
+                      Navigator.pop(context);
+                    },
+                  ),
+                )
+              ],
+            ),
           ),
           Container(
             margin: const EdgeInsets.symmetric(
@@ -128,23 +206,6 @@ class _ScannerPreviewState extends State<ScannerPreview>
         ],
       ),
       backgroundColor: AppColor.background,
-      floatingActionButton: FloatingActionButton(
-        backgroundColor: AppColor.neutral100,
-        onPressed: () async {
-          debugPrint(images.length.toString());
-          await Navigator.push(
-            context,
-            MaterialPageRoute(
-              builder: (context) => const ScannerCamera(),
-            ),
-          );
-        },
-        child: Icon(
-          Icons.add,
-          color: AppColor.neutral600,
-        ),
-      ),
-      floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
     );
   }
 }

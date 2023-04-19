@@ -72,114 +72,106 @@ class _ScannerCameraState extends State<ScannerCamera>
     return FutureBuilder(
         future: _future,
         builder: (context, snapshot) {
-          return Stack(
-            children: [
-              Scaffold(
-                appBar: Header(
-                  onTap: () {
-                    Navigator.pop(context);
-                  },
-                  element: TextGoogle(
-                    style: Fonts.text400,
-                    text: "SCANNER",
-                    align: TextAlign.center,
-                  ),
-                ),
-                backgroundColor:
-                    _isPermissionGranted ? Colors.transparent : null,
-                body: _isPermissionGranted
-                    ? Container(
-                        padding: Values.paddingHorizontal,
-                        color: AppColor.background,
-                        child: SafeArea(
-                          child: Container(
-                            child: Column(
-                              children: [
-                                Expanded(
-                                  child: Container(
-                                    margin: const EdgeInsets.only(bottom: 20),
-                                    decoration: BoxDecoration(
-                                      borderRadius: BorderRadius.circular(
-                                          Values.cardRadius),
-                                      color: Colors.transparent,
-                                      border: Border.all(
-                                        color: AppColor.blueLight,
-                                        width: 4,
-                                      ),
-                                    ),
-                                    child:
-                                        FutureBuilder<List<CameraDescription>>(
-                                      future: availableCameras(),
-                                      builder: (context, snapshot) {
-                                        if (snapshot.hasData) {
-                                          _initCameraController(snapshot.data!);
-                                          return Container(
-                                            width: double.infinity,
-                                            child: ClipRRect(
-                                              borderRadius:
-                                                  BorderRadius.circular(
-                                                      Values.cardRadius - 4),
-                                              child: CameraPreview(
-                                                  _cameraController!),
-                                            ),
-                                          );
-                                        } else {
-                                          return const LinearProgressIndicator();
-                                        }
-                                      },
-                                    ),
+          return Scaffold(
+            appBar: Header(
+              onTap: () {
+                Navigator.pop(context);
+              },
+              element: TextGoogle(
+                style: Fonts.text400,
+                text: "SCANNER",
+                align: TextAlign.center,
+              ),
+            ),
+            backgroundColor: _isPermissionGranted ? Colors.transparent : null,
+            body: _isPermissionGranted
+                ? Container(
+                    padding: Values.paddingHorizontal,
+                    color: AppColor.background,
+                    child: SafeArea(
+                      child: Container(
+                        child: Column(
+                          children: [
+                            Expanded(
+                              child: Container(
+                                margin: const EdgeInsets.only(bottom: 20),
+                                decoration: BoxDecoration(
+                                  borderRadius:
+                                      BorderRadius.circular(Values.cardRadius),
+                                  color: Colors.transparent,
+                                  border: Border.all(
+                                    color: AppColor.blueLight,
+                                    width: 4,
                                   ),
                                 ),
-                                Container(
-                                  child: Column(
-                                    children: [
-                                      Container(
-                                        margin: const EdgeInsets.symmetric(
-                                            vertical: 8, horizontal: 20),
-                                        child: Button(
-                                          btnText: "SCANNEN",
-                                          onTap: _scanImage,
-                                          theme: ButtonColorTheme.primary,
+                                child: FutureBuilder<List<CameraDescription>>(
+                                  future: availableCameras(),
+                                  builder: (context, snapshot) {
+                                    if (snapshot.hasData) {
+                                      _initCameraController(snapshot.data!);
+                                      return Container(
+                                        width: double.infinity,
+                                        child: ClipRRect(
+                                          borderRadius: BorderRadius.circular(
+                                              Values.cardRadius - 4),
+                                          child:
+                                              CameraPreview(_cameraController!),
                                         ),
-                                      ),
-                                      Container(
-                                        margin: const EdgeInsets.symmetric(
-                                            vertical: 8, horizontal: 20),
-                                        child: Button(
-                                          btnText: "MANUELLE EINGABE",
-                                          onTap: () async {
-                                            await Navigator.push(
-                                              context,
-                                              MaterialPageRoute(
-                                                builder: (context) =>
-                                                    //not done yet
-                                                    const Home(),
-                                              ),
-                                            );
-                                          },
-                                          theme: ButtonColorTheme.secondary,
-                                        ),
-                                      ),
-                                    ],
-                                  ),
+                                      );
+                                    } else {
+                                      return const LinearProgressIndicator();
+                                    }
+                                  },
                                 ),
-                              ],
+                              ),
                             ),
-                          ),
-                        ),
-                      )
-                    : Center(
-                        child: Container(
-                          padding:
-                              const EdgeInsets.only(left: 24.0, right: 24.0),
-                          child: const Text(
-                            'Camera permission denied',
-                            textAlign: TextAlign.center,
-                          ),
+                            Container(
+                              child: Column(
+                                children: [
+                                  Container(
+                                    margin: const EdgeInsets.symmetric(
+                                        vertical: 8, horizontal: 20),
+                                    child: Button(
+                                      btnText: "SCANNEN",
+                                      onTap: _scanImage,
+                                      theme: ButtonColorTheme.primary,
+                                    ),
+                                  ),
+                                  Container(
+                                    margin: const EdgeInsets.symmetric(
+                                        vertical: 8, horizontal: 20),
+                                    child: Button(
+                                      btnText: "MANUELLE EINGABE",
+                                      onTap: () async {
+                                        await Navigator.push(
+                                          context,
+                                          MaterialPageRoute(
+                                            builder: (context) =>
+                                                //not done yet
+                                                const Home(),
+                                          ),
+                                        );
+                                      },
+                                      theme: ButtonColorTheme.secondary,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ],
                         ),
                       ),
-              ),
-            ],
+                    ),
+                  )
+                : Center(
+                    child: Container(
+                      padding: const EdgeInsets.only(left: 24.0, right: 24.0),
+                      child: const Text(
+                        'Camera permission denied',
+                        textAlign: TextAlign.center,
+                      ),
+                    ),
+                  ),
           );
         });
   }
@@ -190,8 +182,20 @@ class _ScannerCameraState extends State<ScannerCamera>
     try {
       final pictureFile = await _cameraController!.takePicture();
 
+      int? position;
       if (context.mounted) {
-        context.read<ScannerService>().setImage(pictureFile.path);
+        position = context.read<ScannerService>().getPosition();
+      }
+
+//position is used for the redo button in preview and if its not null, then the redo button was pressed, otherwise just normal scan
+      if (context.mounted) {
+        if (position != null) {
+          context
+              .read<ScannerService>()
+              .setImage(path: pictureFile.path, position: position);
+        } else {
+          context.read<ScannerService>().setImage(path: pictureFile.path);
+        }
       }
 
       //not needed in the moment
@@ -206,8 +210,8 @@ class _ScannerCameraState extends State<ScannerCamera>
           "image": await MultipartFile.fromFile(pictureFile.path),
         },
       );
-      //var response = await dio.post("http://10.0.2.2:5432/scanner/upload",
-      var response = await dio.post("https://data.ingoapp.at/scanner/upload",
+      var response = await dio.post("http://10.0.2.2:5432/scanner/upload",
+          //var response = await dio.post("https://data.ingoapp.at/scanner/upload",
           data: formData);
       debugPrint(response.toString());
     } catch (e) {

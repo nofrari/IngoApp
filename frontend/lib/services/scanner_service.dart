@@ -37,6 +37,7 @@ class ScannerService extends ChangeNotifier {
   // }
 
   List<String> getImages() {
+    debugPrint("gotImages");
     return _prefs.getStringList('images') ?? [];
   }
 
@@ -48,10 +49,14 @@ class ScannerService extends ChangeNotifier {
     }
   }
 
-  Future<void> setImage(String path) async {
+  Future<void> setImage({required String path, int? position}) async {
     try {
       List<String> images = _prefs.getStringList('images') ?? [];
-      images.add(path);
+      if (images.isNotEmpty && position != null) {
+        images[position] = path;
+      } else {
+        images.add(path);
+      }
       _prefs.setStringList('images', images);
       for (var element in images) {
         debugPrint(element);
@@ -59,5 +64,35 @@ class ScannerService extends ChangeNotifier {
     } catch (e) {
       debugPrint(e.toString());
     }
+  }
+
+  Future<void> deleteImage(String path) async {
+    try {
+      List<String> images = _prefs.getStringList('images') ?? [];
+      if (images.isNotEmpty) images.remove(path);
+      _prefs.setStringList('images', images);
+    } catch (e) {
+      debugPrint(e.toString());
+    }
+  }
+
+  Future<void> rememberPosition(int position) async {
+    try {
+      _prefs.setInt('position', position);
+    } catch (e) {
+      debugPrint(e.toString());
+    }
+  }
+
+  Future<void> forgetPosition() async {
+    try {
+      _prefs.remove('position');
+    } catch (e) {
+      debugPrint(e.toString());
+    }
+  }
+
+  int? getPosition() {
+    return _prefs.getInt('position');
   }
 }
