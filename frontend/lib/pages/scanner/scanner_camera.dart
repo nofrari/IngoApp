@@ -8,6 +8,7 @@ import 'package:frontend/pages/home.dart';
 import 'package:frontend/pages/profile.dart';
 import 'package:frontend/widgets/button.dart';
 import 'package:frontend/widgets/header.dart';
+import 'package:frontend/widgets/text_google.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:dio/dio.dart';
 import 'package:permission_handler/permission_handler.dart';
@@ -73,7 +74,11 @@ class _ScannerCameraState extends State<ScannerCamera>
               Scaffold(
                 appBar: Header(
                   onTap: () {},
-                  element: Text("Scanner"),
+                  element: TextGoogle(
+                    style: Fonts.text500,
+                    text: "SCANNER",
+                    align: TextAlign.center,
+                  ),
                 ),
                 backgroundColor:
                     _isPermissionGranted ? Colors.transparent : null,
