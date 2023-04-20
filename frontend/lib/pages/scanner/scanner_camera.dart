@@ -92,70 +92,70 @@ class _ScannerCameraState extends State<ScannerCamera>
                       child: Container(
                         child: Column(
                           children: [
-                            Expanded(
-                              child: Container(
-                                margin: const EdgeInsets.only(bottom: 20),
-                                decoration: BoxDecoration(
-                                  borderRadius:
-                                      BorderRadius.circular(Values.cardRadius),
-                                  color: Colors.transparent,
-                                  border: Border.all(
-                                    color: AppColor.blueLight,
-                                    width: 4,
+                            Stack(
+                              alignment: Alignment.center,
+                              children: [
+                                Expanded(
+                                  child: Container(
+                                    margin: const EdgeInsets.only(bottom: 20),
+                                    decoration: BoxDecoration(
+                                      borderRadius: BorderRadius.circular(
+                                          Values.cardRadius),
+                                      color: Colors.transparent,
+                                      border: Border.all(
+                                        color: AppColor.blueLight,
+                                        width: 4,
+                                      ),
+                                    ),
+                                    child:
+                                        FutureBuilder<List<CameraDescription>>(
+                                      future: availableCameras(),
+                                      builder: (context, snapshot) {
+                                        if (snapshot.hasData) {
+                                          _initCameraController(snapshot.data!);
+                                          return Container(
+                                            width: double.infinity,
+                                            child: ClipRRect(
+                                              borderRadius:
+                                                  BorderRadius.circular(
+                                                      Values.cardRadius - 4),
+                                              child: CameraPreview(
+                                                  _cameraController!),
+                                            ),
+                                          );
+                                        } else {
+                                          return const LinearProgressIndicator();
+                                        }
+                                      },
+                                    ),
                                   ),
                                 ),
-                                child: FutureBuilder<List<CameraDescription>>(
-                                  future: availableCameras(),
-                                  builder: (context, snapshot) {
-                                    if (snapshot.hasData) {
-                                      _initCameraController(snapshot.data!);
-                                      return Container(
-                                        width: double.infinity,
-                                        child: ClipRRect(
-                                          borderRadius: BorderRadius.circular(
-                                              Values.cardRadius - 4),
-                                          child:
-                                              CameraPreview(_cameraController!),
-                                        ),
-                                      );
-                                    } else {
-                                      return const LinearProgressIndicator();
-                                    }
-                                  },
+                                Positioned(
+                                  bottom: 50,
+                                  child: Button(
+                                    btnText: "SCANNEN",
+                                    onTap: _scanImage,
+                                    theme: ButtonColorTheme.primary,
+                                  ),
                                 ),
-                              ),
+                              ],
                             ),
                             Container(
-                              child: Column(
-                                children: [
-                                  Container(
-                                    margin: const EdgeInsets.symmetric(
-                                        vertical: 8, horizontal: 20),
-                                    child: Button(
-                                      btnText: "SCANNEN",
-                                      onTap: _scanImage,
-                                      theme: ButtonColorTheme.primary,
+                              margin: const EdgeInsets.symmetric(
+                                  vertical: 8, horizontal: 20),
+                              child: Button(
+                                btnText: "MANUELLE EINGABE",
+                                onTap: () async {
+                                  await Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                      builder: (context) =>
+                                          //not done yet
+                                          const Home(),
                                     ),
-                                  ),
-                                  Container(
-                                    margin: const EdgeInsets.symmetric(
-                                        vertical: 8, horizontal: 20),
-                                    child: Button(
-                                      btnText: "MANUELLE EINGABE",
-                                      onTap: () async {
-                                        await Navigator.push(
-                                          context,
-                                          MaterialPageRoute(
-                                            builder: (context) =>
-                                                //not done yet
-                                                const Home(),
-                                          ),
-                                        );
-                                      },
-                                      theme: ButtonColorTheme.secondary,
-                                    ),
-                                  ),
-                                ],
+                                  );
+                                },
+                                theme: ButtonColorTheme.secondary,
                               ),
                             ),
                           ],
@@ -210,8 +210,8 @@ class _ScannerCameraState extends State<ScannerCamera>
           "image": await MultipartFile.fromFile(pictureFile.path),
         },
       );
-      var response = await dio.post("http://10.0.2.2:5432/scanner/upload",
-          //var response = await dio.post("https://data.ingoapp.at/scanner/upload",
+      // var response = await dio.post("http://10.0.2.2:5432/scanner/upload",
+      var response = await dio.post("https://data.ingoapp.at/scanner/upload",
           data: formData);
       debugPrint(response.toString());
     } catch (e) {
