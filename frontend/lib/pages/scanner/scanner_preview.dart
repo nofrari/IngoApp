@@ -67,7 +67,11 @@ class _ScannerPreviewState extends State<ScannerPreview>
     return Scaffold(
       appBar: Header(
         onTap: () async {
-          await clearCache();
+          try {
+            await clearCache();
+          } catch (e) {
+            debugPrint(e.toString());
+          }
           Navigator.pop(context);
         },
         element: SizedBox(
@@ -193,7 +197,12 @@ class _ScannerPreviewState extends State<ScannerPreview>
             child: Button(
                 btnText: "BESTÄTIGEN",
                 onTap: () async {
-                  await clearCache();
+                  try {
+                    await clearCache();
+                  } catch (e) {
+                    debugPrint(e.toString());
+                  }
+
                   await Navigator.push(
                     context,
                     MaterialPageRoute(
