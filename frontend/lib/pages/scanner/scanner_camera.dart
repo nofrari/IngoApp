@@ -5,12 +5,10 @@ import 'package:frontend/constants/colors.dart';
 import 'package:frontend/constants/fonts.dart';
 import 'package:frontend/constants/values.dart';
 import 'package:frontend/pages/home.dart';
-import 'package:frontend/pages/profile.dart';
 import 'package:frontend/widgets/button.dart';
 import 'package:frontend/widgets/header.dart';
 import 'package:frontend/widgets/text_google.dart';
 import 'package:image_picker/image_picker.dart';
-import 'package:dio/dio.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:camera/camera.dart';
 import 'package:frontend/pages/scanner/scanner_preview.dart';
@@ -33,8 +31,6 @@ class _ScannerCameraState extends State<ScannerCamera>
 
   late final Future<void> _future;
   CameraController? _cameraController;
-
-  Dio dio = Dio();
 
   @override
   void initState() {
@@ -200,17 +196,7 @@ class _ScannerCameraState extends State<ScannerCamera>
       //   });
       // }
       debugPrint(pictureFile.path);
-      var formData = FormData.fromMap(
-        {
-          "image": await MultipartFile.fromFile(pictureFile.path),
-        },
-      );
-      // var response = await dio.post("http://10.0.2.2:5432/scanner/upload",
-      var response = await dio.post("https://data.ingoapp.at/scanner/upload",
-          data: formData);
-      debugPrint(response.toString());
     } catch (e) {
-      debugPrint("error2: $e");
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
           content: Text('An error occurred when scanning text'),
@@ -226,20 +212,6 @@ class _ScannerCameraState extends State<ScannerCamera>
         ),
       );
     }
-  }
-
-//obsolete, functionality is in _scanImage()
-  Future _uploadImage() async {
-    final navigator = Navigator.of(context);
-    var formData = FormData.fromMap(
-      {
-        "image": await MultipartFile.fromFile(imageFile!.path),
-      },
-    );
-    var response =
-        await dio.post("http://10.0.2.2:5432/scanner/upload", data: formData);
-    debugPrint(response.toString());
-    // navigator.pop(context);
   }
 
   Future<void> _requestCameraPermission() async {

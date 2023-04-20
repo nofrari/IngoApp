@@ -10,6 +10,7 @@ import 'package:frontend/widgets/round_button.dart';
 import 'package:frontend/widgets/scanner/tiny_preview.dart';
 import 'package:provider/provider.dart';
 import 'dart:io';
+import 'package:dio/dio.dart';
 
 //import constants
 import '../../constants/colors.dart';
@@ -29,6 +30,8 @@ class ScannerPreview extends StatefulWidget {
 class _ScannerPreviewState extends State<ScannerPreview>
     with WidgetsBindingObserver {
   final ScrollController _controller = ScrollController();
+
+  Dio dio = Dio();
 
   @override
   void initState() {
@@ -63,6 +66,26 @@ class _ScannerPreviewState extends State<ScannerPreview>
       final cacheDir = directory.path;
       final cacheDirFile = Directory(cacheDir);
       await cacheDirFile.delete(recursive: true);
+    }
+
+    Future<void> sendImages() async {
+      var formData = FormData();
+
+      for (var i = 0; i < images.length; i++) {
+        formData.files.add(MapEntry(
+          'image',
+          await MultipartFile.fromFile(images[i]),
+        ));
+      }
+      // fromMap(
+      //   {
+      //     "image": await MultipartFile.fromFile(pictureFile.path),
+      //   },
+      // );
+      var response = await dio.post("http://10.0.2.2:5432/scanner/upload",
+          //var response = await dio.post("https://data.ingoapp.at/scanner/upload",
+          data: formData);
+      debugPrint(response.toString());
     }
 
     return Scaffold(
@@ -239,6 +262,12 @@ class _ScannerPreviewState extends State<ScannerPreview>
                 child: Button(
                     btnText: "BESTÄTIGEN",
                     onTap: () async {
+                      try {
+                        await sendImages();
+                      } catch (e) {
+                        debugPrint(e.toString());
+                      }
+
                       try {
                         await clearCache();
                       } catch (e) {
