@@ -63,5 +63,9 @@
 	<string>TestApp wants to access your Photos</string>
 	<key>com.apple.security.network.client</key>
 	<true/>
+	<key>io.flutter.embedded_views_preview</key>
+	<true/>
 </dict>
 </plist>
+<key>NSDocumentsFolderUsageDescription</key>
+<string>App benötigt Zugriff auf den Ordner "Documents".</string>
