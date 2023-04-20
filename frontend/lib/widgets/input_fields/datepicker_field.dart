@@ -21,16 +21,20 @@ class _DatepickerFieldState extends State<DatepickerField> {
   Widget build(BuildContext context) {
     return Container(
       alignment: Alignment.center,
-      margin: const EdgeInsets.only(top: 20),
+      margin: const EdgeInsets.only(top: 10, bottom: 15),
       child: SizedBox(
         width: 350,
         height: 40,
-        child: TextFormField(
-          controller: dateController,
-          style: Fonts.text300,
-          cursorColor: Colors.white, //editing controller of this TextField
-          decoration: InputDecoration(
-              contentPadding: const EdgeInsets.all(12),
+        child: Material(
+          elevation: 5,
+          borderRadius: BorderRadius.circular(5),
+          child: TextFormField(
+            controller: dateController,
+            style: Fonts.text300,
+            cursorColor: Colors.white, //editing controller of this TextField
+            decoration: InputDecoration(
+              contentPadding: const EdgeInsets.only(
+                  top: 15, bottom: 12, left: 12, right: 12),
               label:
                   Text("Datum", style: GoogleFonts.josefinSans(fontSize: 18)),
               labelStyle: TextStyle(color: AppColor.neutral100),
@@ -40,22 +44,32 @@ class _DatepickerFieldState extends State<DatepickerField> {
                   borderRadius: BorderRadius.circular(5),
                   borderSide: BorderSide.none),
               focusedBorder: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(Values.inputRadius),
-                  borderSide: BorderSide(
-                      color: AppColor.blueLight, width: Values.inputBorder))),
-          readOnly: true, // when true user cannot edit text
-          onTap: () async {
-            DateTime? pickedDate = await showDatePicker(
-              context: context,
-              initialDate: DateTime.now(), //get today's date
-              firstDate: DateTime.now(),
-              lastDate: DateTime(2101),
-              cancelText: "Schließen",
-              confirmText: "Auswählen",
-              locale: const Locale('de'),
-              builder: (context, child) {
-                return Theme(
-                  data: Theme.of(context).copyWith(
+                borderRadius: BorderRadius.circular(Values.inputRadius),
+                borderSide: BorderSide(
+                    color: AppColor.blueLight, width: Values.inputBorder),
+              ),
+              suffixIcon: const Align(
+                widthFactor: 1.0,
+                heightFactor: 1.0,
+                child: Icon(
+                  Icons.calendar_month,
+                  color: Colors.white,
+                ),
+              ),
+            ),
+            readOnly: true, // when true user cannot edit text
+            onTap: () async {
+              DateTime? pickedDate = await showDatePicker(
+                context: context,
+                initialDate: DateTime.now(), //get today's date
+                firstDate: DateTime.now(),
+                lastDate: DateTime(2101),
+                cancelText: "Schließen",
+                confirmText: "Auswählen",
+                locale: const Locale('de'),
+                builder: (context, child) {
+                  return Theme(
+                    data: Theme.of(context).copyWith(
                       dialogBackgroundColor: AppColor.neutral500,
                       colorScheme: ColorScheme.light(
                         primary: AppColor.blueLight,
@@ -77,21 +91,24 @@ class _DatepickerFieldState extends State<DatepickerField> {
                         bodyLarge: Fonts.text200,
                       ),
                       dialogTheme: DialogTheme(
-                          shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(11)))),
-                  child: child!,
-                );
-              },
-            );
-            if (pickedDate != null) {
-              String formattedDate =
-                  DateFormat('dd/MM/yyyy').format(pickedDate);
+                        shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(11)),
+                      ),
+                    ),
+                    child: child!,
+                  );
+                },
+              );
+              if (pickedDate != null) {
+                String formattedDate =
+                    DateFormat('dd / MM / yyyy').format(pickedDate);
 
-              setState(() {
-                dateController.text = formattedDate;
-              });
-            }
-          },
+                setState(() {
+                  dateController.text = formattedDate;
+                });
+              }
+            },
+          ),
         ),
       ),
     );
