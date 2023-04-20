@@ -27,7 +27,7 @@ class _ManualEntryState extends State<ManualEntry> {
           elevation: 0,
           backgroundColor: AppColor.background,
           title: Text(
-            "Neuer Eintrag".toUpperCase(),
+            "neuer eintrag".toUpperCase(),
             style: Fonts.textHeadingBold,
           ),
           titleTextStyle: TextStyle(color: AppColor.neutral100)),
@@ -53,7 +53,12 @@ class _ManualEntryState extends State<ManualEntry> {
                   keyboardType: numeric,
                 ),
                 InputField(
-                  lblText: "Test",
+                  lblText: "Unternehmen",
+                  formatter: letters,
+                  keyboardType: text,
+                ),
+                InputField(
+                  lblText: "Beschreibung",
                   formatter: letters,
                   keyboardType: text,
                 ),
