@@ -189,14 +189,45 @@ class _ScannerPreviewState extends State<ScannerPreview>
                       child: RoundButton(
                         icon: Icons.add,
                         onTap: () {
-                          // showDialog(
-                          //   context: context,
-                          //   builder: (BuildContext context) => PopUp(
-                          //       onTap: () {},
-                          //       btnTextUpper: "test1",
-                          //       btnTextLower: "test2"),
-                          // );
-                          Navigator.pop(context);
+                          if (images.length == 1) {
+                            // warning dialog
+                            showDialog(
+                              context: context,
+                              builder: (BuildContext context) => PopUp(
+                                content:
+                                    "Vom Scanner wird nur der erste Scan auf Werte geprüft. Es kann vorkommen, dass die Einträge manuell überarbeitet werden müssen.",
+                                actions: [
+                                  Container(
+                                    margin: Values.buttonPadding,
+                                    child: Column(
+                                      children: [
+                                        Button(
+                                            btnText: "ABBRECHEN",
+                                            onTap: () {
+                                              Navigator.pop(context);
+                                            },
+                                            theme: ButtonColorTheme.secondary),
+                                        Button(
+                                            btnText: "FORTFAHREN",
+                                            onTap: () {
+                                              Navigator.push(
+                                                context,
+                                                MaterialPageRoute(
+                                                  builder: (context) =>
+                                                      const ScannerCamera(),
+                                                ),
+                                              );
+                                            },
+                                            theme: ButtonColorTheme.primary),
+                                      ],
+                                    ),
+                                  )
+                                ],
+                              ),
+                            );
+                          } else {
+                            Navigator.pop(context);
+                          }
                         },
                       ),
                     )
@@ -204,10 +235,7 @@ class _ScannerPreviewState extends State<ScannerPreview>
                 ),
               ),
               Container(
-                margin: const EdgeInsets.symmetric(
-                  vertical: 25,
-                  horizontal: 20,
-                ),
+                margin: Values.buttonPadding,
                 child: Button(
                     btnText: "BESTÄTIGEN",
                     onTap: () async {

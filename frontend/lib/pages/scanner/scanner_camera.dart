@@ -127,8 +127,7 @@ class _ScannerCameraState extends State<ScannerCamera>
                                 ),
                                 Container(
                                   width: double.infinity,
-                                  margin: const EdgeInsets.symmetric(
-                                      horizontal: 20, vertical: 25),
+                                  margin: Values.buttonPadding,
                                   child: Button(
                                     btnText: "SCANNEN",
                                     onTap: _scanImage,
@@ -139,8 +138,7 @@ class _ScannerCameraState extends State<ScannerCamera>
                             ),
                           ),
                           Container(
-                            margin: const EdgeInsets.symmetric(
-                                vertical: 25, horizontal: 20),
+                            margin: Values.buttonPadding,
                             child: Button(
                               btnText: "MANUELLE EINGABE",
                               onTap: () async {

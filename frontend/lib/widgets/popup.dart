@@ -1,37 +1,41 @@
 import 'package:flutter/material.dart';
+import 'package:frontend/constants/fonts.dart';
+import 'package:frontend/constants/colors.dart';
+import 'package:frontend/constants/values.dart';
 
 class PopUp extends StatelessWidget {
-  const PopUp(
-      {super.key,
-      required this.onTap,
-      required this.btnTextUpper,
-      required this.btnTextLower});
+  const PopUp({super.key, this.actions, this.title, required this.content});
 
-  final String btnTextUpper;
-  final String btnTextLower;
-  final void Function() onTap;
+  final String? title;
+  final String content;
+  final List<Widget>? actions;
 
   @override
   Widget build(BuildContext context) {
     return AlertDialog(
-      title: const Text("Titel"),
-      content: Column(
-        mainAxisSize: MainAxisSize.min,
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: const <Widget>[Text("Hello")],
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(Values.popupRadius),
       ),
-      actions: <Widget>[
-        TextButton(
-          onPressed: onTap,
-          child: Text(btnTextUpper),
-        ),
-        TextButton(
-          onPressed: () {
-            Navigator.of(context).pop();
-          },
-          child: Text(btnTextLower),
-        ),
-      ],
+      backgroundColor: AppColor.neutral500,
+      title: title != null && title!.isNotEmpty
+          ? Center(
+              child: Text(
+                title!,
+                style: Fonts.text300,
+                textAlign: TextAlign.center,
+              ),
+            )
+          : null,
+      contentPadding: title != null && title!.isNotEmpty
+          ? Values.bigCardPadding
+          : const EdgeInsets.fromLTRB(10, 20, 10, 0),
+      content: Text(
+        content,
+        style: Fonts.popupText,
+        textAlign: TextAlign.center,
+      ),
+      actions: actions,
+      actionsPadding: const EdgeInsets.symmetric(vertical: 0),
     );
   }
 }

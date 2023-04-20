@@ -27,7 +27,7 @@ class TinyPreview extends StatelessWidget {
             )
           : null,
       width: 42,
-      margin: const EdgeInsets.symmetric(horizontal: 10),
+      margin: const EdgeInsets.symmetric(horizontal: 5),
       child: ClipRRect(
         borderRadius: BorderRadius.circular(Values.cardRadius - 15),
         child: Image.file(File(images.elementAt(index)), fit: BoxFit.cover),

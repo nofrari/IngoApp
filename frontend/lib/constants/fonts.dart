@@ -48,4 +48,7 @@ class Fonts {
     fontSize: 16,
     fontWeight: FontWeight.bold,
   );
+
+  static TextStyle popupText = GoogleFonts.josefinSans(
+      color: AppColor.neutral100, fontSize: 15, fontWeight: FontWeight.normal);
 }
