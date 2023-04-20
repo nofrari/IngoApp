@@ -77,26 +77,28 @@ class _ScannerPreviewState extends State<ScannerPreview>
         element: SizedBox(
           height: 50,
           // horizontal list of preview images with length of the list of images in the cache
-          child: ListView.builder(
-            controller: _controller,
+          //Couldn't use Listview because it couldn't center the items
+          child: SingleChildScrollView(
             scrollDirection: Axis.horizontal,
-            itemCount: images.length,
-            itemBuilder: ((context, index) {
-              // state variable selectedImage is set to the image that is tapped
-              return GestureDetector(
-                onTap: () {
-                  setState(() {
-                    selectedImage = images.elementAt(index);
-                  });
-                  debugPrint('Selcted Image: $selectedImage');
-                },
-                child: TinyPreview(
-                  selectedImage: selectedImage!,
-                  images: images,
-                  index: index,
-                ),
-              );
-            }),
+            controller: _controller,
+            child: Row(
+              children: [
+                for (var image in images)
+                  GestureDetector(
+                    onTap: () {
+                      setState(() {
+                        selectedImage = image;
+                      });
+                      debugPrint('Selected Image: $selectedImage');
+                    },
+                    child: TinyPreview(
+                      selectedImage: selectedImage!,
+                      images: images,
+                      index: images.indexOf(image),
+                    ),
+                  ),
+              ],
+            ),
           ),
         ),
       ),
@@ -124,8 +126,8 @@ class _ScannerPreviewState extends State<ScannerPreview>
                       ),
 // redo button
                 Positioned(
-                  top: 5,
-                  left: 1,
+                  top: 10,
+                  left: 4,
                   child: RoundButton(
                     icon: Icons.redo,
                     onTap: () async {
@@ -140,8 +142,8 @@ class _ScannerPreviewState extends State<ScannerPreview>
                 ),
 // delete button
                 Positioned(
-                  top: 5,
-                  right: 1,
+                  top: 10,
+                  right: 4,
                   child: RoundButton(
                     icon: Icons.delete,
                     onTap: () {
@@ -176,9 +178,9 @@ class _ScannerPreviewState extends State<ScannerPreview>
                     },
                   ),
                 ),
-                // add button
+// add button
                 Positioned(
-                  bottom: 5,
+                  bottom: 10,
                   child: RoundButton(
                     icon: Icons.add,
                     onTap: () async {

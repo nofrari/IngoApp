@@ -26,7 +26,7 @@ class TinyPreview extends StatelessWidget {
               border: Border.all(color: AppColor.blueLight),
             )
           : null,
-      width: 50,
+      width: 42,
       margin: const EdgeInsets.symmetric(horizontal: 10),
       child: ClipRRect(
         borderRadius: BorderRadius.circular(Values.cardRadius - 15),

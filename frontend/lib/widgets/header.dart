@@ -21,6 +21,7 @@ class _HeaderState extends State<Header> {
       toolbarHeight: 75,
       elevation: 0,
       backgroundColor: AppColor.neutral600,
+      centerTitle: true,
       title: widget.element,
       leading: GestureDetector(
         onTap: widget.onTap,
