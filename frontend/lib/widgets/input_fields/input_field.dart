@@ -52,32 +52,36 @@ class _InputFieldState extends State<InputField> {
   Widget build(BuildContext context) {
     return Container(
       alignment: Alignment.center,
-      margin: const EdgeInsets.only(top: 20),
+      margin: const EdgeInsets.only(top: 10, bottom: 15),
       child: SizedBox(
         width: 350,
         height: 40,
-        child: TextFormField(
-          //focusNode: _focusNode,
-          controller: controller,
-          style: Fonts.text300,
-          cursorColor: Colors.white,
-          decoration: InputDecoration(
-            contentPadding: const EdgeInsets.all(12),
-            label: Text(widget.lblText,
-                style: GoogleFonts.josefinSans(fontSize: 18)),
-            labelStyle: TextStyle(color: AppColor.neutral100),
-            filled: true,
-            fillColor: AppColor.neutral400,
-            border: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(Values.inputRadius),
-                borderSide: BorderSide.none),
-            focusedBorder: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(Values.inputRadius),
-                borderSide: BorderSide(
-                    color: AppColor.blueLight, width: Values.inputBorder)),
+        child: Material(
+          elevation: 5,
+          borderRadius: BorderRadius.circular(5),
+          child: TextFormField(
+            //focusNode: _focusNode,
+            controller: controller,
+            style: Fonts.text300,
+            cursorColor: Colors.white,
+            decoration: InputDecoration(
+              contentPadding: const EdgeInsets.all(12),
+              label: Text(widget.lblText,
+                  style: GoogleFonts.josefinSans(fontSize: 18)),
+              labelStyle: TextStyle(color: AppColor.neutral100),
+              filled: true,
+              fillColor: AppColor.neutral400,
+              border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(Values.inputRadius),
+                  borderSide: BorderSide.none),
+              focusedBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(Values.inputRadius),
+                  borderSide: BorderSide(
+                      color: AppColor.blueLight, width: Values.inputBorder)),
+            ),
+            inputFormatters: [widget.formatter],
+            keyboardType: widget.keyboardType,
           ),
-          inputFormatters: [widget.formatter],
-          keyboardType: widget.keyboardType,
         ),
       ),
     );
