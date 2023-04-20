@@ -3,7 +3,8 @@ import 'package:flutter/services.dart';
 import 'package:frontend/constants/colors.dart';
 import 'package:frontend/constants/fonts.dart';
 import 'package:frontend/constants/values.dart';
-import 'package:frontend/widgets/input_field.dart';
+import 'package:frontend/widgets/input_fields/input_field.dart';
+import 'package:frontend/widgets/input_fields/datepicker_field.dart';
 
 class ManualEntry extends StatefulWidget {
   const ManualEntry({super.key});
@@ -16,6 +17,8 @@ class _ManualEntryState extends State<ManualEntry> {
   TextInputFormatter digits = FilteringTextInputFormatter.digitsOnly;
   TextInputFormatter letters =
       FilteringTextInputFormatter.allow(RegExp(r"[a-zA-Z0-9#+:()&/^\-{2}|\s]"));
+  TextInputType numeric = TextInputType.number;
+  TextInputType text = TextInputType.text;
 
   @override
   Widget build(BuildContext context) {
@@ -47,11 +50,14 @@ class _ManualEntryState extends State<ManualEntry> {
                 InputField(
                   lblText: "Betrag",
                   formatter: digits,
+                  keyboardType: numeric,
                 ),
                 InputField(
                   lblText: "Test",
                   formatter: letters,
-                )
+                  keyboardType: text,
+                ),
+                const DatepickerField(),
               ],
             ),
           ),
