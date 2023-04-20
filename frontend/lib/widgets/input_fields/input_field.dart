@@ -1,15 +1,20 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import '../constants/colors.dart';
-import '../constants/fonts.dart';
-import '../constants/values.dart';
+import '../../constants/colors.dart';
+import '../../constants/fonts.dart';
+import '../../constants/values.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 class InputField extends StatefulWidget {
-  const InputField({super.key, required this.lblText, required this.formatter});
+  const InputField(
+      {super.key,
+      required this.lblText,
+      required this.formatter,
+      required this.keyboardType});
 
   final String lblText;
   final TextInputFormatter formatter;
+  final TextInputType keyboardType;
 
   @override
   State<InputField> createState() => _InputFieldState();
@@ -51,7 +56,7 @@ class _InputFieldState extends State<InputField> {
       child: SizedBox(
         width: 350,
         height: 40,
-        child: TextField(
+        child: TextFormField(
           //focusNode: _focusNode,
           controller: controller,
           style: Fonts.text300,
@@ -72,10 +77,7 @@ class _InputFieldState extends State<InputField> {
                     color: AppColor.blueLight, width: Values.inputBorder)),
           ),
           inputFormatters: [widget.formatter],
-          //inputFormatters: [FilteringTextInputFormatter.digitsOnly]
-          // inputFormatters: [
-          //   FilteringTextInputFormatter.allow(RegExp(r"[a-zA-Z+|\s]"))
-          // ],
+          keyboardType: widget.keyboardType,
         ),
       ),
     );
