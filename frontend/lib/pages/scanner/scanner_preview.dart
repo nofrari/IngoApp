@@ -5,6 +5,7 @@ import 'package:frontend/services/scanner_service.dart';
 import 'package:frontend/start.dart';
 import 'package:frontend/widgets/button.dart';
 import 'package:frontend/widgets/header.dart';
+import 'package:frontend/widgets/popup.dart';
 import 'package:frontend/widgets/round_button.dart';
 import 'package:frontend/widgets/scanner/tiny_preview.dart';
 import 'package:provider/provider.dart';
@@ -102,119 +103,132 @@ class _ScannerPreviewState extends State<ScannerPreview>
           ),
         ),
       ),
-      body: Column(
-        children: [
-          Expanded(
-            child: Stack(
-              alignment: Alignment.center,
-              children: [
-                selectedImage != null
-                    ? Container(
-                        decoration: BoxDecoration(
-                          borderRadius:
-                              BorderRadius.circular(Values.cardRadius),
-                          border:
-                              Border.all(color: AppColor.blueLight, width: 4),
-                        ),
-                        child: ClipRRect(
-                            borderRadius:
-                                BorderRadius.circular(Values.cardRadius - 4),
-                            child: Image.file(File(selectedImage!))),
-                      )
-                    : const Center(
-                        child: Text("No Images"),
+      body: Container(
+        padding: Values.paddingHorizontal,
+        child: SafeArea(
+          child: Column(
+            children: [
+              Expanded(
+                child: Stack(
+                  alignment: Alignment.center,
+                  children: [
+                    selectedImage != null
+                        ? Container(
+                            width: double.infinity,
+                            decoration: BoxDecoration(
+                              borderRadius:
+                                  BorderRadius.circular(Values.cardRadius),
+                              border: Border.all(
+                                  color: AppColor.blueLight, width: 4),
+                            ),
+                            child: ClipRRect(
+                                borderRadius: BorderRadius.circular(
+                                    Values.cardRadius - 4),
+                                child: Image.file(File(selectedImage!),
+                                    fit: BoxFit.cover)),
+                          )
+                        : const Center(
+                            child: Text("No Images"),
+                          ),
+                    // redo button
+                    Positioned(
+                      top: 10,
+                      left: 4,
+                      child: RoundButton(
+                        icon: Icons.redo,
+                        onTap: () async {
+                          if (context.mounted) {
+                            context.read<ScannerService>().rememberPosition(
+                                images.indexOf(selectedImage!));
+                          }
+                          Navigator.pop(context);
+                        },
                       ),
-// redo button
-                Positioned(
-                  top: 10,
-                  left: 4,
-                  child: RoundButton(
-                    icon: Icons.redo,
-                    onTap: () async {
-                      if (context.mounted) {
-                        context
-                            .read<ScannerService>()
-                            .rememberPosition(images.indexOf(selectedImage!));
-                      }
-                      Navigator.pop(context);
-                    },
-                  ),
-                ),
-// delete button
-                Positioned(
-                  top: 10,
-                  right: 4,
-                  child: RoundButton(
-                    icon: Icons.delete,
-                    onTap: () {
-                      debugPrint("Length1: ${images.length}");
-                      if (context.mounted) {
-                        context
-                            .read<ScannerService>()
-                            .deleteImage(selectedImage!);
-                        images = context
-                            .read<ScannerService>()
-                            .getImages(); // Hier aktualisieren Sie die `images`-Liste
-                        selectedImage = images.isNotEmpty
-                            ? images.last
-                            : null; // Hier aktualisieren Sie die `selectedImage`-Variable
-                      }
-                      debugPrint("Length2: ${images.length}");
-
-                      setState(() {
-                        if (images.isNotEmpty) {
-                          selectedImage = images.last;
-                        } else {
-                          selectedImage = null;
-                        }
-                      });
-
-                      if (images.isNotEmpty) {
-                        _controller
-                            .jumpTo(_controller.position.maxScrollExtent);
-                      } else if (images.isEmpty) {
-                        Navigator.pop(context);
-                      }
-                    },
-                  ),
-                ),
-// add button
-                Positioned(
-                  bottom: 10,
-                  child: RoundButton(
-                    icon: Icons.add,
-                    onTap: () async {
-                      Navigator.pop(context);
-                    },
-                  ),
-                )
-              ],
-            ),
-          ),
-          Container(
-            margin: const EdgeInsets.symmetric(
-              vertical: 40,
-              horizontal: 45,
-            ),
-            child: Button(
-                btnText: "BESTÄTIGEN",
-                onTap: () async {
-                  try {
-                    await clearCache();
-                  } catch (e) {
-                    debugPrint(e.toString());
-                  }
-
-                  await Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) => const Start(),
                     ),
-                  );
-                },
-                theme: ButtonColorTheme.primary),
-          )
-        ],
+                    // delete button
+                    Positioned(
+                      top: 10,
+                      right: 4,
+                      child: RoundButton(
+                        icon: Icons.delete,
+                        onTap: () {
+                          debugPrint("Length1: ${images.length}");
+                          if (context.mounted) {
+                            context
+                                .read<ScannerService>()
+                                .deleteImage(selectedImage!);
+                            images = context
+                                .read<ScannerService>()
+                                .getImages(); // Hier aktualisieren Sie die `images`-Liste
+                            selectedImage = images.isNotEmpty
+                                ? images.last
+                                : null; // Hier aktualisieren Sie die `selectedImage`-Variable
+                          }
+                          debugPrint("Length2: ${images.length}");
+
+                          setState(() {
+                            if (images.isNotEmpty) {
+                              selectedImage = images.last;
+                            } else {
+                              selectedImage = null;
+                            }
+                          });
+
+                          if (images.isNotEmpty) {
+                            _controller
+                                .jumpTo(_controller.position.maxScrollExtent);
+                          } else if (images.isEmpty) {
+                            Navigator.pop(context);
+                          }
+                        },
+                      ),
+                    ),
+                    // add button
+                    Positioned(
+                      bottom: 10,
+                      child: RoundButton(
+                        icon: Icons.add,
+                        onTap: () {
+                          // showDialog(
+                          //   context: context,
+                          //   builder: (BuildContext context) => PopUp(
+                          //       onTap: () {},
+                          //       btnTextUpper: "test1",
+                          //       btnTextLower: "test2"),
+                          // );
+                          Navigator.pop(context);
+                        },
+                      ),
+                    )
+                  ],
+                ),
+              ),
+              Container(
+                margin: const EdgeInsets.symmetric(
+                  vertical: 25,
+                  horizontal: 20,
+                ),
+                child: Button(
+                    btnText: "BESTÄTIGEN",
+                    onTap: () async {
+                      try {
+                        await clearCache();
+                      } catch (e) {
+                        debugPrint(e.toString());
+                      }
+
+                      await Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => const Start(),
+                        ),
+                      );
+                    },
+                    theme: ButtonColorTheme.primary),
+              )
+            ],
+          ),
+        ),
       ),
       backgroundColor: AppColor.background,
     );

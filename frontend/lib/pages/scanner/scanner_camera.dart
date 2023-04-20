@@ -89,49 +89,46 @@ class _ScannerCameraState extends State<ScannerCamera>
                     padding: Values.paddingHorizontal,
                     color: AppColor.background,
                     child: SafeArea(
-                      child: Container(
-                        child: Column(
-                          children: [
-                            Stack(
-                              alignment: Alignment.center,
+                      child: Column(
+                        children: [
+                          Expanded(
+                            child: Stack(
+                              alignment: Alignment.bottomCenter,
                               children: [
-                                Expanded(
-                                  child: Container(
-                                    margin: const EdgeInsets.only(bottom: 20),
-                                    decoration: BoxDecoration(
-                                      borderRadius: BorderRadius.circular(
-                                          Values.cardRadius),
-                                      color: Colors.transparent,
-                                      border: Border.all(
-                                        color: AppColor.blueLight,
-                                        width: 4,
-                                      ),
-                                    ),
-                                    child:
-                                        FutureBuilder<List<CameraDescription>>(
-                                      future: availableCameras(),
-                                      builder: (context, snapshot) {
-                                        if (snapshot.hasData) {
-                                          _initCameraController(snapshot.data!);
-                                          return Container(
-                                            width: double.infinity,
-                                            child: ClipRRect(
-                                              borderRadius:
-                                                  BorderRadius.circular(
-                                                      Values.cardRadius - 4),
-                                              child: CameraPreview(
-                                                  _cameraController!),
-                                            ),
-                                          );
-                                        } else {
-                                          return const LinearProgressIndicator();
-                                        }
-                                      },
+                                Container(
+                                  decoration: BoxDecoration(
+                                    borderRadius: BorderRadius.circular(
+                                        Values.cardRadius),
+                                    color: Colors.transparent,
+                                    border: Border.all(
+                                      color: AppColor.blueLight,
+                                      width: 4,
                                     ),
                                   ),
+                                  child: FutureBuilder<List<CameraDescription>>(
+                                    future: availableCameras(),
+                                    builder: (context, snapshot) {
+                                      if (snapshot.hasData) {
+                                        _initCameraController(snapshot.data!);
+                                        return Container(
+                                          width: double.infinity,
+                                          child: ClipRRect(
+                                            borderRadius: BorderRadius.circular(
+                                                Values.cardRadius - 4),
+                                            child: CameraPreview(
+                                                _cameraController!),
+                                          ),
+                                        );
+                                      } else {
+                                        return const LinearProgressIndicator();
+                                      }
+                                    },
+                                  ),
                                 ),
-                                Positioned(
-                                  bottom: 50,
+                                Container(
+                                  width: double.infinity,
+                                  margin: const EdgeInsets.symmetric(
+                                      horizontal: 20, vertical: 25),
                                   child: Button(
                                     btnText: "SCANNEN",
                                     onTap: _scanImage,
@@ -140,26 +137,26 @@ class _ScannerCameraState extends State<ScannerCamera>
                                 ),
                               ],
                             ),
-                            Container(
-                              margin: const EdgeInsets.symmetric(
-                                  vertical: 8, horizontal: 20),
-                              child: Button(
-                                btnText: "MANUELLE EINGABE",
-                                onTap: () async {
-                                  await Navigator.push(
-                                    context,
-                                    MaterialPageRoute(
-                                      builder: (context) =>
-                                          //not done yet
-                                          const Home(),
-                                    ),
-                                  );
-                                },
-                                theme: ButtonColorTheme.secondary,
-                              ),
+                          ),
+                          Container(
+                            margin: const EdgeInsets.symmetric(
+                                vertical: 25, horizontal: 20),
+                            child: Button(
+                              btnText: "MANUELLE EINGABE",
+                              onTap: () async {
+                                await Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (context) =>
+                                        //not done yet
+                                        const Home(),
+                                  ),
+                                );
+                              },
+                              theme: ButtonColorTheme.secondary,
                             ),
-                          ],
-                        ),
+                          ),
+                        ],
                       ),
                     ),
                   )

@@ -37,7 +37,7 @@ class Button extends StatelessWidget {
     }
 
     return Container(
-      width: 330,
+      width: double.infinity,
       child: ElevatedButton(
         onPressed: onTap,
         style: ElevatedButton.styleFrom(
