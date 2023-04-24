@@ -88,7 +88,7 @@ class _ScannerCameraState extends State<ScannerCamera>
             body: _isPermissionGranted
                 ? Container(
                     padding: Values.paddingHorizontal,
-                    color: AppColor.background,
+                    color: AppColor.backgroundFullScreen,
                     child: SafeArea(
                       child: Column(
                         children: [
@@ -102,7 +102,7 @@ class _ScannerCameraState extends State<ScannerCamera>
                                         Values.cardRadius),
                                     color: Colors.transparent,
                                     border: Border.all(
-                                      color: AppColor.blueLight,
+                                      color: AppColor.blueActive,
                                       width: 4,
                                     ),
                                   ),

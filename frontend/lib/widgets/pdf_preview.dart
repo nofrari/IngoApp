@@ -20,7 +20,7 @@ class _PdfPreviewState extends State<PdfPreview> {
       width: double.infinity,
       decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(Values.cardRadius),
-          border: Border.all(color: AppColor.blueLight, width: 4)),
+          border: Border.all(color: AppColor.blueActive, width: 4)),
       height: 400,
       child: ClipRRect(
         borderRadius: BorderRadius.circular(Values.cardRadius - 4),

@@ -46,7 +46,7 @@ class _DatepickerFieldState extends State<DatepickerField> {
               focusedBorder: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(Values.inputRadius),
                 borderSide: BorderSide(
-                    color: AppColor.blueLight, width: Values.inputBorder),
+                    color: AppColor.blueActive, width: Values.inputBorder),
               ),
               suffixIcon: const Align(
                 widthFactor: 1.0,
@@ -72,13 +72,13 @@ class _DatepickerFieldState extends State<DatepickerField> {
                     data: Theme.of(context).copyWith(
                       dialogBackgroundColor: AppColor.neutral500,
                       colorScheme: ColorScheme.light(
-                        primary: AppColor.blueLight,
+                        primary: AppColor.blueActive,
                         onPrimary: AppColor.neutral600,
                         onSurface: Colors.white,
                       ),
                       textButtonTheme: TextButtonThemeData(
                         style: TextButton.styleFrom(
-                            foregroundColor: AppColor.blueLight,
+                            foregroundColor: AppColor.blueActive,
                             textStyle: Fonts.text300),
                       ),
                       textTheme: TextTheme(

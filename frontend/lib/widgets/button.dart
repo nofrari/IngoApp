@@ -28,12 +28,12 @@ class Button extends StatelessWidget {
 
     if (theme == ButtonColorTheme.primary) {
       buttonText = Fonts.primaryButton;
-      backgroundColor = AppColor.blueLight;
-      borderColor = AppColor.blueLight;
+      backgroundColor = AppColor.blueActive;
+      borderColor = AppColor.blueActive;
     } else {
       buttonText = Fonts.secondaryButton;
       backgroundColor = AppColor.neutral500;
-      borderColor = AppColor.blueLight;
+      borderColor = AppColor.blueActive;
     }
 
     return Container(

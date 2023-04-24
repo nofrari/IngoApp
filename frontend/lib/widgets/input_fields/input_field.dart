@@ -109,7 +109,7 @@ class _InputFieldState extends State<InputField> {
               focusedBorder: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(Values.inputRadius),
                 borderSide: BorderSide(
-                    color: AppColor.blueLight, width: Values.inputBorder),
+                    color: AppColor.blueActive, width: Values.inputBorder),
               ),
             ),
             inputFormatters: [widget.formatter],

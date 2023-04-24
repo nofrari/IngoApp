@@ -23,7 +23,7 @@ class TinyPreview extends StatelessWidget {
       decoration: (selectedImage == images.elementAt(index))
           ? BoxDecoration(
               borderRadius: BorderRadius.circular(Values.cardRadius - 15),
-              border: Border.all(color: AppColor.blueLight),
+              border: Border.all(color: AppColor.blueActive),
             )
           : null,
       width: 42,

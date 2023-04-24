@@ -28,13 +28,13 @@ class _ManualEntryState extends State<ManualEntry> {
     return Scaffold(
       appBar: AppBar(
           elevation: 0,
-          backgroundColor: AppColor.background,
+          backgroundColor: AppColor.backgroundFullScreen,
           title: Text(
             "neuer eintrag".toUpperCase(),
             style: Fonts.textHeadingBold,
           ),
           titleTextStyle: TextStyle(color: AppColor.neutral100)),
-      backgroundColor: AppColor.background,
+      backgroundColor: AppColor.backgroundFullScreen,
       body: Align(
         alignment: Alignment.topCenter,
         child: Container(

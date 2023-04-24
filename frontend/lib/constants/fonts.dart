@@ -44,7 +44,7 @@ class Fonts {
     fontWeight: FontWeight.bold,
   );
   static TextStyle secondaryButton = GoogleFonts.josefinSans(
-    color: AppColor.blueLight,
+    color: AppColor.blueActive,
     fontSize: 16,
     fontWeight: FontWeight.bold,
   );

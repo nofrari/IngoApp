@@ -15,11 +15,11 @@ class RoundButton extends StatelessWidget {
         backgroundColor: AppColor.neutral800,
         padding: const EdgeInsets.all(8),
         shape: const CircleBorder(),
-        side: BorderSide(width: 2, color: AppColor.blueLight),
+        side: BorderSide(width: 2, color: AppColor.blueActive),
       ),
       child: Icon(
         icon,
-        color: AppColor.blueLight,
+        color: AppColor.blueActive,
         size: 25,
       ),
     );

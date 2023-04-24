@@ -81,7 +81,7 @@ class _StartState extends State<Start> {
               },
               style: ElevatedButton.styleFrom(
                   shape: const CircleBorder(),
-                  backgroundColor: AppColor.blueLight),
+                  backgroundColor: AppColor.blueActive),
               child: Text(
                 user.abreviationName,
                 style: Fonts.textNormalBlack18,
@@ -89,13 +89,13 @@ class _StartState extends State<Start> {
             ),
           ),
         ],
-        backgroundColor: AppColor.background,
+        backgroundColor: AppColor.backgroundFullScreen,
       ),
       body: PageStorage(
         bucket: bucket,
         child: currentScreen,
       ),
-      backgroundColor: AppColor.background,
+      backgroundColor: AppColor.backgroundFullScreen,
       floatingActionButton: FloatingActionButton(
         backgroundColor: AppColor.neutral100,
         onPressed: () async {

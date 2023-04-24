@@ -152,7 +152,7 @@ class _ScannerPreviewState extends State<ScannerPreview>
                               borderRadius:
                                   BorderRadius.circular(Values.cardRadius),
                               border: Border.all(
-                                  color: AppColor.blueLight, width: 4),
+                                  color: AppColor.blueActive, width: 4),
                             ),
                             child: ClipRRect(
                                 borderRadius: BorderRadius.circular(
@@ -303,7 +303,7 @@ class _ScannerPreviewState extends State<ScannerPreview>
           ),
         ),
       ),
-      backgroundColor: AppColor.background,
+      backgroundColor: AppColor.backgroundFullScreen,
     );
   }
 }
