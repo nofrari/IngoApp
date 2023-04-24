@@ -96,46 +96,46 @@ app.post("/scanner/upload", upload.array("image"), async (req, res) => {
         supplier_name: "",
         category: ""
     };
-    //Uncomment mindee code again when testing invoice data
+    //Uncomment mindee code and catch() again when testing invoice data
 
-    //mindee parser
-    const apiResponse = mindeeClient
-        .docFromPath("./src/uploads/" + files[0].filename)
-        .parse(mindee.ReceiptV4);
+    // //mindee parser
+    // const apiResponse = mindeeClient
+    //     .docFromPath("./src/uploads/" + files[0].filename)
+    //     .parse(mindee.ReceiptV4);
 
-    apiResponse.then((resp: any) => {
-        console.log(resp);
-        //Using Invoice
-        // invoicedata.total_amount = resp.document.totalAmount.value;
-        // invoicedata.date = resp.document.date.value;
-        // invoicedata.supplier_name = resp.document.supplierName.value;
-        // invoicedata.category = "";
+    // apiResponse.then((resp: any) => {
+    //     console.log(resp);
+    //     //Using Invoice
+    //     // invoicedata.total_amount = resp.document.totalAmount.value;
+    //     // invoicedata.date = resp.document.date.value;
+    //     // invoicedata.supplier_name = resp.document.supplierName.value;
+    //     // invoicedata.category = "";
 
-        //Using Receipt
-        invoicedata.total_amount = resp.document.totalAmount.value;
-        invoicedata.date = resp.document.date.value;
-        invoicedata.supplier_name = resp.document.supplier.value;
-        invoicedata.category = resp.document.category.value;
+    //     //Using Receipt
+    //     invoicedata.total_amount = resp.document.totalAmount.value;
+    //     invoicedata.date = resp.document.date.value;
+    //     invoicedata.supplier_name = resp.document.supplier.value;
+    //     invoicedata.category = resp.document.category.value;
 
-        //console.log(resp);
-        //console.log(invoicedata);
-    }).then(() => {
-        //delete images
-        files.forEach((file: any) => {
-            fs.unlinkSync("./src/uploads/" + file.filename);
-        });
-
-        const data = {
-            invoice_data: invoicedata,
-            pdf_name: pdfname,
-            pdf: fs.readFileSync("./src/uploads/" + pdfname + ".pdf", { encoding: 'base64' })
-        }
-        console.log(data);
-        res.setHeader('Content-Type', 'application/json');
-        return res.status(200).send(JSON.stringify(data));
-    }).catch((err: any) => {
-        console.log(err.toString()); throw new Error("Error parsing invoice data");
+    //     //console.log(resp);
+    //     //console.log(invoicedata);
+    // }).then(() => {
+    //delete images
+    files.forEach((file: any) => {
+        fs.unlinkSync("./src/uploads/" + file.filename);
     });
+
+    const data = {
+        invoice_data: invoicedata,
+        pdf_name: pdfname,
+        pdf: fs.readFileSync("./src/uploads/" + pdfname + ".pdf", { encoding: 'base64' })
+    }
+    console.log(data);
+    res.setHeader('Content-Type', 'application/json');
+    return res.status(200).send(JSON.stringify(data));
+    // }).catch((err: any) => {
+    //     console.log(err.toString()); throw new Error("Error parsing invoice data");
+    // });
 });
 
 app.listen(5432, () => {

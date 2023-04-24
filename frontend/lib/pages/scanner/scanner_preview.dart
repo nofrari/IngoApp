@@ -271,11 +271,11 @@ class _ScannerPreviewState extends State<ScannerPreview>
                       }
 
                       //TODO: add clear cache to end of manuelle eingabe
-                      // try {
-                      //   await clearCache();
-                      // } catch (e) {
-                      //   debugPrint(e.toString());
-                      // }
+                      try {
+                        await clearCache();
+                      } catch (e) {
+                        debugPrint(e.toString());
+                      }
 
                       await Navigator.push(
                         context,

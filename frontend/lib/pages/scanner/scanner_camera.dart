@@ -65,6 +65,8 @@ class _ScannerCameraState extends State<ScannerCamera>
 
   @override
   Widget build(BuildContext context) {
+    List<String> images = context.watch<ScannerService>().getImages();
+
     return FutureBuilder(
         future: _future,
         builder: (context, snapshot) {
@@ -125,7 +127,9 @@ class _ScannerCameraState extends State<ScannerCamera>
                                   width: double.infinity,
                                   margin: Values.buttonPadding,
                                   child: Button(
-                                    btnText: "SCANNEN",
+                                    btnText: (images.isEmpty)
+                                        ? "SCANNEN"
+                                        : "AUFNEHMEN",
                                     onTap: _scanImage,
                                     theme: ButtonColorTheme.primary,
                                   ),
