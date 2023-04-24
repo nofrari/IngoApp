@@ -47,6 +47,9 @@ dependencies:
   provider: ^6.0.5
   flutter_cached_pdfview: ^0.4.1
   control_style: ^0.0.3
+  shared_preferences: ^2.1.0
+  flutter_cache_manager: ^3.3.0
+  path_provider: ^2.0.14
 
 dev_dependencies:
   flutter_test:

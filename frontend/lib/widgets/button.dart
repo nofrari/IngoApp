@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:frontend/widgets/text_google.dart';
 import '../constants/colors.dart';
 import '../constants/fonts.dart';
 import '../constants/values.dart';
@@ -41,12 +42,14 @@ class Button extends StatelessWidget {
         onPressed: onTap,
         style: ElevatedButton.styleFrom(
           backgroundColor: backgroundColor,
-          padding: const EdgeInsets.symmetric(vertical: 15, horizontal: 0),
+          padding: const EdgeInsets.symmetric(vertical: 10),
           shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(Values.buttonRadius),
-              side: BorderSide(color: borderColor, width: 2)),
+            borderRadius: BorderRadius.circular(Values.buttonRadius),
+            side: BorderSide(color: borderColor, width: 2),
+          ),
         ),
-        child: Text(btnText, style: buttonText, textAlign: TextAlign.center),
+        child: TextGoogle(
+            text: btnText, style: buttonText, align: TextAlign.center),
       ),
     );
   }

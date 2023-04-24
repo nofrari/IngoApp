@@ -12,7 +12,7 @@ class Fonts {
   static TextStyle text300 = GoogleFonts.josefinSans(
       color: AppColor.neutral100, fontSize: 18, fontWeight: FontWeight.normal);
   static TextStyle text400 = GoogleFonts.josefinSans(
-      color: AppColor.neutral100, fontSize: 25, fontWeight: FontWeight.w500);
+      color: AppColor.neutral100, fontSize: 25, fontWeight: FontWeight.w400);
   static TextStyle text500 = GoogleFonts.josefinSans(
       color: AppColor.neutral100, fontSize: 30, fontWeight: FontWeight.bold);
   static TextStyle textHeadingBold = GoogleFonts.josefinSans(
@@ -48,4 +48,7 @@ class Fonts {
     fontSize: 16,
     fontWeight: FontWeight.bold,
   );
+
+  static TextStyle popupText = GoogleFonts.josefinSans(
+      color: AppColor.neutral100, fontSize: 15, fontWeight: FontWeight.normal);
 }
