@@ -73,6 +73,9 @@ class _ScannerCameraState extends State<ScannerCamera>
           return Scaffold(
             appBar: Header(
               onTap: () {
+                if (context.mounted) {
+                  context.read<ScannerService>().clearImages();
+                }
                 Navigator.pop(context);
               },
               element: TextGoogle(
