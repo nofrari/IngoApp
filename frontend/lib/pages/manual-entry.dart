@@ -5,7 +5,6 @@ import 'package:frontend/constants/fonts.dart';
 import 'package:frontend/constants/values.dart';
 import 'package:frontend/widgets/input_fields/input_field.dart';
 import 'package:frontend/widgets/input_fields/datepicker_field.dart';
-import 'package:frontend/widgets/input_fields/dropdown_field_test.dart';
 import 'package:frontend/widgets/pdf_preview.dart';
 
 class ManualEntry extends StatefulWidget {

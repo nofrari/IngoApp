@@ -44,8 +44,6 @@ type Invoicedata = {
     category: string;
 }
 
-
-
 async function createPDF(pages: String[]) {
     const doc = new PDFDocument({ margin: 0 });
     if (pages.length != 0) {
@@ -78,16 +76,6 @@ app.post("/scanner/upload", upload.array("image"), async (req, res) => {
     }
 
     let files = req.files as any;
-    const pdfname: string = Date.now().toString();
-
-    //create pdf from images
-    try {
-        const pages: String[] = files.map((file: any) => "./src/uploads/" + file.filename);
-        var pdf = await createPDF(pages);
-        pdf.pipe(fs.createWriteStream("./src/uploads/" + pdfname + ".pdf"));
-    } catch (error) {
-        throw new Error("Error creating pdf");
-    }
 
     //scan first image
     var invoicedata: Invoicedata = {
@@ -96,46 +84,67 @@ app.post("/scanner/upload", upload.array("image"), async (req, res) => {
         supplier_name: "",
         category: ""
     };
-    //Uncomment mindee code and catch() again when testing invoice data
 
-    // //mindee parser
+    const testResponse = new Promise((resolve, reject) => {
+        resolve({
+            document: {
+                totalAmount: { value: 100 },
+                date: { value: "2021-01-01" },
+                supplier: { value: "Test" },
+                category: { value: "Test" }
+            },
+        });
+    })
+
+    //mindee parser
     // const apiResponse = mindeeClient
     //     .docFromPath("./src/uploads/" + files[0].filename)
     //     .parse(mindee.ReceiptV4);
 
-    // apiResponse.then((resp: any) => {
-    //     console.log(resp);
-    //     //Using Invoice
-    //     // invoicedata.total_amount = resp.document.totalAmount.value;
-    //     // invoicedata.date = resp.document.date.value;
-    //     // invoicedata.supplier_name = resp.document.supplierName.value;
-    //     // invoicedata.category = "";
+    testResponse.then((resp: any) => {
+        console.log(resp);
+        //Using Invoice
+        // invoicedata.total_amount = resp.document.totalAmount.value;
+        // invoicedata.date = resp.document.date.value;
+        // invoicedata.supplier_name = resp.document.supplierName.value;
+        // invoicedata.category = "";
 
-    //     //Using Receipt
-    //     invoicedata.total_amount = resp.document.totalAmount.value;
-    //     invoicedata.date = resp.document.date.value;
-    //     invoicedata.supplier_name = resp.document.supplier.value;
-    //     invoicedata.category = resp.document.category.value;
+        //Using Receipt
+        invoicedata.total_amount = resp.document.totalAmount.value;
+        invoicedata.date = resp.document.date.value;
+        invoicedata.supplier_name = resp.document.supplier.value;
+        invoicedata.category = resp.document.category.value;
 
-    //     //console.log(resp);
-    //     //console.log(invoicedata);
-    // }).then(() => {
-    //delete images
-    files.forEach((file: any) => {
-        fs.unlinkSync("./src/uploads/" + file.filename);
+        //console.log(resp);
+        //console.log(invoicedata);
+    }).then(async () => {
+        try {
+            const pdfname: string = Date.now().toString();
+
+            //create pdf from images
+            const pages: String[] = files.map((file: any) => "./src/uploads/" + file.filename);
+            var pdf = await createPDF(pages);
+            pdf.pipe(fs.createWriteStream("./src/uploads/" + pdfname + ".pdf")).on('finish', async () => {
+                const data = {
+                    invoice_data: invoicedata,
+                    pdf_name: pdfname,
+                    pdf: await fs.promises.readFile("./src/uploads/" + pdfname + ".pdf", { encoding: 'base64' })
+                }
+                //delete images
+                files.forEach((file: any) => {
+                    fs.unlinkSync("./src/uploads/" + file.filename);
+                });
+
+                console.log(data);
+                res.setHeader('Content-Type', 'application/json');
+                return res.status(200).send(JSON.stringify(data));
+            });
+        } catch (error) {
+            console.log("Fehler beim PDF auslesen", error);
+        }
+    }).catch((err: any) => {
+        console.log(err.toString()); throw new Error("Error parsing invoice data");
     });
-
-    const data = {
-        invoice_data: invoicedata,
-        pdf_name: pdfname,
-        pdf: fs.readFileSync("./src/uploads/" + pdfname + ".pdf", { encoding: 'base64' })
-    }
-    console.log(data);
-    res.setHeader('Content-Type', 'application/json');
-    return res.status(200).send(JSON.stringify(data));
-    // }).catch((err: any) => {
-    //     console.log(err.toString()); throw new Error("Error parsing invoice data");
-    // });
 });
 
 app.listen(5432, () => {

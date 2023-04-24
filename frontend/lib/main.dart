@@ -69,7 +69,7 @@ class _MyAppState extends State<MyApp> {
         theme: ThemeData(
           primarySwatch: Colors.blue,
         ),
-        home: const ManualEntry());
+        home: const Start());
     //home: const Start());
   }
 }
