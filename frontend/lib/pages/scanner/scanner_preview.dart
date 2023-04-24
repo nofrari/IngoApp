@@ -19,6 +19,8 @@ import '../../constants/values.dart';
 import 'scanner_camera.dart';
 import 'package:flutter_cache_manager/flutter_cache_manager.dart';
 import 'package:path_provider/path_provider.dart';
+import 'dart:convert';
+import 'dart:typed_data';
 
 class ScannerPreview extends StatefulWidget {
   const ScannerPreview({super.key});
@@ -77,15 +79,15 @@ class _ScannerPreviewState extends State<ScannerPreview>
           await MultipartFile.fromFile(images[i]),
         ));
       }
-      // fromMap(
-      //   {
-      //     "image": await MultipartFile.fromFile(pictureFile.path),
-      //   },
-      // );
       var response = await dio.post("http://10.0.2.2:5432/scanner/upload",
           //var response = await dio.post("https://data.ingoapp.at/scanner/upload",
-          data: formData);
+          data: formData,
+          options: Options(responseType: ResponseType.json));
       debugPrint(response.toString());
+      final pdfFile = await DefaultCacheManager().putFile(
+          response.data['pdf_name'], base64Decode(response.data['pdf']));
+      final isDa = await pdfFile.exists();
+      debugPrint(isDa.toString());
     }
 
     return Scaffold(
@@ -268,11 +270,12 @@ class _ScannerPreviewState extends State<ScannerPreview>
                         debugPrint(e.toString());
                       }
 
-                      try {
-                        await clearCache();
-                      } catch (e) {
-                        debugPrint(e.toString());
-                      }
+                      //TODO: add clear cache to end of manuelle eingabe
+                      // try {
+                      //   await clearCache();
+                      // } catch (e) {
+                      //   debugPrint(e.toString());
+                      // }
 
                       await Navigator.push(
                         context,
