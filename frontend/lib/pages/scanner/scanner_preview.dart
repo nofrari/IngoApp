@@ -64,10 +64,18 @@ class _ScannerPreviewState extends State<ScannerPreview>
         context.read<ScannerService>().clearImages();
       }
       await DefaultCacheManager().emptyCache();
-      final directory = await getTemporaryDirectory();
-      final cacheDir = directory.path;
-      final cacheDirFile = Directory(cacheDir);
-      await cacheDirFile.delete(recursive: true);
+      try {
+        final directory = await getTemporaryDirectory();
+        final cacheDir = directory.path;
+        final cacheDirFile = Directory(cacheDir);
+        await cacheDirFile.delete(recursive: true);
+      } catch (e) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('An error occurred when deleting cache'),
+          ),
+        );
+      }
     }
 
     Future<void> sendImages() async {
@@ -155,105 +163,114 @@ class _ScannerPreviewState extends State<ScannerPreview>
                         : const Center(
                             child: Text("No Images"),
                           ),
-                    // redo button
-                    Positioned(
-                      top: 10,
-                      left: 4,
-                      child: RoundButton(
-                        icon: Icons.redo,
-                        onTap: () async {
-                          if (context.mounted) {
-                            context.read<ScannerService>().rememberPosition(
-                                images.indexOf(selectedImage!));
-                          }
-                          Navigator.pop(context);
-                        },
-                      ),
-                    ),
-                    // delete button
-                    Positioned(
-                      top: 10,
-                      right: 4,
-                      child: RoundButton(
-                        icon: Icons.delete,
-                        onTap: () {
-                          debugPrint("Length1: ${images.length}");
-                          if (context.mounted) {
-                            context
-                                .read<ScannerService>()
-                                .deleteImage(selectedImage!);
-                            images = context
-                                .read<ScannerService>()
-                                .getImages(); // Hier aktualisieren Sie die `images`-Liste
-                            selectedImage = images.isNotEmpty
-                                ? images.last
-                                : null; // Hier aktualisieren Sie die `selectedImage`-Variable
-                          }
-                          debugPrint("Length2: ${images.length}");
+                    Column(
+                      children: [
+                        Container(
+                          margin: const EdgeInsets.only(top: 8),
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              // redo button
+                              RoundButton(
+                                icon: Icons.redo,
+                                onTap: () async {
+                                  if (context.mounted) {
+                                    context
+                                        .read<ScannerService>()
+                                        .rememberPosition(
+                                            images.indexOf(selectedImage!));
+                                  }
+                                  Navigator.pop(context);
+                                },
+                              ),
+                              RoundButton(
+                                icon: Icons.delete,
+                                onTap: () {
+                                  debugPrint("Length1: ${images.length}");
+                                  if (context.mounted) {
+                                    context
+                                        .read<ScannerService>()
+                                        .deleteImage(selectedImage!);
+                                    images = context
+                                        .read<ScannerService>()
+                                        .getImages(); // Hier aktualisieren Sie die `images`-Liste
+                                    selectedImage = images.isNotEmpty
+                                        ? images.last
+                                        : null; // Hier aktualisieren Sie die `selectedImage`-Variable
+                                  }
+                                  debugPrint("Length2: ${images.length}");
 
-                          setState(() {
-                            if (images.isNotEmpty) {
-                              selectedImage = images.last;
-                            } else {
-                              selectedImage = null;
-                            }
-                          });
+                                  setState(() {
+                                    if (images.isNotEmpty) {
+                                      selectedImage = images.last;
+                                    } else {
+                                      selectedImage = null;
+                                    }
+                                  });
 
-                          if (images.isNotEmpty) {
-                            _controller
-                                .jumpTo(_controller.position.maxScrollExtent);
-                          } else if (images.isEmpty) {
-                            Navigator.pop(context);
-                          }
-                        },
-                      ),
+                                  if (images.isNotEmpty) {
+                                    _controller.jumpTo(
+                                        _controller.position.maxScrollExtent);
+                                  } else if (images.isEmpty) {
+                                    Navigator.pop(context);
+                                  }
+                                },
+                              ),
+                            ],
+                          ),
+                        ),
+                      ],
                     ),
                     // add button
-                    Positioned(
-                      bottom: 10,
-                      child: RoundButton(
-                        icon: Icons.add,
-                        onTap: () {
-                          if (images.length == 1) {
-                            // warning dialog
-                            showDialog(
-                              context: context,
-                              builder: (BuildContext context) => PopUp(
-                                content:
-                                    "Vom Scanner wird nur der erste Scan auf Werte geprüft. Es kann vorkommen, dass die Einträge manuell überarbeitet werden müssen.",
-                                actions: [
-                                  Container(
-                                    margin: Values.buttonPadding,
-                                    child: Column(
-                                      children: [
-                                        Button(
-                                            btnText: "ABBRECHEN",
-                                            onTap: () {
-                                              Navigator.pop(context);
-                                            },
-                                            theme: ButtonColorTheme.secondary),
-                                        Button(
-                                            btnText: "FORTFAHREN",
-                                            onTap: () {
-                                              Navigator.push(
-                                                context,
-                                                MaterialPageRoute(
-                                                  builder: (context) =>
-                                                      const ScannerCamera(),
-                                                ),
-                                              );
-                                            },
-                                            theme: ButtonColorTheme.primary),
-                                      ],
-                                    ),
-                                  )
-                                ],
-                              ),
-                            );
-                          } else {
-                            Navigator.pop(context);
-                          }
-                        },
+                    Container(
+                      margin: const EdgeInsets.only(bottom: 8),
+                      child: Align(
+                        alignment: Alignment.bottomCenter,
+                        child: RoundButton(
+                          icon: Icons.add,
+                          onTap: () {
+                            if (images.length == 1) {
+                              // warning dialog
+                              showDialog(
+                                context: context,
+                                builder: (BuildContext context) => PopUp(
+                                  content:
+                                      "Vom Scanner wird nur der erste Scan auf Werte geprüft. Es kann vorkommen, dass die Einträge manuell überarbeitet werden müssen.",
+                                  actions: [
+                                    Container(
+                                      margin: Values.buttonPadding,
+                                      child: Column(
+                                        children: [
+                                          Button(
+                                              btnText: "ABBRECHEN",
+                                              onTap: () {
+                                                Navigator.pop(context);
+                                              },
+                                              theme:
+                                                  ButtonColorTheme.secondary),
+                                          Button(
+                                              btnText: "FORTFAHREN",
+                                              onTap: () {
+                                                Navigator.push(
+                                                  context,
+                                                  MaterialPageRoute(
+                                                    builder: (context) =>
+                                                        const ScannerCamera(),
+                                                  ),
+                                                );
+                                              },
+                                              theme: ButtonColorTheme.primary),
+                                        ],
+                                      ),
+                                    )
+                                  ],
+                                ),
+                              );
+                            } else {
+                              Navigator.pop(context);
+                            }
+                          },
+                        ),
                       ),
                     )
                   ],
@@ -271,11 +288,7 @@ class _ScannerPreviewState extends State<ScannerPreview>
                       }
 
                       //TODO: add clear cache to end of manuelle eingabe
-                      try {
-                        await clearCache();
-                      } catch (e) {
-                        debugPrint(e.toString());
-                      }
+                      await clearCache();
 
                       await Navigator.push(
                         context,

@@ -195,13 +195,6 @@ class _ScannerCameraState extends State<ScannerCamera>
           context.read<ScannerService>().setImage(path: pictureFile.path);
         }
       }
-
-      //not needed in the moment
-      // if (pictureFile != null) {
-      //   setState(() {
-      //     imageFile = File(pictureFile.path);
-      //   });
-      // }
       debugPrint(pictureFile.path);
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(
