@@ -7,7 +7,7 @@ class PopUp extends StatelessWidget {
   const PopUp({super.key, this.actions, this.title, required this.content});
 
   final String? title;
-  final String content;
+  final String? content;
   final List<Widget>? actions;
 
   @override
@@ -29,11 +29,13 @@ class PopUp extends StatelessWidget {
       contentPadding: title != null && title!.isNotEmpty
           ? Values.bigCardPadding
           : const EdgeInsets.fromLTRB(10, 20, 10, 0),
-      content: Text(
-        content,
-        style: Fonts.popupText,
-        textAlign: TextAlign.center,
-      ),
+      content: content != null && content!.isNotEmpty
+          ? Text(
+              content!,
+              style: Fonts.popupText,
+              textAlign: TextAlign.center,
+            )
+          : null,
       actions: actions,
       actionsPadding: const EdgeInsets.symmetric(vertical: 0),
     );
