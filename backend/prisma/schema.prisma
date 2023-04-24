@@ -61,8 +61,8 @@ model Transaction {
   transaction_name   String
   transaction_amount Float
   date               DateTime
-  description        String
-  bill_url           String
+  description        String?
+  bill_url           String?
   category_id        String
   category           Category @relation(fields: [category_id], references: [category_id], onDelete: Cascade)
   type_id            String
