@@ -51,4 +51,9 @@ class Fonts {
 
   static TextStyle popupText = GoogleFonts.josefinSans(
       color: AppColor.neutral100, fontSize: 15, fontWeight: FontWeight.normal);
+  static TextStyle errorMessage = GoogleFonts.josefinSans(
+    color: Colors.red,
+    fontSize: 14,
+    fontWeight: FontWeight.normal,
+  );
 }
