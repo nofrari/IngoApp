@@ -72,9 +72,15 @@ class _InputFieldState extends State<InputField> {
             errorStyle: Fonts.errorMessage,
             border: DecoratedInputBorder(
               child: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(Values.inputRadius),
-                borderSide: BorderSide.none,
-              ),
+                  borderRadius: BorderRadius.circular(Values.inputRadius),
+                  borderSide: BorderSide.none),
+              shadow: const [
+                BoxShadow(
+                  color: Color.fromARGB(60, 0, 0, 0),
+                  blurRadius: 4,
+                  offset: Offset(0, 3),
+                )
+              ],
             ),
             focusedBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(Values.inputRadius),
@@ -85,7 +91,7 @@ class _InputFieldState extends State<InputField> {
                 borderRadius: BorderRadius.circular(Values.inputRadius),
                 borderSide: const BorderSide(
                     color: Colors.red, width: Values.inputBorder))),
-        inputFormatters: [widget.formatter],
+        //inputFormatters: [widget.formatter],
         keyboardType: widget.keyboardType,
       ),
     );
