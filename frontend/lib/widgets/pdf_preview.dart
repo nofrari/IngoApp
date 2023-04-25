@@ -14,9 +14,9 @@ import 'package:frontend/widgets/button.dart';
 import 'package:path_provider/path_provider.dart';
 
 class PdfPreview extends StatefulWidget {
-  final String pdfUrl;
+  String? pdfUrl;
 
-  const PdfPreview({Key? key, required this.pdfUrl}) : super(key: key);
+  PdfPreview({Key? key, this.pdfUrl}) : super(key: key);
 
   @override
   State<PdfPreview> createState() => _PdfPreviewState();
@@ -43,6 +43,10 @@ class _PdfPreviewState extends State<PdfPreview> {
       } catch (e) {
         print('Error deleting PDF file: $e');
       }
+    } else {
+      setState(() {
+        widget.pdfUrl = null;
+      });
     }
   }
 
@@ -108,7 +112,7 @@ class _PdfPreviewState extends State<PdfPreview> {
 
   @override
   Widget build(BuildContext context) {
-    return _pdfFile != null && _showPdf
+    return (_pdfFile != null || widget.pdfUrl != null) && _showPdf
         ? Container(
             height: 400,
             decoration: BoxDecoration(
@@ -142,7 +146,7 @@ class _PdfPreviewState extends State<PdfPreview> {
                             onPageError: (page, error) {
                               print('$page: ${error.toString()}');
                             },
-                          ).fromAsset(_pdfFile!.path),
+                          ).fromAsset(widget.pdfUrl ?? _pdfFile!.path),
                         ),
                       ),
                     ),

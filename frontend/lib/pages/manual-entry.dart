@@ -85,7 +85,7 @@ class _ManualEntryState extends State<ManualEntry> {
                       controller: controllerDescription,
                     ),
                     DatepickerField(controller: controllerDate),
-                    const PdfPreview(pdfUrl: '/assets/pdf/sample.pdf'),
+                    PdfPreview(pdfUrl: "assets/pdf/sample.pdf"),
                     ElevatedButton(
                       onPressed: () {
                         if (_formKey.currentState!.validate()) {
