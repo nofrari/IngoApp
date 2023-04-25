@@ -130,12 +130,12 @@ class _DatepickerFieldState extends State<DatepickerField> {
             },
           );
           if (pickedDate != null) {
-            // String formattedDate =
-            //     DateFormat("dd / MM / yyyy").format(pickedDate);
+            String formattedDate =
+                DateFormat("dd / MM / yyyy").format(pickedDate);
 
             setState(() {
-              widget.controller.text = pickedDate.toString();
-              //widget.selectedDate = pickedDate;
+              widget.controller.text = formattedDate;
+              widget.selectedDate = pickedDate;
             });
           }
         },
