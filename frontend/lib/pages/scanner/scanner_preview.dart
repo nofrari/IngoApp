@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:frontend/main.dart';
 import 'package:frontend/pages/home.dart';
+import 'package:frontend/pages/manual-entry.dart';
+import 'package:frontend/services/manualentry_service.dart';
 import 'package:frontend/services/scanner_service.dart';
 import 'package:frontend/start.dart';
 import 'package:frontend/widgets/button.dart';
@@ -63,19 +65,19 @@ class _ScannerPreviewState extends State<ScannerPreview>
       if (context.mounted) {
         context.read<ScannerService>().clearImages();
       }
-      await DefaultCacheManager().emptyCache();
-      try {
-        final directory = await getTemporaryDirectory();
-        final cacheDir = directory.path;
-        final cacheDirFile = Directory(cacheDir);
-        await cacheDirFile.delete(recursive: true);
-      } catch (e) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('An error occurred when deleting cache'),
-          ),
-        );
-      }
+      // await DefaultCacheManager().emptyCache();
+      // try {
+      //   final directory = await getTemporaryDirectory();
+      //   final cacheDir = directory.path;
+      //   final cacheDirFile = Directory(cacheDir);
+      //   await cacheDirFile.delete(recursive: true);
+      // } catch (e) {
+      //   ScaffoldMessenger.of(context).showSnackBar(
+      //     const SnackBar(
+      //       content: Text('An error occurred when deleting cache'),
+      //     ),
+      //   );
+      // }
     }
 
     Future<void> sendImages() async {
@@ -92,10 +94,25 @@ class _ScannerPreviewState extends State<ScannerPreview>
           data: formData,
           options: Options(responseType: ResponseType.json));
       debugPrint(response.toString());
-      final pdfFile = await DefaultCacheManager().putFile(
-          response.data['pdf_name'], base64Decode(response.data['pdf']));
-      final isDa = await pdfFile.exists();
-      debugPrint(isDa.toString());
+      //process pdf data from response
+      final pdfData = base64Decode(response.data['pdf']);
+      final pdfName = response.data['pdf_name'] + '.pdf';
+      //get path to pdf
+      final pdfFile = await DefaultCacheManager()
+          .putFile(pdfName, pdfData, fileExtension: 'pdf');
+      final cacheDir = await DefaultCacheManager().getFileFromCache(pdfName);
+      final pdfPath = '${cacheDir!.file.dirname}/${cacheDir.file.basename}';
+      //create manual entry
+      if (context.mounted) {
+        context.read<ManualEntryService>().setManualEntry(
+            pdfName,
+            pdfPath,
+            response.data['supplier_name'],
+            response.data['total_amount'],
+            response.data['date'],
+            response.data['category']);
+      }
+      debugPrint(pdfPath);
     }
 
     return Scaffold(
@@ -292,7 +309,7 @@ class _ScannerPreviewState extends State<ScannerPreview>
                       await Navigator.push(
                         context,
                         MaterialPageRoute(
-                          builder: (context) => const Start(),
+                          builder: (context) => const ManualEntry(),
                         ),
                       );
                     },

@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:frontend/services/manualentry_service.dart';
 import 'package:provider/provider.dart';
-import 'pages/manual-entry.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:frontend/services/scanner_service.dart';
 import 'start.dart';
@@ -9,8 +9,16 @@ final ImageCache testImageCache = ImageCache();
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await ScannerService.init();
-  runApp(ChangeNotifierProvider(
-    create: (BuildContext context) => ScannerService(),
+  await ManualEntryService.init();
+  runApp(MultiProvider(
+    providers: [
+      ChangeNotifierProvider(
+        create: (BuildContext context) => ScannerService(),
+      ),
+      ChangeNotifierProvider(
+        create: (BuildContext context) => ManualEntryService(),
+      ),
+    ],
     child: const MyApp(),
   ));
 }

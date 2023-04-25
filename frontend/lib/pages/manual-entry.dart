@@ -3,10 +3,13 @@ import 'package:flutter/services.dart';
 import 'package:frontend/constants/colors.dart';
 import 'package:frontend/constants/fonts.dart';
 import 'package:frontend/constants/values.dart';
+import 'package:frontend/services/manualentry_service.dart';
+import 'package:frontend/widgets/header.dart';
 import 'package:frontend/widgets/input_fields/input_field.dart';
 import 'package:frontend/widgets/input_fields/datepicker_field.dart';
 import 'package:frontend/widgets/pdf_preview.dart';
 import 'package:dio/dio.dart';
+import 'package:provider/provider.dart';
 
 class ManualEntry extends StatefulWidget {
   const ManualEntry({super.key});
@@ -37,17 +40,24 @@ class _ManualEntryState extends State<ManualEntry> {
 
   @override
   Widget build(BuildContext context) {
+    Map<String, dynamic> manualEntry =
+        context.watch<ManualEntryService>().getManualEntry();
+
     return GestureDetector(
       onTap: () => FocusManager.instance.primaryFocus?.unfocus(),
       child: Scaffold(
-        appBar: AppBar(
-            elevation: 0,
-            backgroundColor: AppColor.backgroundGray,
-            title: Text(
-              "neuer eintrag".toUpperCase(),
-              style: Fonts.textHeadingBold,
-            ),
-            titleTextStyle: TextStyle(color: AppColor.neutral100)),
+        appBar: Header(
+          onTap: () {
+            if (context.mounted) {
+              context.read<ManualEntryService>().forgetManualEntry();
+            }
+            Navigator.pop(context);
+          },
+          element: Text(
+            "neuer eintrag".toUpperCase(),
+            style: Fonts.textHeadingBold,
+          ),
+        ),
         backgroundColor: AppColor.backgroundGray,
         body: Align(
           alignment: Alignment.topCenter,
@@ -85,7 +95,7 @@ class _ManualEntryState extends State<ManualEntry> {
                       controller: controllerDescription,
                     ),
                     DatepickerField(controller: controllerDate),
-                    PdfPreview(pdfUrl: "assets/pdf/sample.pdf"),
+                    PdfPreview(pdfUrl: manualEntry['pdf_path']),
                     ElevatedButton(
                       onPressed: () {
                         if (_formKey.currentState!.validate()) {

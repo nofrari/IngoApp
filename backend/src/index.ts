@@ -126,7 +126,10 @@ app.post("/scanner/upload", upload.array("image"), async (req, res) => {
             var pdf = await createPDF(pages);
             pdf.pipe(fs.createWriteStream("./src/uploads/" + pdfname + ".pdf")).on('finish', async () => {
                 const data = {
-                    invoice_data: invoicedata,
+                    supplier_name: invoicedata.supplier_name,
+                    total_amount: invoicedata.total_amount,
+                    date: invoicedata.date,
+                    category: invoicedata.category,
                     pdf_name: pdfname,
                     pdf: await fs.promises.readFile("./src/uploads/" + pdfname + ".pdf", { encoding: 'base64' })
                 }

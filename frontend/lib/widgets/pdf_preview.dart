@@ -1,6 +1,7 @@
 import 'dart:io';
 import 'dart:math';
 import 'package:flutter/material.dart';
+import 'package:flutter_cache_manager/flutter_cache_manager.dart';
 import 'package:frontend/constants/fonts.dart';
 import 'package:frontend/widgets/popup.dart';
 import 'package:frontend/widgets/round_button.dart';
@@ -130,24 +131,25 @@ class _PdfPreviewState extends State<PdfPreview> {
                               Container(
                         height: containerHeight > 0 ? containerHeight : 800,
                         child: InteractiveViewer(
-                          clipBehavior: Clip.none,
-                          constrained: true,
-                          child: PDF(
-                            enableSwipe: true,
-                            swipeHorizontal: false,
-                            autoSpacing: true,
-                            pageFling: false,
-                            fitPolicy: FitPolicy.WIDTH,
-                            fitEachPage: false,
-                            pageSnap: false,
-                            onError: (error) {
-                              print(error.toString());
-                            },
-                            onPageError: (page, error) {
-                              print('$page: ${error.toString()}');
-                            },
-                          ).fromAsset(widget.pdfUrl ?? _pdfFile!.path),
-                        ),
+                            clipBehavior: Clip.none,
+                            constrained: true,
+                            child: PDF(
+                              enableSwipe: true,
+                              swipeHorizontal: false,
+                              autoSpacing: true,
+                              pageFling: false,
+                              fitPolicy: FitPolicy.WIDTH,
+                              fitEachPage: false,
+                              pageSnap: false,
+                              onError: (error) {
+                                print(error.toString());
+                              },
+                              onPageError: (page, error) {
+                                print('$page: ${error.toString()}');
+                              },
+                            ).fromPath(widget.pdfUrl ??
+                                _pdfFile!.path) //.fromAsset(_pdfFile!.path),
+                            ),
                       ),
                     ),
                   ),
