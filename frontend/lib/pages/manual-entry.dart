@@ -95,9 +95,7 @@ class _ManualEntryState extends State<ManualEntry> {
                           );
 
                           final amount = double.tryParse(controllerAmount.text);
-                          final date = DateTime.parse(controllerDate.text);
-
-                          //final date = datePicker.selectedDate;
+                          final date = datePicker.selectedDate;
 
                           _sendText(controllerName.text, amount!, date,
                               controllerDescription.text);
@@ -117,22 +115,21 @@ class _ManualEntryState extends State<ManualEntry> {
 
   Future _sendText(
       String name, double amount, DateTime date, String description) async {
-    //final navigator = Navigator.of(context);
-    var formData = FormData.fromMap(
-      {
-        "transaction_name": name,
-        "transaction_amount": amount,
-        "date": date,
-        "description": description,
-        "category_id": "1234",
-        "type_id": "1234",
-        "interval_id": "1234",
-        "account_id": "1234"
-      },
-    );
-    var response = await dio.post("http://10.0.2.2:5432/transactions/test",
+    debugPrint(date.toString());
+    Map<String, dynamic> formData = {
+      "transaction_name": name,
+      "transaction_amount": amount,
+      "date": date.toString(),
+      "description": description,
+      "category_id": "1234",
+      "type_id": "1234",
+      "interval_id": "1234",
+      "account_id": "1234"
+    };
+
+    var response = await dio.post("http://localhost:5432/transactions/test",
         data: formData);
+
     debugPrint(response.toString());
-    // navigator.pop(context);
   }
 }
