@@ -189,17 +189,19 @@ class _PdfPreviewState extends State<PdfPreview> {
                                           btnText: "CAMERA",
                                           onTap: () {
                                             _addPdf("camera");
+                                            Navigator.pop(context);
                                           },
                                           theme: ButtonColorTheme.secondary),
                                       Button(
                                           btnText: "GALLERY",
                                           onTap: () {
                                             _addPdf("gallery");
+                                            Navigator.pop(context);
                                           },
                                           theme: ButtonColorTheme.secondary),
                                     ],
                                   ),
-                                )
+                                ),
                               ],
                             ),
                           );
