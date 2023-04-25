@@ -163,11 +163,11 @@ class _ScannerPreviewState extends State<ScannerPreview>
                         : const Center(
                             child: Text("No Images"),
                           ),
-                    Column(
-                      children: [
-                        Container(
-                          margin: const EdgeInsets.only(top: 8),
-                          child: Row(
+                    Padding(
+                      padding: const EdgeInsets.symmetric(vertical: 8.0),
+                      child: Column(
+                        children: [
+                          Row(
                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             children: [
                               // redo button
@@ -218,61 +218,60 @@ class _ScannerPreviewState extends State<ScannerPreview>
                               ),
                             ],
                           ),
-                        ),
-                      ],
-                    ),
-                    // add button
-                    Container(
-                      margin: const EdgeInsets.only(bottom: 8),
-                      child: Align(
-                        alignment: Alignment.bottomCenter,
-                        child: RoundButton(
-                          icon: Icons.add,
-                          onTap: () {
-                            if (images.length == 1) {
-                              // warning dialog
-                              showDialog(
-                                context: context,
-                                builder: (BuildContext context) => PopUp(
-                                  content:
-                                      "Vom Scanner wird nur der erste Scan auf Werte geprüft. Es kann vorkommen, dass die Einträge manuell überarbeitet werden müssen.",
-                                  actions: [
-                                    Container(
-                                      margin: Values.buttonPadding,
-                                      child: Column(
-                                        children: [
-                                          Button(
-                                              btnText: "ABBRECHEN",
-                                              onTap: () {
-                                                Navigator.pop(context);
-                                              },
-                                              theme:
-                                                  ButtonColorTheme.secondary),
-                                          Button(
-                                              btnText: "FORTFAHREN",
-                                              onTap: () {
-                                                Navigator.push(
-                                                  context,
-                                                  MaterialPageRoute(
-                                                    builder: (context) =>
-                                                        const ScannerCamera(),
-                                                  ),
-                                                );
-                                              },
-                                              theme: ButtonColorTheme.primary),
-                                        ],
-                                      ),
-                                    )
-                                  ],
-                                ),
-                              );
-                            } else {
-                              Navigator.pop(context);
-                            }
-                          },
-                        ),
+                          const Spacer(),
+                          // add button
+                          Align(
+                            alignment: Alignment.bottomCenter,
+                            child: RoundButton(
+                              icon: Icons.add,
+                              onTap: () {
+                                if (images.length == 1) {
+                                  // warning dialog
+                                  showDialog(
+                                    context: context,
+                                    builder: (BuildContext context) => PopUp(
+                                      content:
+                                          "Vom Scanner wird nur der erste Scan auf Werte geprüft. Es kann vorkommen, dass die Einträge manuell überarbeitet werden müssen.",
+                                      actions: [
+                                        Container(
+                                          margin: Values.buttonPadding,
+                                          child: Column(
+                                            children: [
+                                              Button(
+                                                  btnText: "ABBRECHEN",
+                                                  onTap: () {
+                                                    Navigator.pop(context);
+                                                  },
+                                                  theme: ButtonColorTheme
+                                                      .secondary),
+                                              Button(
+                                                  btnText: "FORTFAHREN",
+                                                  onTap: () {
+                                                    Navigator.push(
+                                                      context,
+                                                      MaterialPageRoute(
+                                                        builder: (context) =>
+                                                            const ScannerCamera(),
+                                                      ),
+                                                    );
+                                                  },
+                                                  theme:
+                                                      ButtonColorTheme.primary),
+                                            ],
+                                          ),
+                                        )
+                                      ],
+                                    ),
+                                  );
+                                } else {
+                                  Navigator.pop(context);
+                                }
+                              },
+                            ),
+                          )
+                        ],
                       ),
-                    )
+                    ),
                   ],
                 ),
               ),
