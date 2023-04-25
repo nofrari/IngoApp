@@ -51,7 +51,8 @@ dependencies:
   path_provider: ^2.0.14
   file_picker: ^5.2.10
   pdf: ^3.10.1
-  intl: ^0.18.0
+  intl: ^0.17.0
+  currency_text_input_formatter: ^2.1.8
 
 dev_dependencies:
   flutter_test:

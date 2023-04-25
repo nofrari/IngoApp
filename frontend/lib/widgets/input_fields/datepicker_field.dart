@@ -8,9 +8,10 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:control_style/control_style.dart';
 
 class DatepickerField extends StatefulWidget {
-  const DatepickerField({super.key, required this.controller});
+  DatepickerField({super.key, required this.controller, this.serverDate});
 
   final TextEditingController controller;
+  String? serverDate;
 
   DateTime get selectedDate => DateTime.now();
   set selectedDate(DateTime value) {
@@ -91,7 +92,9 @@ class _DatepickerFieldState extends State<DatepickerField> {
         onTap: () async {
           DateTime? pickedDate = await showDatePicker(
             context: context,
-            initialDate: widget.selectedDate,
+            initialDate: (widget.serverDate != null)
+                ? DateFormat("yyyy-MM-dd").parse(widget.serverDate!)
+                : widget.selectedDate,
             firstDate: DateTime(2000),
             lastDate: DateTime(2101),
             cancelText: "Schließen",

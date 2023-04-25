@@ -11,6 +11,7 @@ import 'package:frontend/widgets/pdf_preview.dart';
 import 'package:dio/dio.dart';
 import 'package:provider/provider.dart';
 import 'package:currency_text_input_formatter/currency_text_input_formatter.dart';
+import 'package:intl/intl.dart';
 
 class ManualEntry extends StatefulWidget {
   const ManualEntry({super.key});
@@ -45,6 +46,10 @@ class _ManualEntryState extends State<ManualEntry> {
   Widget build(BuildContext context) {
     Map<String, dynamic> manualEntry =
         context.watch<ManualEntryService>().getManualEntry();
+    controllerName.text = manualEntry['supplier_name'];
+    controllerAmount.text = manualEntry['amount'].toString();
+    controllerDate.text = DateFormat("dd / MM / yyyy")
+        .format(DateFormat("yyyy-MM-dd").parse(manualEntry['date']));
 
     return GestureDetector(
       onTap: () => FocusManager.instance.primaryFocus?.unfocus(),
@@ -97,7 +102,10 @@ class _ManualEntryState extends State<ManualEntry> {
                       keyboardType: text,
                       controller: controllerDescription,
                     ),
-                    DatepickerField(controller: controllerDate),
+                    DatepickerField(
+                      controller: controllerDate,
+                      serverDate: manualEntry['date'],
+                    ),
                     PdfPreview(pdfUrl: manualEntry['pdf_path']),
                     ElevatedButton(
                       onPressed: () {
