@@ -91,7 +91,8 @@ class _InputFieldState extends State<InputField> {
                 borderRadius: BorderRadius.circular(Values.inputRadius),
                 borderSide: const BorderSide(
                     color: Colors.red, width: Values.inputBorder))),
-        //inputFormatters: [widget.formatter],
+
+        inputFormatters: [widget.formatter],
         keyboardType: widget.keyboardType,
       ),
     );
