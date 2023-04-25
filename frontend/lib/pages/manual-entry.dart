@@ -10,6 +10,7 @@ import 'package:frontend/widgets/input_fields/datepicker_field.dart';
 import 'package:frontend/widgets/pdf_preview.dart';
 import 'package:dio/dio.dart';
 import 'package:provider/provider.dart';
+import 'package:currency_text_input_formatter/currency_text_input_formatter.dart';
 
 class ManualEntry extends StatefulWidget {
   const ManualEntry({super.key});
@@ -19,7 +20,9 @@ class ManualEntry extends StatefulWidget {
 }
 
 class _ManualEntryState extends State<ManualEntry> {
-  TextInputFormatter digits = FilteringTextInputFormatter.digitsOnly;
+  //TextInputFormatter digits = FilteringTextInputFormatter.digitsOnly;
+  TextInputFormatter money =
+      CurrencyTextInputFormatter(locale: 'de', symbol: '€');
   TextInputFormatter letters = FilteringTextInputFormatter.allow(
       RegExp(r"[a-zA-Z0-9#+:'()&/^\-{2}|\s]"));
 
@@ -84,7 +87,7 @@ class _ManualEntryState extends State<ManualEntry> {
                     ),
                     InputField(
                       lblText: "Betrag",
-                      formatter: digits,
+                      formatter: money,
                       keyboardType: numeric,
                       controller: controllerAmount,
                     ),
@@ -104,7 +107,13 @@ class _ManualEntryState extends State<ManualEntry> {
                                 content: Text('Daten werden gespeichert')),
                           );
 
-                          final amount = double.tryParse(controllerAmount.text);
+                          final refactoredAmount = controllerAmount.text
+                              .replaceAll("€", "")
+                              .replaceAll(" ", "")
+                              .replaceAll(".", "")
+                              .replaceAll(",", "");
+
+                          final amount = double.tryParse(refactoredAmount);
                           final date = datePicker.selectedDate;
 
                           _sendText(controllerName.text, amount!, date,
@@ -125,7 +134,6 @@ class _ManualEntryState extends State<ManualEntry> {
 
   Future _sendText(
       String name, double amount, DateTime date, String description) async {
-    debugPrint(date.toString());
     Map<String, dynamic> formData = {
       "transaction_name": name,
       "transaction_amount": amount,
