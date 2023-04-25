@@ -38,7 +38,7 @@ dependencies:
   cupertino_icons: ^1.0.2
   image_picker: ^0.8.7+1
   dio: ^5.1.1
-  intl:  ^0.17.0-nullsafety.2
+  intl: ^0.17.0-nullsafety.2
   permission_handler: ^10.2.0
   camera: ^0.10.4
   google_fonts: ^4.0.3
@@ -50,6 +50,8 @@ dependencies:
   shared_preferences: ^2.1.0
   flutter_cache_manager: ^3.3.0
   path_provider: ^2.0.14
+  file_picker: ^5.2.10
+  pdf: ^3.10.1
 
 dev_dependencies:
   flutter_test:
