@@ -6,6 +6,7 @@ import 'package:frontend/constants/values.dart';
 import 'package:frontend/services/manualentry_service.dart';
 import 'package:frontend/widgets/header.dart';
 import 'package:frontend/widgets/input_fields/input_field.dart';
+import 'package:frontend/widgets/input_fields/dropdown_field.dart';
 import 'package:frontend/widgets/input_fields/datepicker_field.dart';
 import 'package:frontend/widgets/pdf_preview.dart';
 import 'package:dio/dio.dart';
@@ -46,10 +47,13 @@ class _ManualEntryState extends State<ManualEntry> {
   Widget build(BuildContext context) {
     Map<String, dynamic> manualEntry =
         context.watch<ManualEntryService>().getManualEntry();
-    controllerName.text = manualEntry['supplier_name'];
-    controllerAmount.text = manualEntry['amount'].toString();
-    controllerDate.text = DateFormat("dd / MM / yyyy")
-        .format(DateFormat("yyyy-MM-dd").parse(manualEntry['date']));
+
+    if (manualEntry.isNotEmpty) {
+      controllerName.text = manualEntry['supplier_name'];
+      controllerAmount.text = manualEntry['amount'].toString();
+      controllerDate.text = DateFormat("dd / MM / yyyy")
+          .format(DateFormat("yyyy-MM-dd").parse(manualEntry['date']));
+    }
 
     return GestureDetector(
       onTap: () => FocusManager.instance.primaryFocus?.unfocus(),
@@ -101,6 +105,18 @@ class _ManualEntryState extends State<ManualEntry> {
                       formatter: letters,
                       keyboardType: text,
                       controller: controllerDescription,
+                    ),
+                    Dropdown(
+                      dropdownItems: const [
+                        'Essen',
+                        'Freizeit',
+                        'Lebensmittel',
+                        'Shopping',
+                        'awef',
+                        'asdfasdfasdf',
+                        'ölkdjföjrö',
+                        'jkrgh alhfiu',
+                      ],
                     ),
                     DatepickerField(
                       controller: controllerDate,
