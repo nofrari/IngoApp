@@ -22,7 +22,7 @@ const inputSchema = z.object({
     interval_id: z.string(),
     account_id: z.string()
 });
-type TestSchema = z.infer<typeof inputSchema>;
+type InputSchema = z.infer<typeof inputSchema>;
 
 const editSchema = z.object({
     transaction_id: z.string(),
@@ -43,15 +43,13 @@ type EditSchema = z.infer<typeof editSchema>;
 // });
 
 router.post('/transactions/input', async (req, res) => {
-    const body = <TestSchema>req.body;
+    const body = <InputSchema>req.body;
     const validationResult: any = inputSchema.safeParse(body);
 
     if (!validationResult.success) {
         res.status(400).send();
         return;
     }
-
-    //const hash = await bcrypt.hash(body.password, 10);
 
     const transaction = await prisma.transaction.create({
         data: {
