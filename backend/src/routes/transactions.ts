@@ -24,17 +24,30 @@ const inputSchema = z.object({
 });
 type TestSchema = z.infer<typeof inputSchema>;
 
-router.post('/transactions', (req, res) => {
-    res.status(201).send('Hello world2');
+const editSchema = z.object({
+    transaction_id: z.string(),
+    transaction_name: z.string().optional(),
+    transaction_amount: z.number().optional(),
+    date: z.string().optional(),
+    description: z.string().optional().optional(),
+    bill_url: z.string().optional(),
+    category_id: z.string().optional(),
+    type_id: z.string().optional(),
+    interval_id: z.string().optional(),
+    account_id: z.string().optional()
 });
+type EditSchema = z.infer<typeof editSchema>;
+
+// router.post('/transactions', (req, res) => {
+//     res.status(201).send('Hello world2');
+// });
 
 router.post('/transactions/input', async (req, res) => {
-    console.log("request mqde: ", req.body);
     const body = <TestSchema>req.body;
     const validationResult: any = inputSchema.safeParse(body);
 
     if (!validationResult.success) {
-        res.status(402).send();
+        res.status(400).send();
         return;
     }
 
@@ -72,6 +85,140 @@ router.post('/transactions/input', async (req, res) => {
         interval_id: transaction.interval_id,
         account_id: transaction.account_id,
     });
+});
+
+router.post('/transactions/edit', async (req, res) => {
+    const body = <EditSchema>req.body;
+    const validationResult: any = editSchema.safeParse(body);
+
+    if (!validationResult.success) {
+        res.status(400).send();
+        return;
+    }
+
+    const user = await prisma.transaction.findUnique({
+        where: {
+            transaction_id: body.transaction_id
+        }
+    });
+
+    if (!user) {
+        res.status(404).send();
+        return;
+    }
+
+    if (body.transaction_name) {
+        await prisma.transaction.update({
+            where: {
+                transaction_id: body.transaction_id
+            },
+            data: {
+                transaction_name: body.transaction_name
+            }
+        });
+
+        res.status(200).send();
+
+    } else if (body.transaction_amount) {
+        await prisma.transaction.update({
+            where: {
+                transaction_id: body.transaction_id
+            },
+            data: {
+                transaction_amount: body.transaction_amount
+            }
+        });
+
+        res.status(200).send();
+
+    } else if (body.date) {
+        await prisma.transaction.update({
+            where: {
+                transaction_id: body.transaction_id
+            },
+            data: {
+                date: body.date
+            }
+        });
+
+        res.status(200).send();
+
+    } else if (body.description) {
+        await prisma.transaction.update({
+            where: {
+                transaction_id: body.transaction_id
+            },
+            data: {
+                description: body.description
+            }
+        });
+
+        res.status(200).send();
+
+    } else if (body.bill_url) {
+        await prisma.transaction.update({
+            where: {
+                transaction_id: body.transaction_id
+            },
+            data: {
+                bill_url: body.bill_url
+            }
+        });
+
+        res.status(200).send();
+
+    } else if (body.category_id) {
+        await prisma.transaction.update({
+            where: {
+                transaction_id: body.transaction_id
+            },
+            data: {
+                category_id: body.category_id
+            }
+        });
+
+        res.status(200).send();
+
+    } else if (body.type_id) {
+        await prisma.transaction.update({
+            where: {
+                transaction_id: body.transaction_id
+            },
+            data: {
+                type_id: body.type_id
+            }
+        });
+
+        res.status(200).send();
+
+    } else if (body.interval_id) {
+        await prisma.transaction.update({
+            where: {
+                transaction_id: body.transaction_id
+            },
+            data: {
+                interval_id: body.interval_id
+            }
+        });
+
+        res.status(200).send();
+
+    } else if (body.account_id) {
+        await prisma.transaction.update({
+            where: {
+                transaction_id: body.transaction_id
+            },
+            data: {
+                account_id: body.account_id
+            }
+        });
+
+        res.status(200).send();
+
+    } else {
+        res.status(406).send();
+        return;
+    }
 });
 
 export default router;
