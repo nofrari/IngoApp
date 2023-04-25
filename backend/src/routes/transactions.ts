@@ -11,7 +11,7 @@ const prisma = new PrismaClient();
 const router = express.Router();
 //is used to check the parameters of the request body
 
-const testSchema = z.object({
+const inputSchema = z.object({
     transaction_name: z.string(),
     transaction_amount: z.number(),
     date: z.string(),
@@ -22,16 +22,16 @@ const testSchema = z.object({
     interval_id: z.string(),
     account_id: z.string()
 });
-type TestSchema = z.infer<typeof testSchema>;
+type TestSchema = z.infer<typeof inputSchema>;
 
 router.post('/transactions', (req, res) => {
     res.status(201).send('Hello world2');
 });
 
-router.post('/transactions/test', async (req, res) => {
+router.post('/transactions/input', async (req, res) => {
     console.log("request mqde: ", req.body);
     const body = <TestSchema>req.body;
-    const validationResult: any = testSchema.safeParse(body);
+    const validationResult: any = inputSchema.safeParse(body);
 
     if (!validationResult.success) {
         res.status(402).send();

@@ -127,7 +127,7 @@ class _ManualEntryState extends State<ManualEntry> {
       "account_id": "1234"
     };
 
-    var response = await dio.post("http://localhost:5432/transactions/test",
+    var response = await dio.post("http://localhost:5432/transactions/input",
         data: formData);
 
     debugPrint(response.toString());
