@@ -29,13 +29,12 @@ router.post('/transactions', (req, res) => {
 });
 
 router.post('/transactions/test', async (req, res) => {
-    console.log(req.body);
+    console.log("request mqde: ", req.body);
     const body = <TestSchema>req.body;
     const validationResult: any = testSchema.safeParse(body);
-    console.log(validationResult.error);
 
     if (!validationResult.success) {
-        res.status(404).send();
+        res.status(402).send();
         return;
     }
 
@@ -60,7 +59,8 @@ router.post('/transactions/test', async (req, res) => {
     //     exp: Math.floor(Date.now() / 1000) + (60 * 60)
     // }, <string>process.env.JWT_SECRET);
 
-    const response = {
+
+    res.send({
         transaction_id: transaction.transaction_id,
         transaction_name: transaction.transaction_name,
         transaction_amount: transaction.transaction_amount,
@@ -71,11 +71,6 @@ router.post('/transactions/test', async (req, res) => {
         type_id: transaction.type_id,
         interval_id: transaction.interval_id,
         account_id: transaction.account_id,
-    }
-
-    console.log(response);
-    res.send({
-        response
     });
 });
 
