@@ -8,6 +8,7 @@ import 'package:frontend/widgets/round_button.dart';
 import 'package:frontend/widgets/text_google.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:pdf/widgets.dart' as pdf;
+import 'package:pdf_render/pdf_render.dart';
 import 'package:flutter_cached_pdfview/flutter_cached_pdfview.dart';
 import 'package:frontend/constants/colors.dart';
 import 'package:frontend/constants/values.dart';
@@ -29,11 +30,12 @@ class _PdfPreviewState extends State<PdfPreview> {
   bool _showPdf = true;
   double containerHeight = 0;
 
+  // deleting the pdf
   void _deletePdf() async {
     setState(() {
       _showPdf = false;
     });
-
+    //delete the file if it is not null & reset the images
     if (_pdfFile != null) {
       try {
         await _pdfFile!.delete();
@@ -44,6 +46,7 @@ class _PdfPreviewState extends State<PdfPreview> {
       } catch (e) {
         print('Error deleting PDF file: $e');
       }
+      //else set the pdf file to null
     } else {
       setState(() {
         widget.pdfUrl = null;
@@ -51,19 +54,21 @@ class _PdfPreviewState extends State<PdfPreview> {
     }
   }
 
+// take/select the image & generate the pdf & show it
   void _addPdf(String? variant) async {
     if (variant == "gallery") {
       await _pickImages();
     } else if (variant == "camera") {
       await _takeImages();
     }
+
+    await _generatePdf();
     setState(() {
       _showPdf = true;
     });
-
-    await _generatePdf();
   }
 
+  //select the images from the gallery
   Future<void> _pickImages() async {
     final picker = ImagePicker();
     final pickedFiles = await picker.pickMultiImage();
@@ -74,6 +79,7 @@ class _PdfPreviewState extends State<PdfPreview> {
     });
   }
 
+  //take one image with the camera
   Future<void> _takeImages() async {
     final picker = ImagePicker();
     final pickedFile = await picker.pickImage(source: ImageSource.camera);
@@ -84,12 +90,14 @@ class _PdfPreviewState extends State<PdfPreview> {
     });
   }
 
+  //reset the images
   void _resetImages() {
     setState(() {
       _selectedImages = [];
     });
   }
 
+  //generate the pdf
   Future<void> _generatePdf() async {
     final doc = pdf.Document();
 
@@ -109,48 +117,58 @@ class _PdfPreviewState extends State<PdfPreview> {
     setState(() {
       _pdfFile = file;
     });
+
+    getPDFSize(_pdfFile!.path);
+  }
+
+  //get the pdf-size
+  Future<void> getPDFSize(String path) async {
+    final file = File(path);
+    final document = await PdfDocument.openFile(file.path);
+    //get the first page (starts with 1 not with 0) and from there the height
+    final page = await document.getPage(1);
+    double height = page.height;
+    int pageCount = document.pageCount;
+    setState(() {
+      containerHeight = (height * pageCount);
+    });
+    await document.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
     return (_pdfFile != null || widget.pdfUrl != null) && _showPdf
         ? Container(
-            height: 400,
+            height: 450,
             decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(Values.cardRadius),
-                border: Border.all(color: AppColor.blueActive, width: 2)),
+              borderRadius: BorderRadius.circular(Values.cardRadius),
+              border: Border.all(color: AppColor.blueActive, width: 2),
+            ),
             child: Stack(
               alignment: Alignment.bottomCenter,
               children: [
                 ClipRRect(
                   borderRadius: BorderRadius.circular(Values.cardRadius - 4),
                   child: SingleChildScrollView(
-                    child: LayoutBuilder(
-                      builder:
-                          (BuildContext context, BoxConstraints constraints) =>
-                              Container(
-                        height: containerHeight > 0 ? containerHeight : 800,
-                        child: InteractiveViewer(
-                            clipBehavior: Clip.none,
-                            constrained: true,
-                            child: PDF(
-                              enableSwipe: true,
-                              swipeHorizontal: false,
-                              autoSpacing: true,
-                              pageFling: false,
-                              fitPolicy: FitPolicy.WIDTH,
-                              fitEachPage: false,
-                              pageSnap: false,
-                              onError: (error) {
-                                print(error.toString());
-                              },
-                              onPageError: (page, error) {
-                                print('$page: ${error.toString()}');
-                              },
-                            ).fromPath(widget.pdfUrl ??
-                                _pdfFile!.path) //.fromAsset(_pdfFile!.path),
-                            ),
-                      ),
+                    child: Container(
+                      height: containerHeight > 0 ? containerHeight : 800,
+                      child: InteractiveViewer(
+                        clipBehavior: Clip.none,
+                        constrained: true,
+                        child: PDF(
+                          enableSwipe: true,
+                          swipeHorizontal: false,
+                          autoSpacing: true,
+                          pageFling: false,
+                          fitEachPage: false,
+                          onError: (error) {
+                            print(error.toString());
+                          },
+                          onPageError: (page, error) {
+                            print('$page: ${error.toString()}');
+                          },
+                        ).fromPath(widget.pdfUrl ?? _pdfFile!.path),
+                      ), //.fromAsset(_pdfFile!.path),
                     ),
                   ),
                 ),
