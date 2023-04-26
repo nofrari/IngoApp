@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:intl/intl.dart';
 import '../../constants/colors.dart';
 import '../../constants/fonts.dart';
 import '../../constants/values.dart';
@@ -7,15 +8,16 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:control_style/control_style.dart';
 
 class InputField extends StatefulWidget {
-  const InputField(
-      {super.key,
-      required this.lblText,
-      required this.formatter,
-      required this.keyboardType,
-      required this.controller});
+  InputField({
+    super.key,
+    required this.lblText,
+    required this.reqFormatter,
+    required this.keyboardType,
+    required this.controller,
+  });
 
   final String lblText;
-  final TextInputFormatter formatter;
+  final TextInputFormatter reqFormatter;
   final TextInputType keyboardType;
   final TextEditingController controller;
 
@@ -24,6 +26,8 @@ class InputField extends StatefulWidget {
 }
 
 class _InputFieldState extends State<InputField> {
+  final formatCurrency =
+      NumberFormat.currency(locale: 'de_DE', name: "EUR", symbol: '€');
   //late FocusNode _focusNode;
 
   // @override
@@ -62,37 +66,60 @@ class _InputFieldState extends State<InputField> {
         style: Fonts.text300,
         cursorColor: Colors.white,
         decoration: InputDecoration(
-            contentPadding:
-                const EdgeInsets.symmetric(vertical: 10.0, horizontal: 10.0),
-            label: Text(widget.lblText,
-                style: GoogleFonts.josefinSans(fontSize: 18)),
-            labelStyle: TextStyle(color: AppColor.neutral100),
-            filled: true,
-            fillColor: AppColor.neutral400,
-            errorStyle: Fonts.errorMessage,
-            border: DecoratedInputBorder(
-              child: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(Values.inputRadius),
-                  borderSide: BorderSide.none),
-              shadow: const [
-                BoxShadow(
-                  color: Color.fromARGB(60, 0, 0, 0),
-                  blurRadius: 4,
-                  offset: Offset(0, 3),
-                )
-              ],
-            ),
-            focusedBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(Values.inputRadius),
-              borderSide: BorderSide(
-                  color: AppColor.blueActive, width: Values.inputBorder),
-            ),
-            errorBorder: OutlineInputBorder(
+          contentPadding:
+              const EdgeInsets.symmetric(vertical: 10.0, horizontal: 10.0),
+          label: Text(widget.lblText,
+              style: GoogleFonts.josefinSans(fontSize: 18)),
+          labelStyle: TextStyle(color: AppColor.neutral100),
+          filled: true,
+          fillColor: AppColor.neutral400,
+          errorStyle: Fonts.errorMessage,
+          border: DecoratedInputBorder(
+            child: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(Values.inputRadius),
-                borderSide: const BorderSide(
-                    color: Colors.red, width: Values.inputBorder))),
+                borderSide: BorderSide.none),
+            shadow: const [
+              BoxShadow(
+                color: Color.fromARGB(60, 0, 0, 0),
+                blurRadius: 4,
+                offset: Offset(0, 3),
+              )
+            ],
+          ),
+          focusedBorder: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(Values.inputRadius),
+            borderSide: BorderSide(
+                color: AppColor.blueActive, width: Values.inputBorder),
+          ),
+          errorBorder: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(Values.inputRadius),
+            borderSide:
+                const BorderSide(color: Colors.red, width: Values.inputBorder),
+          ),
+        ),
 
-        inputFormatters: [widget.formatter],
+        inputFormatters: [widget.reqFormatter],
+        // inputFormatters: <TextInputFormatter>[
+        //   FilteringTextInputFormatter.allow(RegExp(r'[0-9]')),
+        //   LengthLimitingTextInputFormatter(12),
+        //   TextInputFormatter.withFunction((oldValue, newValue) {
+        //     final newNumericValue = int.tryParse(newValue.text);
+        //     if (newNumericValue != null) {
+        //       final newFormattedValue =
+        //           formatCurrency.format(newNumericValue / 100);
+        //       final newCursorPosition = newFormattedValue.length - 2;
+        //       return TextEditingValue(
+        //         text: newFormattedValue,
+        //         selection:
+        //             // TextSelection.collapsed(offset: newFormattedValue.length),
+        //             TextSelection.collapsed(
+        //                 offset: newCursorPosition < 0 ? 0 : newCursorPosition),
+        //       );
+        //     } else {
+        //       return oldValue;
+        //     }
+        //   })
+        // ],
         keyboardType: widget.keyboardType,
       ),
     );

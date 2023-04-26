@@ -11,7 +11,6 @@ import 'package:frontend/widgets/input_fields/datepicker_field.dart';
 import 'package:frontend/widgets/pdf_preview.dart';
 import 'package:dio/dio.dart';
 import 'package:provider/provider.dart';
-import 'package:currency_text_input_formatter/currency_text_input_formatter.dart';
 import 'package:intl/intl.dart';
 
 class ManualEntry extends StatefulWidget {
@@ -22,9 +21,22 @@ class ManualEntry extends StatefulWidget {
 }
 
 class _ManualEntryState extends State<ManualEntry> {
-  //TextInputFormatter digits = FilteringTextInputFormatter.digitsOnly;
-  TextInputFormatter money =
-      CurrencyTextInputFormatter(locale: 'de', symbol: '€');
+  TextInputFormatter currency =
+      TextInputFormatter.withFunction((oldValue, newValue) {
+    String cleanText = newValue.text.replaceAll(RegExp(r'[^\d]'), '');
+    int value = int.tryParse(cleanText) ?? 0;
+    final formatter =
+        NumberFormat.currency(locale: 'de', name: "EUR", symbol: '€');
+    String newText = formatter.format(value / 100);
+    int cursorPos = newText.length;
+    if (newValue.selection.baseOffset == newValue.selection.extentOffset) {
+      cursorPos = formatter.format((value + 1) / 100).length - 2;
+    }
+    return TextEditingValue(
+      text: newText,
+      selection: TextSelection.collapsed(offset: cursorPos),
+    );
+  });
   TextInputFormatter letters = FilteringTextInputFormatter.allow(
       RegExp(r"[a-zA-Z0-9#+:'()&/^\-{2}|\s]"));
 
@@ -90,19 +102,19 @@ class _ManualEntryState extends State<ManualEntry> {
                   children: [
                     InputField(
                       lblText: "Name",
-                      formatter: letters,
+                      reqFormatter: letters,
                       keyboardType: text,
                       controller: controllerName,
                     ),
                     InputField(
                       lblText: "Betrag",
-                      formatter: money,
+                      reqFormatter: currency,
                       keyboardType: numeric,
                       controller: controllerAmount,
                     ),
                     InputField(
                       lblText: "Beschreibung",
-                      formatter: letters,
+                      reqFormatter: letters,
                       keyboardType: text,
                       controller: controllerDescription,
                     ),
@@ -134,8 +146,7 @@ class _ManualEntryState extends State<ManualEntry> {
                           final refactoredAmount = controllerAmount.text
                               .replaceAll("€", "")
                               .replaceAll(" ", "")
-                              .replaceAll(".", "")
-                              .replaceAll(",", "");
+                              .replaceAll(",", ".");
 
                           final amount = double.tryParse(refactoredAmount);
                           final date = datePicker.selectedDate;
