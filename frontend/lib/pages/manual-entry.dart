@@ -11,7 +11,6 @@ import 'package:frontend/widgets/input_fields/datepicker_field.dart';
 import 'package:frontend/widgets/pdf_preview.dart';
 import 'package:dio/dio.dart';
 import 'package:provider/provider.dart';
-import 'package:currency_text_input_formatter/currency_text_input_formatter.dart';
 import 'package:intl/intl.dart';
 
 class ManualEntry extends StatefulWidget {
@@ -22,9 +21,9 @@ class ManualEntry extends StatefulWidget {
 }
 
 class _ManualEntryState extends State<ManualEntry> {
-  //TextInputFormatter digits = FilteringTextInputFormatter.digitsOnly;
-  TextInputFormatter money =
-      CurrencyTextInputFormatter(locale: 'de', symbol: '€');
+  TextInputFormatter digits = FilteringTextInputFormatter.digitsOnly;
+  //TextInputFormatter money =
+  //CurrencyTextInputFormatter(locale: 'de', symbol: '€');
   TextInputFormatter letters = FilteringTextInputFormatter.allow(
       RegExp(r"[a-zA-Z0-9#+:'()&/^\-{2}|\s]"));
 
@@ -96,7 +95,7 @@ class _ManualEntryState extends State<ManualEntry> {
                     ),
                     InputField(
                       lblText: "Betrag",
-                      formatter: money,
+                      formatter: digits,
                       keyboardType: numeric,
                       controller: controllerAmount,
                     ),
@@ -122,7 +121,10 @@ class _ManualEntryState extends State<ManualEntry> {
                       controller: controllerDate,
                       serverDate: manualEntry['date'],
                     ),
-                    PdfPreview(pdfUrl: manualEntry['pdf_path']),
+                    PdfPreview(
+                      pdfUrl: manualEntry['pdf_path'],
+                      pdfHeight: manualEntry['pdf_height'],
+                    ),
                     ElevatedButton(
                       onPressed: () {
                         if (_formKey.currentState!.validate()) {

@@ -17,8 +17,9 @@ import 'package:path_provider/path_provider.dart';
 
 class PdfPreview extends StatefulWidget {
   String? pdfUrl;
+  int? pdfHeight;
 
-  PdfPreview({Key? key, this.pdfUrl}) : super(key: key);
+  PdfPreview({Key? key, this.pdfUrl, this.pdfHeight}) : super(key: key);
 
   @override
   State<PdfPreview> createState() => _PdfPreviewState();
@@ -151,7 +152,9 @@ class _PdfPreviewState extends State<PdfPreview> {
                   borderRadius: BorderRadius.circular(Values.cardRadius - 4),
                   child: SingleChildScrollView(
                     child: Container(
-                      height: containerHeight > 0 ? containerHeight : 800,
+                      height: (widget.pdfHeight != null)
+                          ? widget.pdfHeight!.ceilToDouble()
+                          : containerHeight,
                       child: InteractiveViewer(
                         clipBehavior: Clip.none,
                         constrained: true,

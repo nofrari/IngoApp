@@ -70,12 +70,21 @@ async function createPDF(pages: String[]) {
     return doc
 };
 
+// function getTotalHeight(pdfDoc: typeof PDFDocument): number {
+//     let totalHeight = 0;
+//     for (let i = 0; i < pdfDoc.pages.length; i++) {
+//       totalHeight += pdfDoc.pages[i].getHeight();
+//     }
+//     return totalHeight;
+//   }
+
 app.post("/scanner/upload", upload.array("image"), async (req, res) => {
     if (!req.files || req.files.length === 0) {
         return res.status(422).send("At least one image is required");
     }
 
     let files = req.files as any;
+
 
     //scan first image
     var invoicedata: Invoicedata = {
@@ -124,6 +133,7 @@ app.post("/scanner/upload", upload.array("image"), async (req, res) => {
             //create pdf from images
             const pages: String[] = files.map((file: any) => "./src/uploads/" + file.filename);
             var pdf = await createPDF(pages);
+            pdf.page
             pdf.pipe(fs.createWriteStream("./src/uploads/" + pdfname + ".pdf")).on('finish', async () => {
                 const data = {
                     supplier_name: invoicedata.supplier_name,
@@ -131,14 +141,16 @@ app.post("/scanner/upload", upload.array("image"), async (req, res) => {
                     date: invoicedata.date,
                     category: invoicedata.category,
                     pdf_name: pdfname,
-                    pdf: await fs.promises.readFile("./src/uploads/" + pdfname + ".pdf", { encoding: 'base64' })
+                    pdf: await fs.promises.readFile("./src/uploads/" + pdfname + ".pdf", { encoding: 'base64' }),
+                    pdf_height: pdf.page.height * pages.length
                 }
+                console.log(pdf.page.height * pages.length);
                 //delete images
                 files.forEach((file: any) => {
                     fs.unlinkSync("./src/uploads/" + file.filename);
                 });
 
-                console.log(data);
+                //console.log(data);
                 res.setHeader('Content-Type', 'application/json');
                 return res.status(200).send(JSON.stringify(data));
             });

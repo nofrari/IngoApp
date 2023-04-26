@@ -107,6 +107,7 @@ class _ScannerPreviewState extends State<ScannerPreview>
         context.read<ManualEntryService>().setManualEntry(
             pdfName,
             pdfPath,
+            response.data['pdf_height'],
             response.data['supplier_name'],
             response.data['total_amount'],
             response.data['date'],
