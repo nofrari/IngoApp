@@ -10,9 +10,9 @@ import '../../pages/home.dart';
 import 'package:control_style/control_style.dart';
 
 class Dropdown extends StatefulWidget {
-  Dropdown({super.key, required this.dropdownItems});
+  const Dropdown({super.key, required this.dropdownItems});
 
-  List<String> dropdownItems;
+  final List<String> dropdownItems;
 
   @override
   State<Dropdown> createState() => _DropdownState();
@@ -25,7 +25,7 @@ class _DropdownState extends State<Dropdown> {
   void initState() {
     // TODO: implement initState
     super.initState();
-    WidgetsBinding.instance.addPostFrameCallback((_) => {selectedValue = null});
+    WidgetsBinding.instance.addPostFrameCallback((_) => selectedValue = null);
   }
 
   late TextEditingController controller = TextEditingController();
@@ -42,7 +42,6 @@ class _DropdownState extends State<Dropdown> {
       alignment: Alignment.center,
       margin: const EdgeInsets.only(top: 10, bottom: 15),
       child: SizedBox(
-        width: Values.inputWidth,
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
@@ -84,24 +83,15 @@ class _DropdownState extends State<Dropdown> {
                     ? DropdownMenuItem(
                         value: widget.dropdownItems[index],
                         child: Container(
-                          width: Values.inputWidth,
                           alignment: Alignment.centerLeft,
-                          decoration: BoxDecoration(
-                            border: Border(
-                                bottom: BorderSide(
-                                    width: 2,
-                                    color: selectedValue ==
-                                            widget.dropdownItems[index]
-                                        ? AppColor.backgroundInputField
-                                        : Colors.transparent),
-                                top: const BorderSide(
-                                    width: 2, color: Colors.transparent)),
-                          ),
                           child: Text(
                             widget.dropdownItems[index],
                             style: GoogleFonts.josefinSans(
-                              fontSize: 16,
-                              color: AppColor.textColor,
+                              fontSize: 18,
+                              color:
+                                  selectedValue == widget.dropdownItems[index]
+                                      ? AppColor.blueActive
+                                      : AppColor.textColor,
                             ),
                           ),
                         ),
@@ -109,12 +99,14 @@ class _DropdownState extends State<Dropdown> {
                     : DropdownMenuItem(
                         value: '',
                         child: TextButton(
-                            style:
-                                const ButtonStyle(alignment: Alignment.center),
+                            style: TextButton.styleFrom(
+                              alignment: Alignment.center,
+                              padding: const EdgeInsets.all(0),
+                            ),
                             child: Text(
-                              'neue Kategorie hinzufügen',
+                              '+ neue Kategorie hinzufügen',
                               style: GoogleFonts.josefinSans(
-                                fontSize: 16,
+                                fontSize: 18,
                                 color: AppColor.blueActive,
                               ),
                             ),
@@ -142,6 +134,22 @@ class _DropdownState extends State<Dropdown> {
                 debugPrint('saved');
                 selectedValue = value.toString();
               },
+              selectedItemBuilder: (BuildContext context) {
+                return widget.dropdownItems.map<Widget>((String item) {
+                  return Container(
+                    alignment: Alignment.centerLeft,
+                    constraints: const BoxConstraints(minWidth: 100),
+                    child: Text(
+                      item,
+                      textAlign: TextAlign.left,
+                      style: GoogleFonts.josefinSans(
+                        fontSize: 18,
+                        color: AppColor.textColor,
+                      ),
+                    ),
+                  );
+                }).toList();
+              },
               iconStyleData: IconStyleData(
                 openMenuIcon: Icon(
                   DropdownArrows.up_open_mini,
@@ -166,14 +174,7 @@ class _DropdownState extends State<Dropdown> {
                       bottomRight: Radius.circular(Values.inputRadius),
                       bottomLeft: Radius.circular(Values.inputRadius)),
                   color: AppColor.backgroundGray,
-                ), /* 
-                    scrollbarTheme: ScrollbarThemeData(
-                      thickness: MaterialStateProperty.all<double>(5),
-                      radius: Radius.circular(10),
-                      thumbColor:
-                          MaterialStateProperty.all<Color>(AppColor.activeMenu),
-                      thumbVisibility: MaterialStateProperty.all(true),
-                    ), */
+                ),
               ),
             ),
           ],
