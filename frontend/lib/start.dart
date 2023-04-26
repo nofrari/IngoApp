@@ -14,6 +14,7 @@ import 'pages/finances.dart';
 import 'pages/profile.dart';
 import 'pages/scanner.dart';
 import 'pages/scanner/scanner_camera.dart';
+import 'pages/manual_entry.dart';
 
 import 'package:frontend/models/user.dart';
 
@@ -42,6 +43,7 @@ class _StartState extends State<Start> {
     const Profile(),
     const Scanner(),
     const ScannerCamera(),
+    const ManualEntry(),
   ];
 
   final PageStorageBucket bucket = PageStorageBucket();
@@ -102,7 +104,7 @@ class _StartState extends State<Start> {
           await Navigator.push(
             context,
             MaterialPageRoute(
-              builder: (context) => const ScannerCamera(),
+              builder: (context) => const ManualEntry(),
             ),
           );
           // setState(() {

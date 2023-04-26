@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:frontend/main.dart';
 import 'package:frontend/pages/home.dart';
-import 'package:frontend/pages/manual-entry.dart';
+import 'package:frontend/pages/manual_entry.dart';
 import 'package:frontend/services/manualentry_service.dart';
 import 'package:frontend/services/scanner_service.dart';
 import 'package:frontend/start.dart';
