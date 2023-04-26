@@ -5,7 +5,7 @@ import 'package:frontend/constants/colors.dart';
 import 'package:frontend/constants/fonts.dart';
 import 'package:frontend/constants/values.dart';
 import 'package:frontend/pages/home.dart';
-import 'package:frontend/pages/manual-entry.dart';
+import 'package:frontend/pages/manual_entry.dart';
 import 'package:frontend/widgets/button.dart';
 import 'package:frontend/widgets/header.dart';
 import 'package:frontend/widgets/text_google.dart';
