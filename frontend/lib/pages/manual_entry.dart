@@ -30,13 +30,14 @@ class _ManualEntryState extends State<ManualEntry> {
     String newText = formatter.format(value / 100);
     int cursorPos = newText.length;
     if (newValue.selection.baseOffset == newValue.selection.extentOffset) {
-      cursorPos = formatter.format((value + 1) / 100).length - 2;
+      cursorPos = formatter.format(value / 100).length - 2;
     }
     return TextEditingValue(
       text: newText,
       selection: TextSelection.collapsed(offset: cursorPos),
     );
   });
+
   TextInputFormatter letters = FilteringTextInputFormatter.allow(
       RegExp(r"[a-zA-Z0-9#+:'()&/^\-{2}|\s]"));
 
@@ -47,6 +48,13 @@ class _ManualEntryState extends State<ManualEntry> {
   TextEditingController controllerAmount = TextEditingController();
   TextEditingController controllerDescription = TextEditingController();
   TextEditingController controllerDate = TextEditingController();
+
+  String? Function(String?) required = (value) {
+    if (value == null) {
+      return 'Das Feld darf nicht leer sein';
+    }
+    return null;
+  };
 
   final DatepickerField datePicker =
       DatepickerField(controller: TextEditingController());
@@ -105,18 +113,37 @@ class _ManualEntryState extends State<ManualEntry> {
                       reqFormatter: letters,
                       keyboardType: text,
                       controller: controllerName,
+                      maxLines: 1,
+                      validator: (value) {
+                        if (value == null || value.isEmpty) {
+                          return 'Das Feld darf nicht leer sein';
+                        }
+                        return null;
+                      },
+                      maxLength: 50,
                     ),
                     InputField(
                       lblText: "Betrag",
                       reqFormatter: currency,
                       keyboardType: numeric,
                       controller: controllerAmount,
+                      maxLines: 1,
+                      validator: (value) {
+                        if (value == null || value.isEmpty) {
+                          return 'Das Feld darf nicht leer sein';
+                        }
+                        return null;
+                      },
+                      maxLength: 15,
                     ),
                     InputField(
                       lblText: "Beschreibung",
                       reqFormatter: letters,
                       keyboardType: text,
                       controller: controllerDescription,
+                      maxLines: 4,
+                      alignLabelLeftCorner: true,
+                      maxLength: 250,
                     ),
                     Dropdown(
                       dropdownItems: const [
@@ -151,8 +178,12 @@ class _ManualEntryState extends State<ManualEntry> {
                           final amount = double.tryParse(refactoredAmount);
                           final date = datePicker.selectedDate;
 
-                          _sendText(controllerName.text, amount!, date,
-                              controllerDescription.text);
+                          // _sendText(
+                          //     controllerName.text,
+                          //     amount!,
+                          //     date,
+                          //     controllerDescription.text,
+                          //     ;
                         }
                       },
                       child: const Text('Submit'),
@@ -167,13 +198,14 @@ class _ManualEntryState extends State<ManualEntry> {
     );
   }
 
-  Future _sendText(
-      String name, double amount, DateTime date, String description) async {
+  Future _sendText(String name, double amount, DateTime date,
+      String description, String pdf_url) async {
     Map<String, dynamic> formData = {
       "transaction_name": name,
       "transaction_amount": amount,
       "date": date.toString(),
       "description": description,
+      "bill_url": pdf_url,
       "category_id": "1234",
       "type_id": "1234",
       "interval_id": "1234",
