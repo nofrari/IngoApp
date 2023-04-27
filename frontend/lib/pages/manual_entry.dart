@@ -93,7 +93,7 @@ class _ManualEntryState extends State<ManualEntry> {
             style: Fonts.textHeadingBold,
           ),
         ),
-        backgroundColor: AppColor.backgroundGray,
+        backgroundColor: AppColor.backgroundFullScreen,
         body: Align(
           alignment: Alignment.topCenter,
           child: Container(
@@ -148,8 +148,8 @@ class _ManualEntryState extends State<ManualEntry> {
                       alignLabelLeftCorner: true,
                       maxLength: 250,
                     ),
-                    Dropdown(
-                      dropdownItems: const [
+                    const Dropdown(
+                      dropdownItems: [
                         'Essen',
                         'Freizeit',
                         'Lebensmittel',
