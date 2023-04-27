@@ -10,6 +10,7 @@ import 'package:frontend/widgets/button.dart';
 import 'package:frontend/widgets/header.dart';
 import 'package:frontend/widgets/text_google.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:path_provider/path_provider.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:camera/camera.dart';
 import 'package:frontend/pages/scanner/scanner_preview.dart';
@@ -73,11 +74,17 @@ class _ScannerCameraState extends State<ScannerCamera>
         builder: (context, snapshot) {
           return Scaffold(
             appBar: Header(
-              onTap: () {
+              onTap: () async {
                 if (context.mounted) {
                   context.read<ScannerService>().clearImages();
                 }
-                Navigator.pop(context);
+                await Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => const ScannerCamera(),
+                  ),
+                );
+                ;
               },
               element: TextGoogle(
                 style: Fonts.text400,
@@ -178,8 +185,16 @@ class _ScannerCameraState extends State<ScannerCamera>
   Future<void> _scanImage() async {
     if (_cameraController == null) return;
     debugPrint("scanImage");
+
     try {
       final pictureFile = await _cameraController!.takePicture();
+      final tempDir = await getTemporaryDirectory();
+      final newDirectory = Directory("${tempDir.path}/images");
+      if (!(await newDirectory.exists())) {
+        newDirectory.create(recursive: true);
+      }
+      debugPrint("tempDir: ${tempDir.path}");
+      pictureFile.saveTo(newDirectory.path); //save the image to the folder
 
       int? position;
       if (context.mounted) {

@@ -65,7 +65,7 @@ class _ScannerPreviewState extends State<ScannerPreview>
       if (context.mounted) {
         context.read<ScannerService>().clearImages();
       }
-      // await DefaultCacheManager().emptyCache();
+      //await DefaultCacheManager().emptyCache();
       // try {
       //   final directory = await getTemporaryDirectory();
       //   final cacheDir = directory.path;

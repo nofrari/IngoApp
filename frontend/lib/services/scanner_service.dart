@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:frontend/services/custom_cache_manager.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'dart:io';
+import 'package:provider/provider.dart';
 
 class ScannerService extends ChangeNotifier {
   static init() async {
@@ -94,5 +96,23 @@ class ScannerService extends ChangeNotifier {
 
   int? getPosition() {
     return _prefs.getInt('position');
+  }
+
+  Future<void> clearCache(BuildContext context) async {
+    if (context.mounted) {
+      context.read<ScannerService>().clearImages();
+    }
+    // try {
+    //   final directory = await getTemporaryDirectory();
+    //   final cacheDir = directory.path;
+    //   final cacheDirFile = Directory(cacheDir);
+    //   await cacheDirFile.delete(recursive: true);
+    // } catch (e) {
+    //   ScaffoldMessenger.of(context).showSnackBar(
+    //     const SnackBar(
+    //       content: Text('An error occurred when deleting cache'),
+    //     ),
+    //   );
+    // }
   }
 }
