@@ -6,8 +6,8 @@ import path from 'path';
 import { Request, Response } from 'express';
 import { FileArray, UploadedFile } from 'express-fileupload'
 import usersRouter from './routes/users';
-import fs from 'fs';
-import PDFDocument from 'pdfkit';
+import fs, { readFileSync } from 'fs';
+import PDFDocument, { options } from 'pdfkit';
 import sharp from 'sharp';
 
 //const fs = require('fs');
@@ -45,20 +45,32 @@ type Invoicedata = {
 }
 
 async function createPDF(pages: String[]) {
-    const doc = new PDFDocument({ margin: 0 });
+    //Die Funktion ist eine absolut mühsam feingetunete Funktion und ich hoffe, dass sich niemals jemand wieder damit auseinandersetzen muss.
+    const doc = new PDFDocument({ margin: 0, size: [720, 1280] });
     if (pages.length != 0) {
         for (let index = 0; index < pages.length; index++) {
             const path: string = pages[index].toString();
-            const image = await sharp(path)
+            const image = await sharp(path, { failOnError: false })
                 .rotate(90)
                 .toBuffer();
 
             const imgSize = await sharp(image).metadata();
             if (imgSize == null) throw new Error("Image size is null");
-            doc.page.width = imgSize.width!;
-            doc.page.height = imgSize.height!;
 
-            doc.image(image, 0, 0, { fit: [imgSize.width!, imgSize.height!], align: 'center', valign: 'center' });
+            const scale = 1280 / imgSize.height!;
+
+            // doc.page.width = imgSize.width!;
+            // doc.page.height = imgSize.height!;
+
+
+            // fit: [1280, imgSize.width! * scale], 
+            const imageData = await sharp(image)
+                .resize(imgSize.width! * scale, 1280, { fit: 'inside' })
+                .toBuffer({ resolveWithObject: true });
+
+            // console.log(`Image size:1280 x ${imgSize.width! * scale}`);
+            // console.log(`Doc size:${doc.page.height} x ${doc.page.width}`);
+            doc.image(imageData.data, 0, 0);
 
             if (pages.length != index + 1) doc.addPage()
         }
@@ -70,12 +82,21 @@ async function createPDF(pages: String[]) {
     return doc
 };
 
+// function getTotalHeight(pdfDoc: typeof PDFDocument): number {
+//     let totalHeight = 0;
+//     for (let i = 0; i < pdfDoc.pages.length; i++) {
+//       totalHeight += pdfDoc.pages[i].getHeight();
+//     }
+//     return totalHeight;
+//   }
+
 app.post("/scanner/upload", upload.array("image"), async (req, res) => {
     if (!req.files || req.files.length === 0) {
         return res.status(422).send("At least one image is required");
     }
 
     let files = req.files as any;
+
 
     //scan first image
     var invoicedata: Invoicedata = {
@@ -124,6 +145,7 @@ app.post("/scanner/upload", upload.array("image"), async (req, res) => {
             //create pdf from images
             const pages: String[] = files.map((file: any) => "./src/uploads/" + file.filename);
             var pdf = await createPDF(pages);
+            pdf.page
             pdf.pipe(fs.createWriteStream("./src/uploads/" + pdfname + ".pdf")).on('finish', async () => {
                 const data = {
                     supplier_name: invoicedata.supplier_name,
@@ -131,14 +153,16 @@ app.post("/scanner/upload", upload.array("image"), async (req, res) => {
                     date: invoicedata.date,
                     category: invoicedata.category,
                     pdf_name: pdfname,
-                    pdf: await fs.promises.readFile("./src/uploads/" + pdfname + ".pdf", { encoding: 'base64' })
+                    pdf: await fs.promises.readFile("./src/uploads/" + pdfname + ".pdf", { encoding: 'base64' }),
+                    pdf_height: pdf.page.height * pages.length
                 }
+                console.log(pdf.page.height * pages.length);
                 //delete images
                 files.forEach((file: any) => {
                     fs.unlinkSync("./src/uploads/" + file.filename);
                 });
 
-                console.log(data);
+                //console.log(data);
                 res.setHeader('Content-Type', 'application/json');
                 return res.status(200).send(JSON.stringify(data));
             });

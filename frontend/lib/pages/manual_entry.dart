@@ -38,6 +38,9 @@ class _ManualEntryState extends State<ManualEntry> {
     );
   });
 
+  TextInputFormatter digits = FilteringTextInputFormatter.digitsOnly;
+  //TextInputFormatter money =
+  //CurrencyTextInputFormatter(locale: 'de', symbol: '€');
   TextInputFormatter letters = FilteringTextInputFormatter.allow(
       RegExp(r"[a-zA-Z0-9#+:'()&/^\-{2}|\s]"));
 
@@ -161,7 +164,10 @@ class _ManualEntryState extends State<ManualEntry> {
                       controller: controllerDate,
                       serverDate: manualEntry['date'],
                     ),
-                    PdfPreview(pdfUrl: manualEntry['pdf_path']),
+                    PdfPreview(
+                      pdfUrl: manualEntry['pdf_path'],
+                      pdfHeight: manualEntry['pdf_height'],
+                    ),
                     ElevatedButton(
                       onPressed: () {
                         if (_formKey.currentState!.validate()) {
