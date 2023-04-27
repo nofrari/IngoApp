@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:intl/intl.dart';
 import '../../constants/colors.dart';
 import '../../constants/fonts.dart';
 import '../../constants/values.dart';
@@ -8,39 +7,31 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:control_style/control_style.dart';
 
 class InputField extends StatefulWidget {
-  InputField({
-    super.key,
-    required this.lblText,
-    required this.reqFormatter,
-    required this.keyboardType,
-    required this.controller,
-  });
+  const InputField(
+      {super.key,
+      required this.lblText,
+      required this.reqFormatter,
+      required this.keyboardType,
+      required this.controller,
+      required this.maxLength,
+      this.maxLines,
+      this.alignLabelLeftCorner,
+      this.validator});
 
   final String lblText;
   final TextInputFormatter reqFormatter;
   final TextInputType keyboardType;
   final TextEditingController controller;
+  final int? maxLines;
+  final bool? alignLabelLeftCorner;
+  final FormFieldValidator<String>? validator;
+  final int maxLength;
 
   @override
   State<InputField> createState() => _InputFieldState();
 }
 
 class _InputFieldState extends State<InputField> {
-  final formatCurrency =
-      NumberFormat.currency(locale: 'de_DE', name: "EUR", symbol: '€');
-  //late FocusNode _focusNode;
-
-  // @override
-  // void initState() {
-  //   super.initState();
-  //   _focusNode = FocusNode();
-  //   _focusNode.addListener(_onFocusChange);
-  // }
-
-  // void _onFocusChange() {
-  //   debugPrint("Focus: ${_focusNode.hasFocus.toString()}");
-  // }
-
   @override
   void dispose() {
     widget.controller.dispose();
@@ -54,23 +45,22 @@ class _InputFieldState extends State<InputField> {
       margin: const EdgeInsets.only(top: 10, bottom: 15),
       color: AppColor.neutral500,
       child: TextFormField(
-        validator: (value) {
-          if (value == null || value.isEmpty) {
-            return 'Das Feld darf nicht leer sein';
-          }
-          return null;
-        },
+        validator: widget.validator,
         //focusNode: _focusNode,
         controller: widget.controller,
         autovalidateMode: AutovalidateMode.onUserInteraction,
         style: Fonts.text300,
         cursorColor: Colors.white,
+        maxLines: widget.maxLines,
+        maxLength: widget.maxLength,
         decoration: InputDecoration(
-          contentPadding:
-              const EdgeInsets.symmetric(vertical: 10.0, horizontal: 10.0),
-          label: Text(widget.lblText,
-              style: GoogleFonts.josefinSans(fontSize: 18)),
+          contentPadding: const EdgeInsets.only(top: 30, left: 10),
+          label: Text(
+            widget.lblText,
+            style: GoogleFonts.josefinSans(fontSize: 18),
+          ),
           labelStyle: TextStyle(color: AppColor.neutral100),
+          alignLabelWithHint: widget.alignLabelLeftCorner,
           filled: true,
           fillColor: AppColor.neutral400,
           errorStyle: Fonts.errorMessage,
@@ -96,30 +86,10 @@ class _InputFieldState extends State<InputField> {
             borderSide:
                 const BorderSide(color: Colors.red, width: Values.inputBorder),
           ),
+          counterText: "",
         ),
 
         inputFormatters: [widget.reqFormatter],
-        // inputFormatters: <TextInputFormatter>[
-        //   FilteringTextInputFormatter.allow(RegExp(r'[0-9]')),
-        //   LengthLimitingTextInputFormatter(12),
-        //   TextInputFormatter.withFunction((oldValue, newValue) {
-        //     final newNumericValue = int.tryParse(newValue.text);
-        //     if (newNumericValue != null) {
-        //       final newFormattedValue =
-        //           formatCurrency.format(newNumericValue / 100);
-        //       final newCursorPosition = newFormattedValue.length - 2;
-        //       return TextEditingValue(
-        //         text: newFormattedValue,
-        //         selection:
-        //             // TextSelection.collapsed(offset: newFormattedValue.length),
-        //             TextSelection.collapsed(
-        //                 offset: newCursorPosition < 0 ? 0 : newCursorPosition),
-        //       );
-        //     } else {
-        //       return oldValue;
-        //     }
-        //   })
-        // ],
         keyboardType: widget.keyboardType,
       ),
     );
