@@ -12,10 +12,11 @@ class DatepickerField extends StatefulWidget {
 
   final TextEditingController controller;
   String? serverDate;
+  DateTime _selectedDate = DateTime.now();
 
-  DateTime get selectedDate => DateTime.now();
+  DateTime get selectedDate => _selectedDate;
   set selectedDate(DateTime value) {
-    selectedDate = value;
+    _selectedDate = value;
   }
 
   @override
