@@ -62,18 +62,17 @@ class _DatepickerFieldState extends State<DatepickerField> {
             ),
           ),
           border: DecoratedInputBorder(
-              child: OutlineInputBorder(
+            child: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(Values.inputRadius),
-                borderSide: BorderSide(
-                    color: AppColor.blueActive, width: Values.inputBorder),
-              ),
-              shadow: const [
-                BoxShadow(
-                  color: Color.fromARGB(60, 0, 0, 0),
-                  blurRadius: 4,
-                  offset: Offset(0, 3),
-                )
-              ]),
+                borderSide: BorderSide.none),
+            shadow: const [
+              BoxShadow(
+                color: Color.fromARGB(60, 0, 0, 0),
+                blurRadius: 4,
+                offset: Offset(0, 3),
+              )
+            ],
+          ),
           focusedBorder: OutlineInputBorder(
             borderRadius: BorderRadius.circular(Values.inputRadius),
             borderSide: BorderSide(
