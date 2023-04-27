@@ -89,10 +89,9 @@ class _ScannerPreviewState extends State<ScannerPreview>
           await MultipartFile.fromFile(images[i]),
         ));
       }
-      var response = await dio.post("http://10.0.2.2:5432/scanner/upload",
-          //var response = await dio.post("https://data.ingoapp.at/scanner/upload",
-          data: formData,
-          options: Options(responseType: ResponseType.json));
+      //var response = await dio.post("http://10.0.2.2:5432/scanner/upload",
+      var response = await dio.post("https://data.ingoapp.at/scanner/upload",
+          data: formData, options: Options(responseType: ResponseType.json));
       debugPrint(response.toString());
       //process pdf data from response
       final pdfData = base64Decode(response.data['pdf']);
@@ -182,7 +181,7 @@ class _ScannerPreviewState extends State<ScannerPreview>
                             child: Text("No Images"),
                           ),
                     Padding(
-                      padding: const EdgeInsets.symmetric(vertical: 8.0),
+                      padding: const EdgeInsets.symmetric(vertical: 20.0),
                       child: Column(
                         children: [
                           Row(

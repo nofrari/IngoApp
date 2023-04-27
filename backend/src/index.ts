@@ -6,8 +6,8 @@ import path from 'path';
 import { Request, Response } from 'express';
 import { FileArray, UploadedFile } from 'express-fileupload'
 import usersRouter from './routes/users';
-import fs from 'fs';
-import PDFDocument from 'pdfkit';
+import fs, { readFileSync } from 'fs';
+import PDFDocument, { options } from 'pdfkit';
 import sharp from 'sharp';
 
 //const fs = require('fs');
@@ -45,20 +45,32 @@ type Invoicedata = {
 }
 
 async function createPDF(pages: String[]) {
-    const doc = new PDFDocument({ margin: 0 });
+    //Die Funktion ist eine absolut mühsam feingetunete Funktion und ich hoffe, dass sich niemals jemand wieder damit auseinandersetzen muss.
+    const doc = new PDFDocument({ margin: 0, size: [720, 1280] });
     if (pages.length != 0) {
         for (let index = 0; index < pages.length; index++) {
             const path: string = pages[index].toString();
-            const image = await sharp(path)
+            const image = await sharp(path, { failOnError: false })
                 .rotate(90)
                 .toBuffer();
 
             const imgSize = await sharp(image).metadata();
             if (imgSize == null) throw new Error("Image size is null");
-            doc.page.width = imgSize.width!;
-            doc.page.height = imgSize.height!;
 
-            doc.image(image, 0, 0, { fit: [imgSize.width!, imgSize.height!], align: 'center', valign: 'center' });
+            const scale = 1280 / imgSize.height!;
+
+            // doc.page.width = imgSize.width!;
+            // doc.page.height = imgSize.height!;
+
+
+            // fit: [1280, imgSize.width! * scale], 
+            const imageData = await sharp(image)
+                .resize(imgSize.width! * scale, 1280, { fit: 'inside' })
+                .toBuffer({ resolveWithObject: true });
+
+            // console.log(`Image size:1280 x ${imgSize.width! * scale}`);
+            // console.log(`Doc size:${doc.page.height} x ${doc.page.width}`);
+            doc.image(imageData.data, 0, 0);
 
             if (pages.length != index + 1) doc.addPage()
         }
