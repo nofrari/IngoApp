@@ -217,11 +217,15 @@ class _ScannerPreviewState extends State<ScannerPreview>
                                   );
                                 },
                               ),
+                              //delete button
                               RoundButton(
                                 icon: Icons.delete,
-                                onTap: () {
+                                onTap: () async {
                                   debugPrint("Length1: ${images.length}");
                                   if (context.mounted) {
+                                    context
+                                        .read<ScannerService>()
+                                        .forgetPosition();
                                     context
                                         .read<ScannerService>()
                                         .deleteImage(selectedImage!);
@@ -246,7 +250,13 @@ class _ScannerPreviewState extends State<ScannerPreview>
                                     _controller.jumpTo(
                                         _controller.position.maxScrollExtent);
                                   } else if (images.isEmpty) {
-                                    Navigator.pop(context);
+                                    await Navigator.push(
+                                      context,
+                                      MaterialPageRoute(
+                                        builder: (context) =>
+                                            const ScannerCamera(),
+                                      ),
+                                    );
                                   }
                                 },
                               ),

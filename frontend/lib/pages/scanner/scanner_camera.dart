@@ -70,6 +70,7 @@ class _ScannerCameraState extends State<ScannerCamera>
   Widget build(BuildContext context) {
     List<String> images = context.watch<ScannerService>().getImages();
     position = context.watch<ScannerService>().getPosition();
+    debugPrint("Position: $position, Images: ${images.isNotEmpty}");
 
     String headerText() {
       if (position != null) {
@@ -204,18 +205,17 @@ class _ScannerCameraState extends State<ScannerCamera>
                           Container(
                             margin: Values.buttonPadding,
                             child: Button(
-                              btnText: (position != 0 || images.isNotEmpty)
-                                  ? "ABBRECHEN"
-                                  : "MANUELLE EINGABE",
+                              btnText: (position == null && images.isEmpty)
+                                  ? "MANUELLE EINGABE"
+                                  : "ABBRECHEN",
                               onTap: () async {
                                 await Navigator.push(
                                   context,
                                   MaterialPageRoute(
                                     builder: (context) =>
-                                        //not done yet
-                                        (position != 0 || images.isNotEmpty)
-                                            ? const ScannerPreview()
-                                            : const ManualEntry(),
+                                        (position == null && images.isEmpty)
+                                            ? const ManualEntry()
+                                            : const ScannerPreview(),
                                   ),
                                 );
                               },
