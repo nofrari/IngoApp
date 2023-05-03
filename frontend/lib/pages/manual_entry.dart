@@ -1,5 +1,8 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_cached_pdfview/flutter_cached_pdfview.dart';
 import 'package:frontend/constants/colors.dart';
 import 'package:frontend/constants/fonts.dart';
 import 'package:frontend/constants/values.dart';
@@ -46,8 +49,6 @@ class _ManualEntryState extends State<ManualEntry> {
   });
 
   TextInputFormatter digits = FilteringTextInputFormatter.digitsOnly;
-  //TextInputFormatter money =
-  //CurrencyTextInputFormatter(locale: 'de', symbol: '€');
   TextInputFormatter letters = FilteringTextInputFormatter.allow(
       RegExp(r"[a-zA-Z0-9#+:'()&/^\-{2}|\s]"));
 
@@ -68,6 +69,8 @@ class _ManualEntryState extends State<ManualEntry> {
 
   final DatepickerField datePicker =
       DatepickerField(controller: TextEditingController());
+
+  final pdfPreview = PdfPreview();
 
   final _formKey = GlobalKey<FormState>();
 
@@ -256,12 +259,25 @@ class _ManualEntryState extends State<ManualEntry> {
                         final amount = double.tryParse(refactoredAmount);
                         final date = datePicker.selectedDate;
 
-                        // _sendText(
-                        //     controllerName.text,
-                        //     amount!,
-                        //     date,
-                        //     controllerDescription.text,
-                        //     ;
+                        String? pdf_path = PdfName.getName();
+
+                        // final pdf_pathRefactored = pdf_path!
+                        //     .replaceAll('"', "")
+                        //     .replaceAll(
+                        //         "/Users/norariglthaler/Library/Developer/CoreSimulator/Devices/20E001D3-ECF9-4A9F-BDD3-1DD818636A4E/data/Containers/Data/Application",
+                        //         "");
+
+                        print(pdf_path);
+
+                        // final pdfFile = File(pdf_path!);
+                        // final pdfBytes = pdfFile.readAsBytes();
+
+                        // final List<int> codeUnits = pdf_path!.codeUnits;
+                        // final Uint8List unit8List =
+                        //     Uint8List.fromList(codeUnits);
+
+                        _sendText(controllerName.text, amount!, date,
+                            controllerDescription.text, pdf_path!);
                         List<String> images =
                             context.read<ScannerService>().getImages();
 
@@ -290,13 +306,13 @@ class _ManualEntryState extends State<ManualEntry> {
   }
 
   Future _sendText(String name, double amount, DateTime date,
-      String description, String pdf_url) async {
+      String description, String pdf_name) async {
     Map<String, dynamic> formData = {
       "transaction_name": name,
       "transaction_amount": amount,
       "date": date.toString(),
       "description": description,
-      "bill_url": pdf_url,
+      "bill_url": pdf_name,
       "category_id": "1234",
       "type_id": "1234",
       "interval_id": "1234",
