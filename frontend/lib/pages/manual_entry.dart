@@ -232,10 +232,6 @@ class _ManualEntryState extends State<ManualEntry> {
                           pdfUrl: manualEntry['pdf_path'],
                           pdfHeight: manualEntry['pdf_height'],
                         ),
-                        //Maximaler Pfusch damit der Button unter dem Transparenten Overlay klickbar ist
-                        const SizedBox(
-                          height: 100,
-                        ),
                       ],
                     ),
                   ),

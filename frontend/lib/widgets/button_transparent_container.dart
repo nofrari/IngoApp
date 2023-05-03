@@ -21,7 +21,7 @@ class ButtonTransparentContainer extends StatelessWidget {
           colors: [Colors.transparent, Colors.black],
         ),
       ),
-      padding: const EdgeInsets.symmetric(vertical: 50),
+      padding: const EdgeInsets.symmetric(vertical: 30),
       child: child,
     );
   }
