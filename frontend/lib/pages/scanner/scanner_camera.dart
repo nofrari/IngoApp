@@ -6,6 +6,8 @@ import 'package:frontend/constants/fonts.dart';
 import 'package:frontend/constants/values.dart';
 import 'package:frontend/pages/home.dart';
 import 'package:frontend/pages/manual_entry.dart';
+import 'package:frontend/services/custom_cache_manager.dart';
+import 'package:frontend/start.dart';
 import 'package:frontend/widgets/button.dart';
 import 'package:frontend/widgets/header.dart';
 import 'package:frontend/widgets/text_google.dart';
@@ -76,12 +78,12 @@ class _ScannerCameraState extends State<ScannerCamera>
             appBar: Header(
               onTap: () async {
                 if (context.mounted) {
-                  context.read<ScannerService>().clearImages();
+                  CustomCacheManager.clearCache(context, images);
                 }
                 await Navigator.push(
                   context,
                   MaterialPageRoute(
-                    builder: (context) => const ScannerCamera(),
+                    builder: (context) => const Start(),
                   ),
                 );
                 ;
@@ -188,13 +190,6 @@ class _ScannerCameraState extends State<ScannerCamera>
 
     try {
       final pictureFile = await _cameraController!.takePicture();
-      final tempDir = await getTemporaryDirectory();
-      final newDirectory = Directory("${tempDir.path}/images");
-      if (!(await newDirectory.exists())) {
-        newDirectory.create(recursive: true);
-      }
-      debugPrint("tempDir: ${tempDir.path}");
-      pictureFile.saveTo(newDirectory.path); //save the image to the folder
 
       int? position;
       if (context.mounted) {
