@@ -6,10 +6,13 @@ import 'package:frontend/constants/fonts.dart';
 import 'package:frontend/constants/values.dart';
 import 'package:frontend/pages/home.dart';
 import 'package:frontend/pages/manual_entry.dart';
+import 'package:frontend/services/custom_cache_manager.dart';
+import 'package:frontend/start.dart';
 import 'package:frontend/widgets/button.dart';
 import 'package:frontend/widgets/header.dart';
 import 'package:frontend/widgets/text_google.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:path_provider/path_provider.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:camera/camera.dart';
 import 'package:frontend/pages/scanner/scanner_preview.dart';
@@ -73,11 +76,17 @@ class _ScannerCameraState extends State<ScannerCamera>
         builder: (context, snapshot) {
           return Scaffold(
             appBar: Header(
-              onTap: () {
+              onTap: () async {
                 if (context.mounted) {
-                  context.read<ScannerService>().clearImages();
+                  CustomCacheManager.clearCache(context, images);
                 }
-                Navigator.pop(context);
+                await Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => const Start(),
+                  ),
+                );
+                ;
               },
               element: TextGoogle(
                 style: Fonts.text400,
@@ -178,6 +187,7 @@ class _ScannerCameraState extends State<ScannerCamera>
   Future<void> _scanImage() async {
     if (_cameraController == null) return;
     debugPrint("scanImage");
+
     try {
       final pictureFile = await _cameraController!.takePicture();
 

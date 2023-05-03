@@ -104,7 +104,7 @@ class _StartState extends State<Start> {
           await Navigator.push(
             context,
             MaterialPageRoute(
-              builder: (context) => const ManualEntry(),
+              builder: (context) => const ScannerCamera(),
             ),
           );
           // setState(() {

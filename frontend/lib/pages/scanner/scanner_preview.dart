@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:frontend/main.dart';
 import 'package:frontend/pages/home.dart';
 import 'package:frontend/pages/manual_entry.dart';
+import 'package:frontend/services/custom_cache_manager.dart';
 import 'package:frontend/services/manualentry_service.dart';
 import 'package:frontend/services/scanner_service.dart';
 import 'package:frontend/start.dart';
@@ -61,25 +62,6 @@ class _ScannerPreviewState extends State<ScannerPreview>
       selectedImage = images.last;
     }
 
-    Future<void> clearCache() async {
-      if (context.mounted) {
-        context.read<ScannerService>().clearImages();
-      }
-      // await DefaultCacheManager().emptyCache();
-      // try {
-      //   final directory = await getTemporaryDirectory();
-      //   final cacheDir = directory.path;
-      //   final cacheDirFile = Directory(cacheDir);
-      //   await cacheDirFile.delete(recursive: true);
-      // } catch (e) {
-      //   ScaffoldMessenger.of(context).showSnackBar(
-      //     const SnackBar(
-      //       content: Text('An error occurred when deleting cache'),
-      //     ),
-      //   );
-      // }
-    }
-
     Future<void> sendImages() async {
       var formData = FormData();
 
@@ -89,9 +71,10 @@ class _ScannerPreviewState extends State<ScannerPreview>
           await MultipartFile.fromFile(images[i]),
         ));
       }
-      //var response = await dio.post("http://10.0.2.2:5432/scanner/upload",
-      var response = await dio.post("https://data.ingoapp.at/scanner/upload",
-          data: formData, options: Options(responseType: ResponseType.json));
+      var response = await dio.post("http://10.0.2.2:5432/scanner/upload",
+          //var response = await dio.post("https://data.ingoapp.at/scanner/upload",
+          data: formData,
+          options: Options(responseType: ResponseType.json));
       debugPrint(response.toString());
       //process pdf data from response
       final pdfData = base64Decode(response.data['pdf']);
@@ -119,7 +102,7 @@ class _ScannerPreviewState extends State<ScannerPreview>
       appBar: Header(
         onTap: () async {
           try {
-            await clearCache();
+            await CustomCacheManager.clearCache(context, images);
           } catch (e) {
             debugPrint(e.toString());
           }
@@ -304,7 +287,7 @@ class _ScannerPreviewState extends State<ScannerPreview>
                       }
 
                       //TODO: add clear cache to end of manuelle eingabe
-                      await clearCache();
+                      await CustomCacheManager.clearCache(context, images);
 
                       await Navigator.push(
                         context,
