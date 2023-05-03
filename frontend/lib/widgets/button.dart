@@ -14,11 +14,13 @@ class Button extends StatelessWidget {
       {required this.btnText,
       required this.onTap,
       required this.theme,
+      this.isTransparent,
       super.key});
 
   final String btnText;
   final void Function() onTap;
   final ButtonColorTheme theme;
+  final bool? isTransparent;
 
   @override
   Widget build(BuildContext context) {
@@ -32,7 +34,9 @@ class Button extends StatelessWidget {
       borderColor = AppColor.blueActive;
     } else {
       buttonText = Fonts.secondaryButton;
-      backgroundColor = AppColor.neutral500;
+      backgroundColor = (isTransparent != null && isTransparent!)
+          ? Colors.transparent
+          : AppColor.neutral500;
       borderColor = AppColor.blueActive;
     }
 

@@ -1,11 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:frontend/main.dart';
-import 'package:frontend/pages/home.dart';
 import 'package:frontend/pages/manual_entry.dart';
 import 'package:frontend/services/custom_cache_manager.dart';
 import 'package:frontend/services/manualentry_service.dart';
 import 'package:frontend/services/scanner_service.dart';
-import 'package:frontend/start.dart';
 import 'package:frontend/widgets/button.dart';
 import 'package:frontend/widgets/header.dart';
 import 'package:frontend/widgets/popup.dart';
@@ -17,13 +14,10 @@ import 'package:dio/dio.dart';
 
 //import constants
 import '../../constants/colors.dart';
-import '../../constants/strings.dart';
 import '../../constants/values.dart';
 import 'scanner_camera.dart';
 import 'package:flutter_cache_manager/flutter_cache_manager.dart';
-import 'package:path_provider/path_provider.dart';
 import 'dart:convert';
-import 'dart:typed_data';
 
 class ScannerPreview extends StatefulWidget {
   const ScannerPreview({super.key});
@@ -71,10 +65,9 @@ class _ScannerPreviewState extends State<ScannerPreview>
           await MultipartFile.fromFile(images[i]),
         ));
       }
-      var response = await dio.post("http://10.0.2.2:5432/scanner/upload",
-          //var response = await dio.post("https://data.ingoapp.at/scanner/upload",
-          data: formData,
-          options: Options(responseType: ResponseType.json));
+      //var response = await dio.post("http://10.0.2.2:5432/scanner/upload",
+      var response = await dio.post("https://data.ingoapp.at/scanner/upload",
+          data: formData, options: Options(responseType: ResponseType.json));
       debugPrint(response.toString());
       //process pdf data from response
       final pdfData = base64Decode(response.data['pdf']);
@@ -101,12 +94,47 @@ class _ScannerPreviewState extends State<ScannerPreview>
     return Scaffold(
       appBar: Header(
         onTap: () async {
-          try {
-            await CustomCacheManager.clearCache(context, images);
-          } catch (e) {
-            debugPrint(e.toString());
-          }
-          Navigator.pop(context);
+          showDialog(
+            context: context,
+            builder: (BuildContext context) => PopUp(
+              content:
+                  "Wenn du die Preview verlässt, werden alle gescannten Bilder gelöscht. Bist du sicher, dass du zurück zum Scanner möchtest?",
+              actions: [
+                Container(
+                  margin: Values.buttonPadding,
+                  child: Column(
+                    children: [
+                      Button(
+                          btnText: "ABBRECHEN",
+                          onTap: () {
+                            Navigator.pop(context);
+                          },
+                          theme: ButtonColorTheme.secondary),
+                      Button(
+                          btnText: "FORTFAHREN",
+                          onTap: () async {
+                            if (context.mounted) {
+                              try {
+                                await CustomCacheManager.clearCache(
+                                    context, images);
+                              } catch (e) {
+                                debugPrint(e.toString());
+                              }
+                            }
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) => const ScannerCamera(),
+                              ),
+                            );
+                          },
+                          theme: ButtonColorTheme.primary),
+                    ],
+                  ),
+                )
+              ],
+            ),
+          );
         },
         element: SizedBox(
           height: 50,
@@ -180,7 +208,13 @@ class _ScannerPreviewState extends State<ScannerPreview>
                                         .rememberPosition(
                                             images.indexOf(selectedImage!));
                                   }
-                                  Navigator.pop(context);
+                                  await Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                      builder: (context) =>
+                                          const ScannerCamera(),
+                                    ),
+                                  );
                                 },
                               ),
                               RoundButton(
@@ -264,7 +298,14 @@ class _ScannerPreviewState extends State<ScannerPreview>
                                     ),
                                   );
                                 } else {
-                                  Navigator.pop(context);
+                                  Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                      builder: (context) =>
+                                          //not done yet
+                                          const ScannerCamera(),
+                                    ),
+                                  );
                                 }
                               },
                             ),
@@ -285,9 +326,6 @@ class _ScannerPreviewState extends State<ScannerPreview>
                       } catch (e) {
                         debugPrint(e.toString());
                       }
-
-                      //TODO: add clear cache to end of manuelle eingabe
-                      await CustomCacheManager.clearCache(context, images);
 
                       await Navigator.push(
                         context,

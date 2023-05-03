@@ -33,35 +33,6 @@ class MyApp extends StatefulWidget {
 class _MyAppState extends State<MyApp> {
   // This widget is the root of your application.
   @override
-  // void initState() {
-  //   super.initState();
-  //   WidgetsBinding.instance.addObserver(this);
-  // }
-
-  // @override
-  // void dispose() {
-  //   WidgetsBinding.instance.removeObserver(this);
-  //   super.dispose();
-  // }
-
-  // @override
-  // void didChangeAppLifecycleState(AppLifecycleState state) {
-  //   super.didChangeAppLifecycleState(state);
-  //   if (state == AppLifecycleState.detached) {
-  //     debugPrint("app stopped");
-  //     clearCache();
-  //   }
-  // }
-
-  // Future<void> clearCache() async {
-  //   await DefaultCacheManager().emptyCache();
-  //   final directory = await getTemporaryDirectory();
-  //   final cacheDir = directory.path;
-  //   final cacheDirFile = Directory(cacheDir);
-  //   await cacheDirFile.delete(recursive: true);
-  // }
-
-  @override
   Widget build(BuildContext context) {
     return MaterialApp(
         localizationsDelegates: const [
@@ -78,6 +49,5 @@ class _MyAppState extends State<MyApp> {
           primarySwatch: Colors.blue,
         ),
         home: const Start());
-    //home: const Start());
   }
 }

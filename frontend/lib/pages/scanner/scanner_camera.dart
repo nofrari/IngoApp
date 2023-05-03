@@ -1,18 +1,16 @@
 import 'dart:io';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:frontend/constants/colors.dart';
 import 'package:frontend/constants/fonts.dart';
 import 'package:frontend/constants/values.dart';
-import 'package:frontend/pages/home.dart';
 import 'package:frontend/pages/manual_entry.dart';
 import 'package:frontend/services/custom_cache_manager.dart';
 import 'package:frontend/start.dart';
 import 'package:frontend/widgets/button.dart';
 import 'package:frontend/widgets/header.dart';
+import 'package:frontend/widgets/popup.dart';
 import 'package:frontend/widgets/text_google.dart';
 import 'package:image_picker/image_picker.dart';
-import 'package:path_provider/path_provider.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:camera/camera.dart';
 import 'package:frontend/pages/scanner/scanner_preview.dart';
@@ -35,6 +33,7 @@ class _ScannerCameraState extends State<ScannerCamera>
 
   late final Future<void> _future;
   CameraController? _cameraController;
+  int? position;
 
   @override
   void initState() {
@@ -70,6 +69,17 @@ class _ScannerCameraState extends State<ScannerCamera>
   @override
   Widget build(BuildContext context) {
     List<String> images = context.watch<ScannerService>().getImages();
+    position = context.watch<ScannerService>().getPosition();
+
+    String headerText() {
+      if (position != null) {
+        return "WIEDERHOLEN";
+      } else if (images.isNotEmpty) {
+        return "HINZUFÜGEN";
+      } else {
+        return "SCANNER";
+      }
+    }
 
     return FutureBuilder(
         future: _future,
@@ -77,20 +87,61 @@ class _ScannerCameraState extends State<ScannerCamera>
           return Scaffold(
             appBar: Header(
               onTap: () async {
-                if (context.mounted) {
-                  CustomCacheManager.clearCache(context, images);
+                if (images.isNotEmpty) {
+                  // warning dialog
+                  showDialog(
+                    context: context,
+                    builder: (BuildContext context) => PopUp(
+                      content:
+                          "Wenn du den Scanner verlässt, werden alle gescannten Bilder gelöscht. Bist du sicher, dass du den Scanner verlassen möchtest?",
+                      actions: [
+                        Container(
+                          margin: Values.buttonPadding,
+                          child: Column(
+                            children: [
+                              Button(
+                                  btnText: "ABBRECHEN",
+                                  onTap: () {
+                                    Navigator.pop(context);
+                                  },
+                                  theme: ButtonColorTheme.secondary),
+                              Button(
+                                  btnText: "FORTFAHREN",
+                                  onTap: () async {
+                                    if (context.mounted) {
+                                      try {
+                                        await CustomCacheManager.clearCache(
+                                            context, images);
+                                      } catch (e) {
+                                        debugPrint(e.toString());
+                                      }
+                                    }
+                                    Navigator.push(
+                                      context,
+                                      MaterialPageRoute(
+                                        builder: (context) => const Start(),
+                                      ),
+                                    );
+                                  },
+                                  theme: ButtonColorTheme.primary),
+                            ],
+                          ),
+                        )
+                      ],
+                    ),
+                  );
+                } else {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => const Start(),
+                    ),
+                  );
                 }
-                await Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => const Start(),
-                  ),
-                );
-                ;
               },
               element: TextGoogle(
                 style: Fonts.text400,
-                text: "SCANNER",
+                text: headerText(),
                 align: TextAlign.center,
               ),
             ),
@@ -140,7 +191,7 @@ class _ScannerCameraState extends State<ScannerCamera>
                                   width: double.infinity,
                                   margin: Values.buttonPadding,
                                   child: Button(
-                                    btnText: (images.isEmpty)
+                                    btnText: (images.isEmpty || position == 0)
                                         ? "SCANNEN"
                                         : "AUFNEHMEN",
                                     onTap: _scanImage,
@@ -153,14 +204,18 @@ class _ScannerCameraState extends State<ScannerCamera>
                           Container(
                             margin: Values.buttonPadding,
                             child: Button(
-                              btnText: "MANUELLE EINGABE",
+                              btnText: (position != 0 || images.isNotEmpty)
+                                  ? "ABBRECHEN"
+                                  : "MANUELLE EINGABE",
                               onTap: () async {
                                 await Navigator.push(
                                   context,
                                   MaterialPageRoute(
                                     builder: (context) =>
                                         //not done yet
-                                        const ManualEntry(),
+                                        (position != 0 || images.isNotEmpty)
+                                            ? const ScannerPreview()
+                                            : const ManualEntry(),
                                   ),
                                 );
                               },
@@ -190,11 +245,6 @@ class _ScannerCameraState extends State<ScannerCamera>
 
     try {
       final pictureFile = await _cameraController!.takePicture();
-
-      int? position;
-      if (context.mounted) {
-        position = context.read<ScannerService>().getPosition();
-      }
 
 //position is used for the redo button in preview and if its not null, then the redo button was pressed, otherwise just normal scan
       if (context.mounted) {
