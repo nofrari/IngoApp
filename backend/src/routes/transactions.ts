@@ -1,15 +1,32 @@
 import express from 'express';
 import { PrismaClient } from '@prisma/client';
 import { z } from 'zod';
+import multer from 'multer';
+import PDFDocument, { options } from 'pdfkit';
+const fs = require('fs');
 import jwt from 'jsonwebtoken';
 import verifyToken from '../middleware/verifyToken';
 import bcrypt from 'bcrypt';
 import { request } from 'http';
-import { parse } from 'path';
+import path, { parse } from 'path';
 
 const prisma = new PrismaClient();
 const router = express.Router();
-//is used to check the parameters of the request body
+
+var storage =
+    multer.diskStorage({
+        destination: function (req, file, cb) {
+            const parentDir = path.dirname(__dirname);
+            cb(null, parentDir + "/uploads");
+            console.log(parentDir);
+            //cb(null, __dirname);
+        },
+        filename: function (req, file, cb) {
+            cb(null, file.originalname);
+        }
+    });
+
+const upload = multer({ storage: storage });
 
 const inputSchema = z.object({
     transaction_name: z.string(),
@@ -41,6 +58,15 @@ type EditSchema = z.infer<typeof editSchema>;
 // router.post('/transactions', (req, res) => {
 //     res.status(201).send('Hello world2');
 // });
+
+router.post("/transactions/pdfUpload", upload.single("pdf"), async (req, res) => {
+    if (!req.file) {
+        return res.status(422).send("At least one image is required");
+    }
+
+    res.send('PDF erfolgreich hochgeladen und gespeichert');
+});
+
 
 router.post('/transactions/input', async (req, res) => {
     const body = <InputSchema>req.body;
