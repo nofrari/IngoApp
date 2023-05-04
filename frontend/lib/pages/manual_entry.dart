@@ -342,7 +342,6 @@ class _ManualEntryState extends State<ManualEntry> {
                           focusNode: _focusNodes[6],
                         ),
                         Dropdown(
-                          label: "Wiederholen",
                           dropdownItems: const [
                             'Nie',
                             'Wöchentlich',
@@ -351,6 +350,7 @@ class _ManualEntryState extends State<ManualEntry> {
                             'Quartalsweise',
                             'Jährlich',
                           ],
+                          label: "Wiederholen",
                           needsNewCategoryButton: false,
                           initialValue: 'Nie',
                           focusNode: _focusNodes[7],
@@ -374,6 +374,9 @@ class _ManualEntryState extends State<ManualEntry> {
                         const SizedBox(
                           height: 80,
                         ),
+                        const SizedBox(
+                          height: 300,
+                        )
                       ],
                     ),
                   ),
@@ -402,25 +405,29 @@ class _ManualEntryState extends State<ManualEntry> {
                               final amount = double.tryParse(refactoredAmount);
                               final date = datePicker.selectedDate;
 
-                              String? pdf_path = ""; //PdfName.getName();
+                              String? pdf_name = PdfFile.getName();
 
-                              // final pdf_pathRefactored = pdf_path!
-                              //     .replaceAll('"', "")
-                              //     .replaceAll(
-                              //         "/Users/norariglthaler/Library/Developer/CoreSimulator/Devices/20E001D3-ECF9-4A9F-BDD3-1DD818636A4E/data/Containers/Data/Application",
-                              //         "");
+                              if (manualEntry.isNotEmpty) {
+                                _sendData(
+                                    controllerTitle.text,
+                                    amount!,
+                                    date,
+                                    controllerDescription.text,
+                                    manualEntry['pdf_name']);
+                              } else {
+                                _sendData(controllerTitle.text, amount!, date,
+                                    controllerDescription.text, pdf_name!);
+                                savePDFToServer(PdfFile.getPath().toString());
+                              }
 
-                              print(pdf_path);
+                              // print("Name from Gallery: ${PdfFile.getName()}");
+                              // print("Path from Camera: " +
+                              //     manualEntry['pdf_name'].toString());
+                              // print(
+                              //     "Name from Gallery: ${PdfFile.getPath().toString()}");
+                              // print("Path from Camera: " +
+                              //     manualEntry['pdf_path'].toString());
 
-                              // final pdfFile = File(pdf_path!);
-                              // final pdfBytes = pdfFile.readAsBytes();
-
-                              // final List<int> codeUnits = pdf_path!.codeUnits;
-                              // final Uint8List unit8List =
-                              //     Uint8List.fromList(codeUnits);
-
-                              _sendText(controllerTitle.text, amount!, date,
-                                  controllerDescription.text, pdf_path);
                               List<String> images =
                                   context.read<ScannerService>().getImages();
 
@@ -432,6 +439,7 @@ class _ManualEntryState extends State<ManualEntry> {
                                     .read<ManualEntryService>()
                                     .forgetManualEntry();
                               }
+                              // ignore: use_build_context_synchronously
                               await Navigator.push(
                                 context,
                                 MaterialPageRoute(
@@ -450,14 +458,14 @@ class _ManualEntryState extends State<ManualEntry> {
     );
   }
 
-  Future _sendText(String name, double amount, DateTime date,
-      String description, String pdf_name) async {
+  Future _sendData(String name, double amount, DateTime date,
+      String description, String pdfName) async {
     Map<String, dynamic> formData = {
       "transaction_name": name,
       "transaction_amount": amount,
       "date": date.toString(),
       "description": description,
-      "bill_url": pdf_name,
+      "bill_url": pdfName,
       "category_id": "1234",
       "type_id": "1234",
       "interval_id": "1234",
@@ -466,6 +474,18 @@ class _ManualEntryState extends State<ManualEntry> {
 
     var response = await dio.post("http://localhost:5432/transactions/input",
         data: formData);
+    debugPrint(response.toString());
+  }
+
+  Future savePDFToServer(String filePath) async {
+    final formData = FormData.fromMap({
+      'pdf': await MultipartFile.fromFile(filePath),
+    });
+
+    var response = await dio.post(
+        "http://localhost:5432/transactions/pdfUpload",
+        data: formData,
+        options: Options(responseType: ResponseType.json));
 
     debugPrint(response.toString());
   }
