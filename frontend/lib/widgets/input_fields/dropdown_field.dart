@@ -10,9 +10,19 @@ import '../../pages/home.dart';
 import 'package:control_style/control_style.dart';
 
 class Dropdown extends StatefulWidget {
-  const Dropdown({super.key, required this.dropdownItems});
+  const Dropdown(
+      {super.key,
+      required this.dropdownItems,
+      required this.label,
+      required this.needsNewCategoryButton,
+      required this.focusNode,
+      this.initialValue});
 
   final List<String> dropdownItems;
+  final String label;
+  final bool needsNewCategoryButton;
+  final String? initialValue;
+  final FocusNode focusNode;
 
   @override
   State<Dropdown> createState() => _DropdownState();
@@ -23,9 +33,13 @@ class _DropdownState extends State<Dropdown> {
 
   @override
   void initState() {
-    // TODO: implement initState
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) => selectedValue = null);
+    setState(() {
+      (widget.initialValue != null)
+          ? selectedValue = widget.initialValue
+          : selectedValue = null;
+    });
   }
 
   late TextEditingController controller = TextEditingController();
@@ -41,43 +55,41 @@ class _DropdownState extends State<Dropdown> {
     return Container(
       alignment: Alignment.center,
       margin: const EdgeInsets.only(top: 10, bottom: 15),
-      child: SizedBox(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            DropdownButtonFormField2(
-              value: selectedValue,
-              decoration: InputDecoration(
-                label: Text(Strings.dropdownCategory, style: Fonts.text300),
-                labelStyle: TextStyle(color: AppColor.neutral100),
-                border: DecoratedInputBorder(
-                    child: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(Values.inputRadius),
-                        borderSide: BorderSide.none),
-                    shadow: const [
-                      BoxShadow(
-                        color: Color.fromARGB(60, 0, 0, 0),
-                        blurRadius: 4,
-                        offset: Offset(0, 3),
-                      )
-                    ]),
-                focusedBorder: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(Values.inputRadius),
-                    borderSide: BorderSide(
-                        color: AppColor.blueActive, width: Values.inputBorder)),
-                errorBorder: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(Values.inputRadius),
-                    borderSide: const BorderSide(
-                        color: Colors.red, width: Values.inputBorder)),
-                filled: true,
-                fillColor: AppColor.backgroundInputField,
-                errorStyle: Fonts.errorMessage,
-                isDense: true,
-                contentPadding: const EdgeInsets.symmetric(
-                    vertical: 10.0, horizontal: 10.0),
-              ),
-              isExpanded: true,
-              items: List.generate(
+      child: DropdownButtonFormField2(
+        focusNode: widget.focusNode,
+        value: selectedValue,
+        decoration: InputDecoration(
+          label: Text(widget.label, style: Fonts.text300),
+          labelStyle: TextStyle(color: AppColor.neutral100),
+          border: DecoratedInputBorder(
+              child: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(Values.inputRadius),
+                  borderSide: BorderSide.none),
+              shadow: const [
+                BoxShadow(
+                  color: Color.fromARGB(60, 0, 0, 0),
+                  blurRadius: 4,
+                  offset: Offset(0, 3),
+                )
+              ]),
+          focusedBorder: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(Values.inputRadius),
+              borderSide: BorderSide(
+                  color: AppColor.blueActive, width: Values.inputBorder)),
+          errorBorder: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(Values.inputRadius),
+              borderSide: const BorderSide(
+                  color: Colors.red, width: Values.inputBorder)),
+          filled: true,
+          fillColor: AppColor.backgroundInputField,
+          errorStyle: Fonts.errorMessage,
+          isDense: true,
+          contentPadding:
+              const EdgeInsets.symmetric(vertical: 10.0, horizontal: 10.0),
+        ),
+        isExpanded: true,
+        items: (widget.needsNewCategoryButton == true)
+            ? List.generate(
                 widget.dropdownItems.length + 1,
                 (index) => index < widget.dropdownItems.length
                     ? DropdownMenuItem(
@@ -119,65 +131,80 @@ class _DropdownState extends State<Dropdown> {
                               );
                             }),
                       ),
-              ),
-              validator: (value) {
-                if (value == null || value.isEmpty) {
-                  return 'Das Feld darf nicht leer sein';
-                }
-                return null;
-              },
-              onChanged: (value) {
-                debugPrint('changed');
-                setState(() => selectedValue = value!);
-              },
-              onSaved: (value) {
-                debugPrint('saved');
-                selectedValue = value.toString();
-              },
-              selectedItemBuilder: (BuildContext context) {
-                return widget.dropdownItems.map<Widget>((String item) {
-                  return Container(
+              )
+            : List.generate(
+                widget.dropdownItems.length,
+                (index) => DropdownMenuItem(
+                  value: widget.dropdownItems[index],
+                  child: Container(
                     alignment: Alignment.centerLeft,
-                    constraints: const BoxConstraints(minWidth: 100),
                     child: Text(
-                      item,
-                      textAlign: TextAlign.left,
+                      widget.dropdownItems[index],
                       style: GoogleFonts.josefinSans(
                         fontSize: 18,
-                        color: AppColor.textColor,
+                        color: selectedValue == widget.dropdownItems[index]
+                            ? AppColor.blueActive
+                            : AppColor.textColor,
                       ),
                     ),
-                  );
-                }).toList();
-              },
-              iconStyleData: IconStyleData(
-                openMenuIcon: Icon(
-                  DropdownArrows.up_open_mini,
-                  color: AppColor.textColor,
-                ),
-                icon: Icon(
-                  DropdownArrows.down_open_mini,
-                  color: AppColor.textColor,
-                ),
-                iconSize: 30,
-              ),
-              dropdownStyleData: DropdownStyleData(
-                offset: const Offset(-10, -6),
-                width: Values.inputWidth,
-                maxHeight: 200,
-                decoration: BoxDecoration(
-                  border: Border.all(
-                    width: 2,
-                    color: AppColor.activeMenu,
                   ),
-                  borderRadius: const BorderRadius.only(
-                      bottomRight: Radius.circular(Values.inputRadius),
-                      bottomLeft: Radius.circular(Values.inputRadius)),
-                  color: AppColor.backgroundGray,
                 ),
               ),
+        validator: (value) {
+          if (value == null || value.isEmpty) {
+            return 'Das Feld darf nicht leer sein';
+          }
+          return null;
+        },
+        onChanged: (value) {
+          debugPrint('changed');
+          setState(() => selectedValue = value!);
+        },
+        onSaved: (value) {
+          debugPrint('saved');
+          selectedValue = value.toString();
+        },
+        selectedItemBuilder: (BuildContext context) {
+          return widget.dropdownItems.map<Widget>((String item) {
+            return Container(
+              alignment: Alignment.centerLeft,
+              constraints: const BoxConstraints(minWidth: 100),
+              child: Text(
+                item,
+                textAlign: TextAlign.left,
+                style: GoogleFonts.josefinSans(
+                  fontSize: 18,
+                  color: AppColor.textColor,
+                ),
+              ),
+            );
+          }).toList();
+        },
+        iconStyleData: IconStyleData(
+          openMenuIcon: Icon(
+            DropdownArrows.up_open_mini,
+            color: AppColor.textColor,
+          ),
+          icon: Icon(
+            DropdownArrows.down_open_mini,
+            color: AppColor.textColor,
+          ),
+          iconSize: 30,
+        ),
+        dropdownStyleData: DropdownStyleData(
+          offset: const Offset(-10, -6),
+          width: Values.inputWidth,
+          maxHeight: 200,
+          decoration: BoxDecoration(
+            border: Border.all(
+              width: 2,
+              color: AppColor.activeMenu,
             ),
-          ],
+            borderRadius: const BorderRadius.only(
+                bottomRight: Radius.circular(Values.inputRadius),
+                bottomLeft: Radius.circular(Values.inputRadius)),
+            color: AppColor.backgroundGray,
+          ),
         ),
       ),
     );

@@ -18,8 +18,10 @@ import 'package:path_provider/path_provider.dart';
 class PdfPreview extends StatefulWidget {
   String? pdfUrl;
   int? pdfHeight;
+  FocusNode focusNode;
 
-  PdfPreview({Key? key, this.pdfUrl, this.pdfHeight}) : super(key: key);
+  PdfPreview({Key? key, required this.focusNode, this.pdfUrl, this.pdfHeight})
+      : super(key: key);
 
   @override
   State<PdfPreview> createState() => _PdfPreviewState();
@@ -139,50 +141,53 @@ class _PdfPreviewState extends State<PdfPreview> {
   @override
   Widget build(BuildContext context) {
     return (_pdfFile != null || widget.pdfUrl != null) && _showPdf
-        ? Container(
-            height: 450,
-            decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(Values.cardRadius),
-              border: Border.all(color: AppColor.blueActive, width: 2),
-            ),
-            child: Stack(
-              alignment: Alignment.bottomCenter,
-              children: [
-                ClipRRect(
-                  borderRadius: BorderRadius.circular(Values.cardRadius - 4),
-                  child: SingleChildScrollView(
-                    child: Container(
-                      height: (widget.pdfHeight != null)
-                          ? widget.pdfHeight!.ceilToDouble()
-                          : containerHeight,
-                      child: InteractiveViewer(
-                        clipBehavior: Clip.none,
-                        constrained: true,
-                        child: PDF(
-                          enableSwipe: true,
-                          swipeHorizontal: false,
-                          autoSpacing: true,
-                          pageFling: false,
-                          fitEachPage: false,
-                          onError: (error) {
-                            print(error.toString());
-                          },
-                          onPageError: (page, error) {
-                            print('$page: ${error.toString()}');
-                          },
-                        ).fromPath(widget.pdfUrl ?? _pdfFile!.path),
-                      ), //.fromAsset(_pdfFile!.path),
+        ? Focus(
+            focusNode: widget.focusNode,
+            child: Container(
+              height: 450,
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(Values.cardRadius),
+                border: Border.all(color: AppColor.blueActive, width: 2),
+              ),
+              child: Stack(
+                alignment: Alignment.bottomCenter,
+                children: [
+                  ClipRRect(
+                    borderRadius: BorderRadius.circular(Values.cardRadius - 4),
+                    child: SingleChildScrollView(
+                      child: Container(
+                        height: (widget.pdfHeight != null)
+                            ? widget.pdfHeight!.ceilToDouble()
+                            : containerHeight,
+                        child: InteractiveViewer(
+                          clipBehavior: Clip.none,
+                          constrained: true,
+                          child: PDF(
+                            enableSwipe: true,
+                            swipeHorizontal: false,
+                            autoSpacing: true,
+                            pageFling: false,
+                            fitEachPage: false,
+                            onError: (error) {
+                              print(error.toString());
+                            },
+                            onPageError: (page, error) {
+                              print('$page: ${error.toString()}');
+                            },
+                          ).fromPath(widget.pdfUrl ?? _pdfFile!.path),
+                        ), //.fromAsset(_pdfFile!.path),
+                      ),
                     ),
                   ),
-                ),
-                Container(
-                  margin: const EdgeInsets.only(bottom: 10),
-                  child: RoundButton(
-                    icon: Icons.delete,
-                    onTap: _deletePdf,
+                  Container(
+                    margin: const EdgeInsets.only(bottom: 10),
+                    child: RoundButton(
+                      icon: Icons.delete,
+                      onTap: _deletePdf,
+                    ),
                   ),
-                ),
-              ],
+                ],
+              ),
             ),
           )
         : Container(

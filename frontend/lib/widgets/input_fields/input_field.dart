@@ -14,6 +14,8 @@ class InputField extends StatefulWidget {
       required this.keyboardType,
       required this.controller,
       required this.maxLength,
+      required this.onFocusChanged,
+      required this.focusNode,
       this.maxLines,
       this.alignLabelLeftCorner,
       this.validator});
@@ -26,6 +28,8 @@ class InputField extends StatefulWidget {
   final bool? alignLabelLeftCorner;
   final FormFieldValidator<String>? validator;
   final int maxLength;
+  final ValueChanged<bool> onFocusChanged;
+  final FocusNode focusNode;
 
   @override
   State<InputField> createState() => _InputFieldState();
@@ -46,7 +50,7 @@ class _InputFieldState extends State<InputField> {
       color: AppColor.neutral500,
       child: TextFormField(
         validator: widget.validator,
-        //focusNode: _focusNode,
+        focusNode: widget.focusNode,
         controller: widget.controller,
         autovalidateMode: AutovalidateMode.onUserInteraction,
         style: Fonts.text300,
@@ -88,9 +92,10 @@ class _InputFieldState extends State<InputField> {
           ),
           counterText: "",
         ),
-
         inputFormatters: [widget.reqFormatter],
         keyboardType: widget.keyboardType,
+        onTap: () => widget.onFocusChanged(true),
+        onEditingComplete: () => widget.onFocusChanged(false),
       ),
     );
   }

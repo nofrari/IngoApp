@@ -5,6 +5,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_cached_pdfview/flutter_cached_pdfview.dart';
 import 'package:frontend/constants/colors.dart';
 import 'package:frontend/constants/fonts.dart';
+import 'package:frontend/constants/strings.dart';
 import 'package:frontend/constants/values.dart';
 import 'package:frontend/pages/scanner/scanner_camera.dart';
 import 'package:frontend/services/custom_cache_manager.dart';
@@ -55,7 +56,7 @@ class _ManualEntryState extends State<ManualEntry> {
   TextInputType numeric = TextInputType.number;
   TextInputType text = TextInputType.text;
 
-  TextEditingController controllerName = TextEditingController();
+  TextEditingController controllerTitle = TextEditingController();
   TextEditingController controllerAmount = TextEditingController();
   TextEditingController controllerDescription = TextEditingController();
   TextEditingController controllerDate = TextEditingController();
@@ -67,30 +68,110 @@ class _ManualEntryState extends State<ManualEntry> {
     return null;
   };
 
-  final DatepickerField datePicker =
-      DatepickerField(controller: TextEditingController());
-
-  final pdfPreview = PdfPreview();
-
   final _formKey = GlobalKey<FormState>();
 
   Dio dio = Dio();
 
+  bool _isFocused = false;
+  void onTextFieldFocusChanged(bool isFocused) {
+    setState(() {
+      _isFocused = isFocused;
+    });
+  }
+
+  final _focusNodes = <FocusNode>[
+    FocusNode(),
+    FocusNode(),
+    FocusNode(),
+    FocusNode(),
+    FocusNode(),
+    FocusNode(),
+    FocusNode(),
+    FocusNode(),
+    FocusNode(),
+    FocusNode()
+  ];
+
+  final _scrollController = ScrollController();
+
+  @override
+  void initState() {
+    super.initState();
+    _focusNodes.forEach((node) => node.addListener(_scrollToFocusedField));
+  }
+
+  @override
+  void dispose() {
+    controllerTitle.dispose();
+    controllerAmount.dispose();
+    controllerDescription.dispose();
+    controllerDate.dispose();
+    _focusNodes.forEach((node) => node.removeListener(_scrollToFocusedField));
+    super.dispose();
+  }
+
+  void _scrollToFocusedField() {
+    // Get the current focused field
+    final focusedField = FocusScope.of(context).focusedChild;
+    if (focusedField == null) {
+      return;
+    }
+
+    // Get the index of the focused field
+    final index = _focusNodes.indexOf(focusedField);
+
+    // Scroll the ScrollController to the focused field
+    _scrollController.animateTo(
+      index * 80.0,
+      duration: Duration(milliseconds: 500),
+      curve: Curves.easeInOut,
+    );
+    //     .then((_) {
+    //   // Get the position of the focused field
+    //   final renderObject =
+    //       focusedField!.context?.findRenderObject() as RenderBox;
+    //   final offset = renderObject.localToGlobal(Offset.zero).dy;
+
+    //   List<double> dropdowns = [2, 3, 4, 5, 7];
+
+    //   // Update the offset value in the state
+    //   if (dropdowns.contains(index)) {
+    //     setState(() {
+    //       _offset = offset;
+    //     });
+    //     debugPrint('offset: $_offset');
+    //   }
+    // });
+  }
+
   @override
   Widget build(BuildContext context) {
+    final DatepickerField datePicker = DatepickerField(
+      controller: TextEditingController(),
+      focusNode: _focusNodes[6],
+    );
+
+    final pdfPreview = PdfPreview(
+      focusNode: _focusNodes[9],
+    );
     Map<String, dynamic> manualEntry =
         context.watch<ManualEntryService>().getManualEntry();
     List<String> images = context.watch<ScannerService>().getImages();
 
     if (manualEntry.isNotEmpty) {
-      controllerName.text = manualEntry['supplier_name'];
+      controllerTitle.text = manualEntry['supplier_name'];
       controllerAmount.text = manualEntry['amount'].toString();
       controllerDate.text = DateFormat("dd / MM / yyyy")
           .format(DateFormat("yyyy-MM-dd").parse(manualEntry['date']));
     }
 
     return GestureDetector(
-      onTap: () => FocusManager.instance.primaryFocus?.unfocus(),
+      onTap: () {
+        setState(() {
+          _isFocused = false;
+        });
+        FocusManager.instance.primaryFocus?.unfocus();
+      },
       child: Scaffold(
         appBar: Header(
           onTap: () async {
@@ -160,26 +241,27 @@ class _ManualEntryState extends State<ManualEntry> {
           children: [
             Align(
               alignment: Alignment.topCenter,
-              child: Container(
-                padding: Values.bigCardPadding,
-                decoration: BoxDecoration(
-                    border: Border.all(
-                        color: AppColor.neutral500,
-                        width: 0,
-                        style: BorderStyle.solid),
-                    borderRadius: BorderRadius.circular(11),
-                    color: AppColor.neutral500),
-                margin: const EdgeInsets.all(20),
-                child: SingleChildScrollView(
+              child: SingleChildScrollView(
+                controller: _scrollController,
+                child: Container(
+                  padding: Values.bigCardPadding,
+                  decoration: BoxDecoration(
+                      border: Border.all(
+                          color: AppColor.neutral500,
+                          width: 0,
+                          style: BorderStyle.solid),
+                      borderRadius: BorderRadius.circular(11),
+                      color: AppColor.neutral500),
+                  margin: const EdgeInsets.all(20),
                   child: Form(
                     key: _formKey,
                     child: Column(
                       children: [
                         InputField(
-                          lblText: "Name",
+                          lblText: "Titel",
                           reqFormatter: letters,
                           keyboardType: text,
-                          controller: controllerName,
+                          controller: controllerTitle,
                           maxLines: 1,
                           validator: (value) {
                             if (value == null || value.isEmpty) {
@@ -188,9 +270,11 @@ class _ManualEntryState extends State<ManualEntry> {
                             return null;
                           },
                           maxLength: 50,
+                          onFocusChanged: onTextFieldFocusChanged,
+                          focusNode: _focusNodes[0],
                         ),
                         InputField(
-                          lblText: "Betrag",
+                          lblText: "Betrag in €",
                           reqFormatter: currency,
                           keyboardType: numeric,
                           controller: controllerAmount,
@@ -202,18 +286,22 @@ class _ManualEntryState extends State<ManualEntry> {
                             return null;
                           },
                           maxLength: 15,
+                          onFocusChanged: onTextFieldFocusChanged,
+                          focusNode: _focusNodes[1],
                         ),
-                        InputField(
-                          lblText: "Beschreibung",
-                          reqFormatter: letters,
-                          keyboardType: text,
-                          controller: controllerDescription,
-                          maxLines: 4,
-                          alignLabelLeftCorner: true,
-                          maxLength: 250,
+                        Dropdown(
+                          label: Strings.dropdownTypeCategory,
+                          dropdownItems: const [
+                            'Einnahme',
+                            'Ausgabe',
+                            'Transfer',
+                          ],
+                          needsNewCategoryButton: false,
+                          focusNode: _focusNodes[2],
                         ),
-                        const Dropdown(
-                          dropdownItems: [
+                        Dropdown(
+                          label: Strings.dropdownCategory,
+                          dropdownItems: const [
                             'Essen',
                             'Freizeit',
                             'Lebensmittel',
@@ -223,14 +311,68 @@ class _ManualEntryState extends State<ManualEntry> {
                             'ölkdjföjrö',
                             'jkrgh alhfiu',
                           ],
+                          needsNewCategoryButton: true,
+                          focusNode: _focusNodes[3],
+                        ),
+                        //TODO: Kontos aus DB holen
+                        Dropdown(
+                          label: Strings.dropdownAccount1,
+                          dropdownItems: const [
+                            'Gelbörse',
+                            'Bank',
+                            'Kreditkarte',
+                          ],
+                          needsNewCategoryButton: false,
+                          focusNode: _focusNodes[4],
+                        ),
+                        //TODO: Konditional machen
+                        Dropdown(
+                          label: Strings.dropdownAccount2,
+                          dropdownItems: const [
+                            'Gelbörse',
+                            'Bank',
+                            'Kreditkarte',
+                          ],
+                          needsNewCategoryButton: false,
+                          focusNode: _focusNodes[5],
                         ),
                         DatepickerField(
                           controller: controllerDate,
                           serverDate: manualEntry['date'],
+                          focusNode: _focusNodes[6],
+                        ),
+                        Dropdown(
+                          label: "Wiederholen",
+                          dropdownItems: const [
+                            'Nie',
+                            'Wöchentlich',
+                            'Alle zwei Wochen',
+                            'Monatlich',
+                            'Quartalsweise',
+                            'Jährlich',
+                          ],
+                          needsNewCategoryButton: false,
+                          initialValue: 'Nie',
+                          focusNode: _focusNodes[7],
+                        ),
+                        InputField(
+                          lblText: "Beschreibung",
+                          reqFormatter: letters,
+                          keyboardType: text,
+                          controller: controllerDescription,
+                          maxLines: 4,
+                          alignLabelLeftCorner: true,
+                          maxLength: 250,
+                          onFocusChanged: onTextFieldFocusChanged,
+                          focusNode: _focusNodes[8],
                         ),
                         PdfPreview(
                           pdfUrl: manualEntry['pdf_path'],
                           pdfHeight: manualEntry['pdf_height'],
+                          focusNode: _focusNodes[9],
+                        ),
+                        const SizedBox(
+                          height: 80,
                         ),
                       ],
                     ),
@@ -238,67 +380,70 @@ class _ManualEntryState extends State<ManualEntry> {
                 ),
               ),
             ),
-            ButtonTransparentContainer(
-              child: Container(
-                margin: Values.buttonPadding,
-                child: Button(
-                    isTransparent: true,
-                    btnText: "SPEICHERN",
-                    onTap: () async {
-                      if (_formKey.currentState!.validate()) {
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          const SnackBar(
-                              content: Text('Daten werden gespeichert')),
-                        );
+            (_isFocused == false)
+                ? ButtonTransparentContainer(
+                    child: Container(
+                      margin: Values.buttonPadding,
+                      child: Button(
+                          isTransparent: true,
+                          btnText: "SPEICHERN",
+                          onTap: () async {
+                            if (_formKey.currentState!.validate()) {
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                const SnackBar(
+                                    content: Text('Daten werden gespeichert')),
+                              );
 
-                        final refactoredAmount = controllerAmount.text
-                            .replaceAll("€", "")
-                            .replaceAll(" ", "")
-                            .replaceAll(",", ".");
+                              final refactoredAmount = controllerAmount.text
+                                  .replaceAll("€", "")
+                                  .replaceAll(" ", "")
+                                  .replaceAll(",", ".");
 
-                        final amount = double.tryParse(refactoredAmount);
-                        final date = datePicker.selectedDate;
+                              final amount = double.tryParse(refactoredAmount);
+                              final date = datePicker.selectedDate;
 
-                        String? pdf_path = ""; //PdfName.getName();
+                              String? pdf_path = ""; //PdfName.getName();
 
-                        // final pdf_pathRefactored = pdf_path!
-                        //     .replaceAll('"', "")
-                        //     .replaceAll(
-                        //         "/Users/norariglthaler/Library/Developer/CoreSimulator/Devices/20E001D3-ECF9-4A9F-BDD3-1DD818636A4E/data/Containers/Data/Application",
-                        //         "");
+                              // final pdf_pathRefactored = pdf_path!
+                              //     .replaceAll('"', "")
+                              //     .replaceAll(
+                              //         "/Users/norariglthaler/Library/Developer/CoreSimulator/Devices/20E001D3-ECF9-4A9F-BDD3-1DD818636A4E/data/Containers/Data/Application",
+                              //         "");
 
-                        print(pdf_path);
+                              print(pdf_path);
 
-                        // final pdfFile = File(pdf_path!);
-                        // final pdfBytes = pdfFile.readAsBytes();
+                              // final pdfFile = File(pdf_path!);
+                              // final pdfBytes = pdfFile.readAsBytes();
 
-                        // final List<int> codeUnits = pdf_path!.codeUnits;
-                        // final Uint8List unit8List =
-                        //     Uint8List.fromList(codeUnits);
+                              // final List<int> codeUnits = pdf_path!.codeUnits;
+                              // final Uint8List unit8List =
+                              //     Uint8List.fromList(codeUnits);
 
-                        _sendText(controllerName.text, amount!, date,
-                            controllerDescription.text, pdf_path!);
-                        List<String> images =
-                            context.read<ScannerService>().getImages();
+                              _sendText(controllerTitle.text, amount!, date,
+                                  controllerDescription.text, pdf_path);
+                              List<String> images =
+                                  context.read<ScannerService>().getImages();
 
-                        await CustomCacheManager.clearCache(context, images);
+                              await CustomCacheManager.clearCache(
+                                  context, images);
 
-                        if (context.mounted) {
-                          await context
-                              .read<ManualEntryService>()
-                              .forgetManualEntry();
-                        }
-                        await Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) => const Start(),
-                          ),
-                        );
-                      }
-                    },
-                    theme: ButtonColorTheme.secondary),
-              ),
-            ),
+                              if (context.mounted) {
+                                await context
+                                    .read<ManualEntryService>()
+                                    .forgetManualEntry();
+                              }
+                              await Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (context) => const Start(),
+                                ),
+                              );
+                            }
+                          },
+                          theme: ButtonColorTheme.secondary),
+                    ),
+                  )
+                : Container(),
           ],
         ),
       ),
