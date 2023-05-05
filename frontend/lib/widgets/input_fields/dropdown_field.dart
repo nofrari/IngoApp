@@ -15,12 +15,14 @@ class Dropdown extends StatefulWidget {
       required this.dropdownItems,
       required this.label,
       required this.needsNewCategoryButton,
+      this.setValue,
       this.initialValue});
 
   final List<String> dropdownItems;
   final String label;
   final bool needsNewCategoryButton;
   final String? initialValue;
+  final ValueChanged<String>? setValue;
 
   @override
   State<Dropdown> createState() => _DropdownState();
@@ -156,6 +158,9 @@ class _DropdownState extends State<Dropdown> {
         onChanged: (value) {
           debugPrint('changed');
           setState(() => selectedValue = value!);
+          if (widget.setValue != null && value != null) {
+            widget.setValue!(value);
+          }
         },
         onSaved: (value) {
           debugPrint('saved');

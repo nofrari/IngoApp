@@ -76,6 +76,14 @@ class _ManualEntryState extends State<ManualEntry> {
     });
   }
 
+  String _selectedType = "";
+  void setSelectedType(String type) {
+    setState(() {
+      _selectedType = type;
+    });
+    debugPrint("Selected Type: $_selectedType");
+  }
+
   @override
   void initState() {
     super.initState();
@@ -176,7 +184,9 @@ class _ManualEntryState extends State<ManualEntry> {
             }
           },
           element: Text(
-            "neuer eintrag".toUpperCase(),
+            (controllerTitle.text.isNotEmpty)
+                ? controllerTitle.text.toUpperCase()
+                : "NEUER EINTRAG",
             style: Fonts.textHeadingBold,
           ),
         ),
@@ -231,14 +241,15 @@ class _ManualEntryState extends State<ManualEntry> {
                           maxLength: 15,
                           onFocusChanged: onTextFieldFocusChanged,
                         ),
-                        const Dropdown(
+                        Dropdown(
                           label: Strings.dropdownTypeCategory,
-                          dropdownItems: [
+                          dropdownItems: const [
                             'Einnahme',
                             'Ausgabe',
                             'Transfer',
                           ],
                           needsNewCategoryButton: false,
+                          setValue: setSelectedType,
                         ),
                         const Dropdown(
                           label: Strings.dropdownCategory,
@@ -264,16 +275,18 @@ class _ManualEntryState extends State<ManualEntry> {
                           ],
                           needsNewCategoryButton: false,
                         ),
-                        //TODO: Konditional machen
-                        const Dropdown(
-                          label: Strings.dropdownAccount2,
-                          dropdownItems: [
-                            'Gelbörse',
-                            'Bank',
-                            'Kreditkarte',
-                          ],
-                          needsNewCategoryButton: false,
-                        ),
+                        //TODO: String als Constante anlegen und bei Registrieren mitschicken
+                        (_selectedType == 'Transfer')
+                            ? const Dropdown(
+                                label: Strings.dropdownAccount2,
+                                dropdownItems: [
+                                  'Gelbörse',
+                                  'Bank',
+                                  'Kreditkarte',
+                                ],
+                                needsNewCategoryButton: false,
+                              )
+                            : Container(),
                         DatepickerField(
                           controller: controllerDate,
                           serverDate: manualEntry['date'],
