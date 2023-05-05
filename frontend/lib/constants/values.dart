@@ -22,6 +22,7 @@ class Values {
       EdgeInsets.symmetric(vertical: 20, horizontal: 60);
   static const EdgeInsets bigCardPadding =
       EdgeInsets.symmetric(vertical: 10, horizontal: 10);
+  static const EdgeInsets bigCardMargin = EdgeInsets.all(20);
 
   static const EdgeInsets paddingHorizontal =
       EdgeInsets.symmetric(vertical: 0, horizontal: 25);

@@ -15,7 +15,6 @@ class InputField extends StatefulWidget {
       required this.controller,
       required this.maxLength,
       required this.onFocusChanged,
-      required this.focusNode,
       this.maxLines,
       this.alignLabelLeftCorner,
       this.validator});
@@ -29,7 +28,6 @@ class InputField extends StatefulWidget {
   final FormFieldValidator<String>? validator;
   final int maxLength;
   final ValueChanged<bool> onFocusChanged;
-  final FocusNode focusNode;
 
   @override
   State<InputField> createState() => _InputFieldState();
@@ -50,7 +48,6 @@ class _InputFieldState extends State<InputField> {
       color: AppColor.neutral500,
       child: TextFormField(
         validator: widget.validator,
-        focusNode: widget.focusNode,
         controller: widget.controller,
         autovalidateMode: AutovalidateMode.onUserInteraction,
         style: Fonts.text300,

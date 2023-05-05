@@ -76,25 +76,9 @@ class _ManualEntryState extends State<ManualEntry> {
     });
   }
 
-  final _focusNodes = <FocusNode>[
-    FocusNode(),
-    FocusNode(),
-    FocusNode(),
-    FocusNode(),
-    FocusNode(),
-    FocusNode(),
-    FocusNode(),
-    FocusNode(),
-    FocusNode(),
-    FocusNode()
-  ];
-
-  final _scrollController = ScrollController();
-
   @override
   void initState() {
     super.initState();
-    _focusNodes.forEach((node) => node.addListener(_scrollToFocusedField));
   }
 
   @override
@@ -103,54 +87,17 @@ class _ManualEntryState extends State<ManualEntry> {
     controllerAmount.dispose();
     controllerDescription.dispose();
     controllerDate.dispose();
-    _focusNodes.forEach((node) => node.removeListener(_scrollToFocusedField));
     super.dispose();
   }
 
-  void _scrollToFocusedField() {
-    // Get the current focused field
-    final focusedField = FocusScope.of(context).focusedChild;
-    if (focusedField == null) {
-      return;
-    }
+  final DatepickerField datePicker = DatepickerField(
+    controller: TextEditingController(),
+  );
 
-    // Get the index of the focused field
-    final index = _focusNodes.indexOf(focusedField);
-
-    // Scroll the ScrollController to the focused field
-    _scrollController.animateTo(
-      index * 80.0,
-      duration: Duration(milliseconds: 500),
-      curve: Curves.easeInOut,
-    );
-    //     .then((_) {
-    //   // Get the position of the focused field
-    //   final renderObject =
-    //       focusedField!.context?.findRenderObject() as RenderBox;
-    //   final offset = renderObject.localToGlobal(Offset.zero).dy;
-
-    //   List<double> dropdowns = [2, 3, 4, 5, 7];
-
-    //   // Update the offset value in the state
-    //   if (dropdowns.contains(index)) {
-    //     setState(() {
-    //       _offset = offset;
-    //     });
-    //     debugPrint('offset: $_offset');
-    //   }
-    // });
-  }
+  final pdfPreview = PdfPreview();
 
   @override
   Widget build(BuildContext context) {
-    final DatepickerField datePicker = DatepickerField(
-      controller: TextEditingController(),
-      focusNode: _focusNodes[6],
-    );
-
-    final pdfPreview = PdfPreview(
-      focusNode: _focusNodes[9],
-    );
     Map<String, dynamic> manualEntry =
         context.watch<ManualEntryService>().getManualEntry();
     List<String> images = context.watch<ScannerService>().getImages();
@@ -240,7 +187,6 @@ class _ManualEntryState extends State<ManualEntry> {
             Align(
               alignment: Alignment.topCenter,
               child: SingleChildScrollView(
-                controller: _scrollController,
                 child: Container(
                   padding: Values.bigCardPadding,
                   decoration: BoxDecoration(
@@ -250,7 +196,7 @@ class _ManualEntryState extends State<ManualEntry> {
                           style: BorderStyle.solid),
                       borderRadius: BorderRadius.circular(11),
                       color: AppColor.neutral500),
-                  margin: const EdgeInsets.all(20),
+                  margin: Values.bigCardMargin,
                   child: Form(
                     key: _formKey,
                     child: Column(
@@ -269,7 +215,6 @@ class _ManualEntryState extends State<ManualEntry> {
                           },
                           maxLength: 50,
                           onFocusChanged: onTextFieldFocusChanged,
-                          focusNode: _focusNodes[0],
                         ),
                         InputField(
                           lblText: "Betrag in €",
@@ -285,21 +230,19 @@ class _ManualEntryState extends State<ManualEntry> {
                           },
                           maxLength: 15,
                           onFocusChanged: onTextFieldFocusChanged,
-                          focusNode: _focusNodes[1],
                         ),
-                        Dropdown(
+                        const Dropdown(
                           label: Strings.dropdownTypeCategory,
-                          dropdownItems: const [
+                          dropdownItems: [
                             'Einnahme',
                             'Ausgabe',
                             'Transfer',
                           ],
                           needsNewCategoryButton: false,
-                          focusNode: _focusNodes[2],
                         ),
-                        Dropdown(
+                        const Dropdown(
                           label: Strings.dropdownCategory,
-                          dropdownItems: const [
+                          dropdownItems: [
                             'Essen',
                             'Freizeit',
                             'Lebensmittel',
@@ -310,37 +253,33 @@ class _ManualEntryState extends State<ManualEntry> {
                             'jkrgh alhfiu',
                           ],
                           needsNewCategoryButton: true,
-                          focusNode: _focusNodes[3],
                         ),
                         //TODO: Kontos aus DB holen
-                        Dropdown(
+                        const Dropdown(
                           label: Strings.dropdownAccount1,
-                          dropdownItems: const [
+                          dropdownItems: [
                             'Gelbörse',
                             'Bank',
                             'Kreditkarte',
                           ],
                           needsNewCategoryButton: false,
-                          focusNode: _focusNodes[4],
                         ),
                         //TODO: Konditional machen
-                        Dropdown(
+                        const Dropdown(
                           label: Strings.dropdownAccount2,
-                          dropdownItems: const [
+                          dropdownItems: [
                             'Gelbörse',
                             'Bank',
                             'Kreditkarte',
                           ],
                           needsNewCategoryButton: false,
-                          focusNode: _focusNodes[5],
                         ),
                         DatepickerField(
                           controller: controllerDate,
                           serverDate: manualEntry['date'],
-                          focusNode: _focusNodes[6],
                         ),
-                        Dropdown(
-                          dropdownItems: const [
+                        const Dropdown(
+                          dropdownItems: [
                             'Nie',
                             'Wöchentlich',
                             'Alle zwei Wochen',
@@ -348,10 +287,9 @@ class _ManualEntryState extends State<ManualEntry> {
                             'Quartalsweise',
                             'Jährlich',
                           ],
-                          label: "Wiederholen",
+                          label: Strings.dropdownFrequency,
                           needsNewCategoryButton: false,
                           initialValue: 'Nie',
-                          focusNode: _focusNodes[7],
                         ),
                         InputField(
                           lblText: "Beschreibung",
@@ -362,12 +300,10 @@ class _ManualEntryState extends State<ManualEntry> {
                           alignLabelLeftCorner: true,
                           maxLength: 250,
                           onFocusChanged: onTextFieldFocusChanged,
-                          focusNode: _focusNodes[8],
                         ),
                         PdfPreview(
                           pdfUrl: manualEntry['pdf_path'],
                           pdfHeight: manualEntry['pdf_height'],
-                          focusNode: _focusNodes[9],
                         ),
                         const SizedBox(
                           height: 80,

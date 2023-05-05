@@ -15,14 +15,12 @@ class Dropdown extends StatefulWidget {
       required this.dropdownItems,
       required this.label,
       required this.needsNewCategoryButton,
-      required this.focusNode,
       this.initialValue});
 
   final List<String> dropdownItems;
   final String label;
   final bool needsNewCategoryButton;
   final String? initialValue;
-  final FocusNode focusNode;
 
   @override
   State<Dropdown> createState() => _DropdownState();
@@ -56,7 +54,6 @@ class _DropdownState extends State<Dropdown> {
       alignment: Alignment.center,
       margin: const EdgeInsets.only(top: 10, bottom: 15),
       child: DropdownButtonFormField2(
-        focusNode: widget.focusNode,
         value: selectedValue,
         decoration: InputDecoration(
           label: Text(widget.label, style: Fonts.text300),
@@ -192,8 +189,10 @@ class _DropdownState extends State<Dropdown> {
           iconSize: 30,
         ),
         dropdownStyleData: DropdownStyleData(
+          width: MediaQuery.of(context).size.width -
+              Values.bigCardPadding.horizontal -
+              Values.bigCardMargin.horizontal,
           offset: const Offset(-10, -6),
-          width: Values.inputWidth,
           maxHeight: 200,
           decoration: BoxDecoration(
             border: Border.all(

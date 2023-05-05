@@ -18,10 +18,8 @@ import 'package:path_provider/path_provider.dart';
 class PdfPreview extends StatefulWidget {
   String? pdfUrl;
   int? pdfHeight;
-  FocusNode focusNode;
 
-  PdfPreview({Key? key, required this.focusNode, this.pdfUrl, this.pdfHeight})
-      : super(key: key);
+  PdfPreview({Key? key, this.pdfUrl, this.pdfHeight}) : super(key: key);
 
   @override
   State<PdfPreview> createState() => _PdfPreviewState();
@@ -145,7 +143,6 @@ class _PdfPreviewState extends State<PdfPreview> {
   Widget build(BuildContext context) {
     return (_pdfFile != null || widget.pdfUrl != null) && _showPdf
         ? Focus(
-            focusNode: widget.focusNode,
             child: Container(
               height: 450,
               decoration: BoxDecoration(
