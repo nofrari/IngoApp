@@ -12,11 +12,11 @@ import path, { parse } from 'path';
 
 const prisma = new PrismaClient();
 const router = express.Router();
+const parentDir = path.dirname(__dirname);
 
 var storage =
     multer.diskStorage({
         destination: function (req, file, cb) {
-            const parentDir = path.dirname(__dirname);
             cb(null, parentDir + "/uploads");
             console.log(parentDir);
             //cb(null, __dirname);
@@ -59,13 +59,7 @@ type EditSchema = z.infer<typeof editSchema>;
 //     res.status(201).send('Hello world2');
 // });
 
-router.post("/transactions/pdfUpload", upload.single("pdf"), async (req, res) => {
-    if (!req.file) {
-        return res.status(422).send("At least one image is required");
-    }
 
-    res.send('PDF erfolgreich hochgeladen und gespeichert');
-});
 
 
 router.post('/transactions/input', async (req, res) => {
@@ -243,6 +237,29 @@ router.post('/transactions/edit', async (req, res) => {
         res.status(406).send();
         return;
     }
+});
+
+router.post("/transactions/pdfUpload", upload.single("pdf"), async (req, res) => {
+    if (!req.file) {
+        return res.status(422).send("At least one image is required");
+    }
+
+    res.send('PDF erfolgreich hochgeladen und gespeichert');
+});
+
+router.delete('/transactions/:filename', (req, res) => {
+    const filePath = parentDir + '/uploads/' + req.params.filename;
+    console.log("FILEPFAD:" + filePath.toString());
+
+    fs.unlink(filePath, (err: any) => {
+        if (err) {
+            console.error(err);
+            res.status(500).send('Error deleting file');
+        } else {
+            console.log(`PDF file ${req.params.filename} deleted successfully`);
+            res.send('PDF file deleted successfully');
+        }
+    });
 });
 
 export default router;
