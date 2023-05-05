@@ -7,6 +7,8 @@ class Fonts {
   Fonts._();
   static TextStyle text100 = GoogleFonts.josefinSans(
       color: AppColor.neutral100, fontSize: 12, fontWeight: FontWeight.normal);
+  static TextStyle text150 = GoogleFonts.josefinSans(
+      color: AppColor.neutral100, fontSize: 14, fontWeight: FontWeight.normal);
   static TextStyle text200 = GoogleFonts.josefinSans(
       color: AppColor.neutral100, fontSize: 15, fontWeight: FontWeight.bold);
   static TextStyle text300 = GoogleFonts.josefinSans(
@@ -55,5 +57,12 @@ class Fonts {
     color: Colors.red,
     fontSize: 14,
     fontWeight: FontWeight.normal,
+  );
+
+  //TOGGLE BUTTON
+  static TextStyle toggleButton = GoogleFonts.josefinSans(
+    color: AppColor.backgroundFullScreen,
+    fontSize: 16,
+    fontWeight: FontWeight.w500,
   );
 }
