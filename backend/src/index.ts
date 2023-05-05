@@ -4,7 +4,7 @@ import multer from 'multer';
 const mindee = require("mindee");
 import path from 'path';
 import { Request, Response } from 'express';
-import { FileArray, UploadedFile } from 'express-fileupload'
+//import { FileArray, UploadedFile } from 'express-fileupload'
 import usersRouter from './routes/users';
 import fs, { readFileSync } from 'fs';
 import PDFDocument, { options } from 'pdfkit';
@@ -14,12 +14,15 @@ import sharp from 'sharp';
 //const imgToPDF = require('image-to-pdf');
 // const PDFDocument = require('pdfkit');
 // const sharp = require('sharp');
+import transactionsRouter from './routes/transactions';
 
 const app = express();
 const mindeeClient = new mindee.Client({ apiKey: "408ec2ab38cadbb87b1d5b976e3644b9" });
 
 app.use(express.json());
 app.use(usersRouter);
+app.use(transactionsRouter);
+
 
 var storage =
     multer.diskStorage({
@@ -140,7 +143,10 @@ app.post("/scanner/upload", upload.array("image"), async (req, res) => {
         //console.log(invoicedata);
     }).then(async () => {
         try {
-            const pdfname: string = Date.now().toString();
+            //const pdfname: string = Date.now().toString();
+            const randomNum = Math.floor(Math.random() * 1000);
+            const timecode: string = Date.now().toString(); // Aktueller Timecode
+            const pdfname: string = `${timecode}_${randomNum}`;
 
             //create pdf from images
             const pages: String[] = files.map((file: any) => "./src/uploads/" + file.filename);
