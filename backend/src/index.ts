@@ -6,6 +6,8 @@ import path from 'path';
 import { Request, Response } from 'express';
 import { FileArray, UploadedFile } from 'express-fileupload'
 import usersRouter from './routes/users';
+import transactionsRouter from './routes/transactions';
+import categoriesRouter from './routes/categories';
 import fs, { readFileSync } from 'fs';
 import PDFDocument, { options } from 'pdfkit';
 import sharp from 'sharp';
@@ -20,6 +22,8 @@ const mindeeClient = new mindee.Client({ apiKey: "408ec2ab38cadbb87b1d5b976e3644
 
 app.use(express.json());
 app.use(usersRouter);
+app.use(transactionsRouter);
+app.use(categoriesRouter);
 
 var storage =
     multer.diskStorage({
