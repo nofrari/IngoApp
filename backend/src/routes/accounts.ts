@@ -110,6 +110,17 @@ router.delete('/accounts/:id', async (req, res) => {
     res.json({ message: 'Kategorie erfolgreich gelöscht' });
 });
 
+router.get('/accounts/totalAmount/:user_id', async (req, res) => {
+    const user_id = req.params.user_id;
+
+    const accounts = await prisma.account.findMany({ where: { user_id: user_id } });
+    const totalAmount = accounts.reduce((acc, account) => {
+        return acc + account.account_balance;
+    }, 0);
+
+    res.send({ totalAmount });
+});
+
 router.get('/accounts', async (req, res) => {
     const accounts = await prisma.account.findMany();
     res.send(accounts);
