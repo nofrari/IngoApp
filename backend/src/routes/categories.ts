@@ -1,6 +1,7 @@
 import express from 'express';
 import { PrismaClient } from '@prisma/client';
 import { z } from 'zod';
+import { CarteVitaleV1 } from 'mindee/src/documents/fr';
 
 const prisma = new PrismaClient();
 const router = express.Router();
@@ -124,6 +125,28 @@ router.delete('/categories/:id', async (req, res) => {
     }
 
     res.json({ message: 'Kategorie erfolgreich gelöscht' });
+});
+
+router.get('/categories', async (req, res) => {
+    const categories = await prisma.category.findMany();
+    res.send(categories);
+});
+
+router.get('/categories/:id', async (req, res) => {
+    const id = req.params.id;
+
+    const category = await prisma.category.findUnique({ where: { category_id: id } });
+    res.send(category);
+});
+
+router.get('/categories/:user_id', async (req, res) => {
+    const user_id = req.params.user_id;
+
+    const categories = await prisma.category.findMany({
+        where: { user_id: user_id },
+    });
+
+    res.send(categories);
 });
 
 export default router;
