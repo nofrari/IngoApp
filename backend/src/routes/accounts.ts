@@ -115,4 +115,21 @@ router.get('/accounts', async (req, res) => {
     res.send(accounts);
 });
 
+router.get('/accounts/:id', async (req, res) => {
+    const id = req.params.id;
+
+    const account = await prisma.account.findUnique({ where: { account_id: id } });
+    res.send(account);
+});
+
+router.get('/accounts/:user_id', async (req, res) => {
+    const user_id = req.params.user_id;
+
+    const accounts = await prisma.account.findMany({
+        where: { user_id: user_id },
+    });
+
+    res.send(accounts);
+});
+
 export default router;
