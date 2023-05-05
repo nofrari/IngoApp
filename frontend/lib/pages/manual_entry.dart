@@ -217,6 +217,7 @@ class _ManualEntryState extends State<ManualEntry> {
                           keyboardType: text,
                           controller: controllerTitle,
                           maxLines: 1,
+                          hidePassword: false,
                           validator: (value) {
                             if (value == null || value.isEmpty) {
                               return 'Das Feld darf nicht leer sein';
@@ -232,6 +233,7 @@ class _ManualEntryState extends State<ManualEntry> {
                           keyboardType: numeric,
                           controller: controllerAmount,
                           maxLines: 1,
+                          hidePassword: false,
                           validator: (value) {
                             if (value == null || value.isEmpty) {
                               return 'Das Feld darf nicht leer sein';
@@ -310,6 +312,7 @@ class _ManualEntryState extends State<ManualEntry> {
                           keyboardType: text,
                           controller: controllerDescription,
                           maxLines: 4,
+                          hidePassword: false,
                           alignLabelLeftCorner: true,
                           maxLength: 250,
                           onFocusChanged: onTextFieldFocusChanged,

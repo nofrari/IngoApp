@@ -58,6 +58,7 @@ class _LoginState extends State<Login> {
               controller: controllerMail,
               maxLength: 50,
               maxLines: 1,
+              hidePassword: false,
               onFocusChanged: (hasFocus) {
                 if (hasFocus) {
                   // do stuff
@@ -80,6 +81,7 @@ class _LoginState extends State<Login> {
               controller: controllerPassword,
               maxLength: 50,
               maxLines: 1,
+              hidePassword: true,
               onFocusChanged: (hasFocus) {
                 if (hasFocus) {
                   // do stuff

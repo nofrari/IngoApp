@@ -15,6 +15,7 @@ class InputField extends StatefulWidget {
       required this.controller,
       required this.maxLength,
       required this.onFocusChanged,
+      required this.hidePassword,
       this.maxLines,
       this.alignLabelLeftCorner,
       this.validator,
@@ -30,6 +31,7 @@ class InputField extends StatefulWidget {
   final int maxLength;
   final AutovalidateMode? autovalidateMode;
   final ValueChanged<bool> onFocusChanged;
+  final bool hidePassword;
 
   @override
   State<InputField> createState() => _InputFieldState();
@@ -49,6 +51,7 @@ class _InputFieldState extends State<InputField> {
       margin: const EdgeInsets.only(top: 10, bottom: 15),
       color: AppColor.neutral500,
       child: TextFormField(
+        obscureText: widget.hidePassword,
         validator: widget.validator,
         controller: widget.controller,
         style: Fonts.text300,

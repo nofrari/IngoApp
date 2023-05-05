@@ -60,6 +60,7 @@ class _RegisterState extends State<Register> {
               controller: controllerName,
               maxLength: 50,
               maxLines: 1,
+              hidePassword: false,
               onFocusChanged: (hasFocus) {
                 if (hasFocus) {
                   // do stuff
@@ -81,6 +82,7 @@ class _RegisterState extends State<Register> {
               controller: controllerLastName,
               maxLength: 50,
               maxLines: 1,
+              hidePassword: false,
               onFocusChanged: (hasFocus) {
                 if (hasFocus) {
                   // do stuff
@@ -101,6 +103,7 @@ class _RegisterState extends State<Register> {
               controller: controllerMail,
               maxLength: 50,
               maxLines: 1,
+              hidePassword: false,
               onFocusChanged: (hasFocus) {
                 if (hasFocus) {
                   // do stuff
@@ -123,6 +126,7 @@ class _RegisterState extends State<Register> {
               controller: controllerPassword,
               maxLength: 50,
               maxLines: 1,
+              hidePassword: false,
               onFocusChanged: (hasFocus) {
                 if (hasFocus) {
                   // do stuff
@@ -143,6 +147,7 @@ class _RegisterState extends State<Register> {
               controller: controllerPasswordRepeat,
               maxLength: 50,
               maxLines: 1,
+              hidePassword: false,
               onFocusChanged: (hasFocus) {
                 if (hasFocus) {
                   // do stuff

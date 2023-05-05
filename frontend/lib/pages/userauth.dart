@@ -17,7 +17,6 @@ class _AuthState extends State<Auth> {
   bool showSignIn = true;
   void toggleView() {
     setState(() => showSignIn = !showSignIn);
-    debugPrint(showSignIn.toString());
   }
 
   @override
