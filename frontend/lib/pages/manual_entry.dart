@@ -1,8 +1,5 @@
-import 'dart:io';
-
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:flutter_cached_pdfview/flutter_cached_pdfview.dart';
 import 'package:frontend/constants/colors.dart';
 import 'package:frontend/constants/fonts.dart';
 import 'package:frontend/constants/strings.dart';
@@ -213,6 +210,7 @@ class _ManualEntryState extends State<ManualEntry> {
                                     builder: (context) => const ScannerCamera(),
                                   ),
                                 );
+                                deletePdfFile(manualEntry['pdf_name']);
                               },
                               theme: ButtonColorTheme.primary),
                         ],
@@ -472,7 +470,7 @@ class _ManualEntryState extends State<ManualEntry> {
       "account_id": "1234"
     };
 
-    var response = await dio.post("http://localhost:5432/transactions/input",
+    var response = await dio.post("http://10.0.2.2:5432/transactions/input",
         data: formData);
     debugPrint(response.toString());
   }
@@ -488,5 +486,16 @@ class _ManualEntryState extends State<ManualEntry> {
         options: Options(responseType: ResponseType.json));
 
     debugPrint(response.toString());
+  }
+
+  Future deletePdfFile(String pdfName) async {
+    try {
+      await dio.delete(
+        "http://10.0.2.2:5432/transactions/$pdfName",
+      );
+      print('PDF file deleted successfully!');
+    } catch (e) {
+      print('Error while deleting PDF file: $e');
+    }
   }
 }
