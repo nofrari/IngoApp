@@ -32,5 +32,5 @@ class Strings {
 
   //Buttons
   static const String btnRegister = "Registrieren";
-  static const String btnSignIn = "Anmelden";
+  static const String btnLogin = "Anmelden";
 }

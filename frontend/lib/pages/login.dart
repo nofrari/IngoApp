@@ -2,23 +2,21 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:email_validator/email_validator.dart';
 
-import '../widgets/input_fields/checkbox_field.dart';
+import '../start.dart';
+import '../constants/strings.dart';
 import '../widgets/input_fields/input_field.dart';
 import '../widgets/button.dart';
 
-import '../constants/strings.dart';
-import '../start.dart';
-
-class Register extends StatefulWidget {
-  const Register({
+class Login extends StatefulWidget {
+  const Login({
     super.key,
   });
 
   @override
-  State<Register> createState() => _RegisterState();
+  State<Login> createState() => _LoginState();
 }
 
-class _RegisterState extends State<Register> {
+class _LoginState extends State<Login> {
   String? valuePWValidator;
   TextInputFormatter digits = FilteringTextInputFormatter.digitsOnly;
   TextInputFormatter letters = FilteringTextInputFormatter.allow(
@@ -53,47 +51,6 @@ class _RegisterState extends State<Register> {
         key: _formKey,
         child: Column(
           children: [
-            InputField(
-              lblText: Strings.registerFirstName,
-              reqFormatter: letters,
-              keyboardType: text,
-              controller: controllerName,
-              maxLength: 50,
-              maxLines: 1,
-              onFocusChanged: (hasFocus) {
-                if (hasFocus) {
-                  // do stuff
-                }
-                ;
-              },
-              autovalidateMode: AutovalidateMode.onUserInteraction,
-              validator: (value) {
-                if (value == null || value.isEmpty) {
-                  return Strings.alertInputfieldEmpty;
-                }
-                return null;
-              },
-            ),
-            InputField(
-              lblText: Strings.registerLastName,
-              reqFormatter: letters,
-              keyboardType: text,
-              controller: controllerLastName,
-              maxLength: 50,
-              maxLines: 1,
-              onFocusChanged: (hasFocus) {
-                if (hasFocus) {
-                  // do stuff
-                }
-              },
-              autovalidateMode: AutovalidateMode.onUserInteraction,
-              validator: (value) {
-                if (value == null || value.isEmpty) {
-                  return Strings.alertInputfieldEmpty;
-                }
-                return null;
-              },
-            ),
             InputField(
               lblText: Strings.registerMail,
               reqFormatter: mail,
@@ -136,40 +93,10 @@ class _RegisterState extends State<Register> {
                 return null;
               },
             ),
-            InputField(
-              lblText: Strings.registerPasswordRepeat,
-              reqFormatter: letters,
-              keyboardType: text,
-              controller: controllerPasswordRepeat,
-              maxLength: 50,
-              maxLines: 1,
-              onFocusChanged: (hasFocus) {
-                if (hasFocus) {
-                  // do stuff
-                }
-                ;
-              },
-              validator: (valuePW) {
-                if (valuePW == null || valuePW.isEmpty) {
-                  return Strings.alertInputfieldEmpty;
-                } else if (valuePW != controllerPassword.text) {
-                  return Strings.alertPasswordWrong;
-                }
-                return null;
-              },
-            ),
-            CheckboxField(
-              validator: (valuePW) {
-                if (valuePW == false) {
-                  return Strings.alertDataProtectionEmpty;
-                }
-                return null;
-              },
-            ),
             Padding(
               padding: EdgeInsets.only(top: 10),
               child: Button(
-                  btnText: Strings.btnRegister,
+                  btnText: Strings.btnLogin,
                   onTap: () {
                     if (_formKey.currentState!.validate() != false) {
                       // ScaffoldMessenger.of(context)
