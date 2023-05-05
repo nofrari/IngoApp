@@ -15,6 +15,7 @@ import sharp from 'sharp';
 // const PDFDocument = require('pdfkit');
 // const sharp = require('sharp');
 import transactionsRouter from './routes/transactions';
+import accountsRouter from './routes/accounts';
 
 const app = express();
 const mindeeClient = new mindee.Client({ apiKey: "408ec2ab38cadbb87b1d5b976e3644b9" });
@@ -22,6 +23,7 @@ const mindeeClient = new mindee.Client({ apiKey: "408ec2ab38cadbb87b1d5b976e3644
 app.use(express.json());
 app.use(usersRouter);
 app.use(transactionsRouter);
+app.use(accountsRouter);
 
 
 var storage =
