@@ -110,4 +110,9 @@ router.delete('/accounts/:id', async (req, res) => {
     res.json({ message: 'Kategorie erfolgreich gelöscht' });
 });
 
+router.get('/accounts', async (req, res) => {
+    const accounts = await prisma.account.findMany();
+    res.send(accounts);
+});
+
 export default router;
