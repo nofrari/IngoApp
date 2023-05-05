@@ -1,7 +1,7 @@
+import 'dart:developer';
 import 'dart:io';
 import 'dart:math';
 import 'package:flutter/material.dart';
-import 'package:flutter_cache_manager/flutter_cache_manager.dart';
 import 'package:frontend/constants/fonts.dart';
 import 'package:frontend/widgets/popup.dart';
 import 'package:frontend/widgets/round_button.dart';
@@ -112,7 +112,8 @@ class _PdfPreviewState extends State<PdfPreview> {
     }
 
     final output = await getTemporaryDirectory();
-    final fileName = 'pdf_file_${Random().nextInt(100000)}.pdf';
+    final fileName =
+        '${DateTime.now().millisecondsSinceEpoch}_${Random().nextInt(100000)}.pdf';
     final file = File('${output.path}/$fileName');
     final bytes = await doc.save();
     await file.writeAsBytes(bytes);
@@ -122,6 +123,8 @@ class _PdfPreviewState extends State<PdfPreview> {
     });
 
     getPDFSize(_pdfFile!.path);
+    PdfFile.setName(fileName);
+    PdfFile.setPath(_pdfFile!.path);
   }
 
   //get the pdf-size
@@ -250,4 +253,21 @@ class _PdfPreviewState extends State<PdfPreview> {
             ),
           );
   }
+}
+
+class PdfFile {
+  static String? _filename;
+  static String? _filePath;
+
+  static void setName(String name) {
+    _filename = name;
+  }
+
+  static String? getName() => _filename;
+
+  static void setPath(String path) {
+    _filePath = path;
+  }
+
+  static String? getPath() => _filePath;
 }
