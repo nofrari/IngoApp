@@ -1,7 +1,7 @@
 //working with uuids?
 import 'package:intl/intl.dart';
 
-final dateFormatter = DateFormat.yMd();
+final dateFormatter = DateFormat('dd / MM / yyyy');
 
 class Transaction {
   Transaction(
@@ -13,7 +13,7 @@ class Transaction {
       required this.description,
       required this.transactionType});
 
-  final int id;
+  final String id;
   final String name;
   final double amount;
   final String category;
