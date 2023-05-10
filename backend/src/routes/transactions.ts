@@ -60,8 +60,6 @@ type EditSchema = z.infer<typeof editSchema>;
 // });
 
 
-
-
 router.post('/transactions/input', async (req, res) => {
     const body = <InputSchema>req.body;
     const validationResult: any = inputSchema.safeParse(body);
@@ -260,6 +258,34 @@ router.delete('/transactions/:filename', (req, res) => {
             res.send('PDF file deleted successfully');
         }
     });
+});
+
+// router.get('/transactions', async (req, res) => {
+//     const transactions = await prisma.transaction.findMany();
+//     res.send(transactions);
+// });
+
+router.get('/transactions/:id', async (req, res) => {
+    const id = req.params.id;
+
+    const transaction = await prisma.transaction.findUnique({ where: { transaction_id: id } });
+    res.send(transaction);
+});
+
+router.get('/transactions/list/:user_id', async (req, res) => {
+    const user_id = req.params.user_id;
+
+    const transactions = await prisma.transaction.findMany({
+        where: {
+            category: {
+                user: {
+                    user_id: user_id,
+                },
+            },
+        },
+    });
+
+    res.send(transactions);
 });
 
 export default router;
