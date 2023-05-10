@@ -5,7 +5,7 @@ class Account {
     required this.amount,
   });
 
-  final int id;
+  final String id;
   final String name;
   final double amount;
 
