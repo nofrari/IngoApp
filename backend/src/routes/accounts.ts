@@ -133,7 +133,7 @@ router.get('/accounts/:id', async (req, res) => {
     res.send(account);
 });
 
-router.get('/accounts/:user_id', async (req, res) => {
+router.get('/accounts/list/:user_id', async (req, res) => {
     const user_id = req.params.user_id;
 
     const accounts = await prisma.account.findMany({
