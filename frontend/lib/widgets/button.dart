@@ -6,7 +6,9 @@ import '../constants/values.dart';
 
 enum ButtonColorTheme {
   primary,
-  secondary,
+  secondaryDark,
+  secondaryLight,
+  disabled,
 }
 
 class Button extends StatelessWidget {
@@ -32,6 +34,16 @@ class Button extends StatelessWidget {
       buttonText = Fonts.primaryButton;
       backgroundColor = AppColor.blueActive;
       borderColor = AppColor.blueActive;
+    } else if (theme == ButtonColorTheme.secondaryDark) {
+      buttonText = Fonts.secondaryButton;
+      backgroundColor = AppColor.neutral600;
+      borderColor = AppColor.blueActive;
+    } else if (theme == ButtonColorTheme.disabled) {
+      buttonText = Fonts.disabledButton;
+      backgroundColor = (isTransparent != null && isTransparent!)
+          ? Colors.transparent
+          : AppColor.neutral600;
+      borderColor = AppColor.neutral300;
     } else {
       buttonText = Fonts.secondaryButton;
       backgroundColor = (isTransparent != null && isTransparent!)
