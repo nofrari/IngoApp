@@ -32,7 +32,7 @@ class _HomeOverviewCardState extends State<HomeOverviewCard> {
           await Dio().get('http://localhost:5432/transactions/list/1234');
       List<Transaction> transactions = [];
 
-      for (var i = 0; i < 2 && i < response.data.length; i++) {
+      for (var i = 0; i < 5 && i < response.data.length; i++) {
         transactions.add(
           Transaction(
               id: response.data[i]['transaction_id'].toString(),
