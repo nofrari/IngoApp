@@ -1,3 +1,5 @@
+import 'package:intl/intl.dart';
+
 class Account {
   Account({
     required this.id,
@@ -10,6 +12,9 @@ class Account {
   final double amount;
 
   String formatedAmount(double amount) {
-    return "$amount €";
+    var formatter = NumberFormat('#,##0.00', 'de_DE');
+    String formattedNumber = formatter.format(amount);
+
+    return "$formattedNumber €";
   }
 }
