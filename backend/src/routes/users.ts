@@ -160,10 +160,7 @@ router.post('/users/register', async (req, res) => {
 
 //get one user by id
 //for testing: copy token from login or register and paste it in the authorization header under Bearer token
-router.get('/users/:id', verifyToken, async (req, res) => {
-    if (res.locals.user.userId !== req.params.id) {
-        res.status(403).send();
-    }
+router.get('/users/:id', async (req, res) => {
     const user = await prisma.user.findUnique({ where: { user_id: req.params.id } });
     res.send(user);
 });

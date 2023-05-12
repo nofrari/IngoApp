@@ -1,7 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:frontend/services/accounts_service.dart';
+import 'package:frontend/services/manualentry_service.dart';
 import 'package:frontend/widgets/accounts/accounts_overview.dart';
 import 'package:frontend/widgets/transactions/latest_transactions_list.dart';
 import 'package:dio/dio.dart';
+import 'package:provider/provider.dart';
 //import constants
 import '../constants/colors.dart';
 import '../constants/values.dart';
@@ -29,7 +32,7 @@ class _HomeOverviewCardState extends State<HomeOverviewCard> {
   void _getTransactions() async {
     try {
       Response response =
-          await Dio().get('http://localhost:5432/transactions/list/1234');
+          await Dio().get('${Values.serverURL}/transactions/list/1');
       List<Transaction> transactions = [];
 
       for (var i = 0; i < 5 && i < response.data.length; i++) {
@@ -57,7 +60,7 @@ class _HomeOverviewCardState extends State<HomeOverviewCard> {
   void _getAccounts() async {
     try {
       Response response =
-          await Dio().get('http://localhost:5432/accounts/list/1234');
+          await Dio().get('${Values.serverURL}/accounts/list/1');
 
       for (var i = 0; i < response.data.length; i++) {
         accounts.add(Account(
@@ -66,6 +69,8 @@ class _HomeOverviewCardState extends State<HomeOverviewCard> {
           amount: double.parse(response.data[i]['account_balance'].toString()),
         ));
       }
+
+      await context.read<AccountsService>().setAccounts(accounts: accounts);
 
       setState(() {
         _allAccounts = accounts;

@@ -29,23 +29,6 @@ class ManualEntry extends StatefulWidget {
 }
 
 class _ManualEntryState extends State<ManualEntry> {
-  TextInputFormatter currency =
-      TextInputFormatter.withFunction((oldValue, newValue) {
-    String cleanText = newValue.text.replaceAll(RegExp(r'[^\d]'), '');
-    int value = int.tryParse(cleanText) ?? 0;
-    final formatter =
-        NumberFormat.currency(locale: 'de', name: "EUR", symbol: '€');
-    String newText = formatter.format(value / 100);
-    int cursorPos = newText.length;
-    if (newValue.selection.baseOffset == newValue.selection.extentOffset) {
-      cursorPos = formatter.format(value / 100).length - 2;
-    }
-    return TextEditingValue(
-      text: newText,
-      selection: TextSelection.collapsed(offset: cursorPos),
-    );
-  });
-
   TextInputFormatter digits = FilteringTextInputFormatter.digitsOnly;
   TextInputFormatter letters = FilteringTextInputFormatter.allow(
       RegExp(r"[a-zA-Z0-9#+:'()&/^\-{2}|\s]"));
@@ -144,7 +127,7 @@ class _ManualEntryState extends State<ManualEntry> {
                               onTap: () {
                                 Navigator.pop(context);
                               },
-                              theme: ButtonColorTheme.secondary),
+                              theme: ButtonColorTheme.secondaryLight),
                           Button(
                               btnText: "FORTFAHREN",
                               onTap: () async {
@@ -228,7 +211,7 @@ class _ManualEntryState extends State<ManualEntry> {
                         ),
                         InputField(
                           lblText: "Betrag in €",
-                          reqFormatter: currency,
+                          reqFormatter: currencyFormatter,
                           keyboardType: numeric,
                           controller: controllerAmount,
                           maxLines: 1,
@@ -343,13 +326,6 @@ class _ManualEntryState extends State<ManualEntry> {
                                 const SnackBar(
                                     content: Text('Daten werden gespeichert')),
                               );
-
-                              final refactoredAmount = controllerAmount.text
-                                  .replaceAll("€", "")
-                                  .replaceAll(" ", "")
-                                  .replaceAll(",", ".");
-
-                              final amount = double.tryParse(refactoredAmount);
                               final date = datePicker.selectedDate;
 
                               String? pdf_name = PdfFile.getName();
@@ -357,13 +333,17 @@ class _ManualEntryState extends State<ManualEntry> {
                               if (manualEntry.isNotEmpty) {
                                 _sendData(
                                     controllerTitle.text,
-                                    amount!,
+                                    currencyToDouble(controllerAmount.text),
                                     date,
                                     controllerDescription.text,
                                     manualEntry['pdf_name']);
                               } else {
-                                _sendData(controllerTitle.text, amount!, date,
-                                    controllerDescription.text, pdf_name!);
+                                _sendData(
+                                    controllerTitle.text,
+                                    currencyToDouble(controllerAmount.text),
+                                    date,
+                                    controllerDescription.text,
+                                    pdf_name!);
                                 savePDFToServer(PdfFile.getPath().toString());
                               }
 
@@ -395,7 +375,7 @@ class _ManualEntryState extends State<ManualEntry> {
                               );
                             }
                           },
-                          theme: ButtonColorTheme.secondary),
+                          theme: ButtonColorTheme.secondaryLight),
                     ),
                   )
                 : Container(),
@@ -419,7 +399,7 @@ class _ManualEntryState extends State<ManualEntry> {
       "account_id": "1234"
     };
 
-    var response = await dio.post("http://10.0.2.2:5432/transactions/input",
+    var response = await dio.post("${Values.serverURL}/transactions/input",
         data: formData);
     debugPrint(response.toString());
   }
@@ -429,10 +409,8 @@ class _ManualEntryState extends State<ManualEntry> {
       'pdf': await MultipartFile.fromFile(filePath),
     });
 
-    var response = await dio.post(
-        "http://localhost:5432/transactions/pdfUpload",
-        data: formData,
-        options: Options(responseType: ResponseType.json));
+    var response = await dio.post("${Values.serverURL}/transactions/pdfUpload",
+        data: formData, options: Options(responseType: ResponseType.json));
 
     debugPrint(response.toString());
   }
@@ -440,7 +418,7 @@ class _ManualEntryState extends State<ManualEntry> {
   Future deletePdfFile(String pdfName) async {
     try {
       await dio.delete(
-        "http://10.0.2.2:5432/transactions/$pdfName",
+        "${Values.serverURL}/transactions/$pdfName",
       );
       print('PDF file deleted successfully!');
     } catch (e) {

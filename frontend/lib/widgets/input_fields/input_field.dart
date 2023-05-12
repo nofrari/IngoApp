@@ -1,10 +1,36 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:intl/intl.dart';
 import '../../constants/colors.dart';
 import '../../constants/fonts.dart';
 import '../../constants/values.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:control_style/control_style.dart';
+
+TextInputFormatter currencyFormatter =
+    TextInputFormatter.withFunction((oldValue, newValue) {
+  String cleanText = newValue.text.replaceAll(RegExp(r'[^\d]'), '');
+  int value = int.tryParse(cleanText) ?? 0;
+  final formatter =
+      NumberFormat.currency(locale: 'de', name: "EUR", symbol: '€');
+  String newText = formatter.format(value / 100);
+  int cursorPos = newText.length;
+  if (newValue.selection.baseOffset == newValue.selection.extentOffset) {
+    cursorPos = formatter.format(value / 100).length - 2;
+  }
+  return TextEditingValue(
+    text: newText,
+    selection: TextSelection.collapsed(offset: cursorPos),
+  );
+});
+
+double currencyToDouble(String currency) {
+  final refactoredAmount =
+      currency.replaceAll("€", "").replaceAll(" ", "").replaceAll(",", ".");
+
+  final amount = double.tryParse(refactoredAmount);
+  return amount ?? 0;
+}
 
 class InputField extends StatefulWidget {
   const InputField(
@@ -94,7 +120,10 @@ class _InputFieldState extends State<InputField> {
         inputFormatters: [widget.reqFormatter],
         keyboardType: widget.keyboardType,
         onTap: () => widget.onFocusChanged(true),
-        onEditingComplete: () => widget.onFocusChanged(false),
+        onEditingComplete: () {
+          FocusScope.of(context).unfocus();
+          widget.onFocusChanged(false); //Tastatur schließen
+        },
       ),
     );
   }

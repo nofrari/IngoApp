@@ -97,22 +97,4 @@ class ScannerService extends ChangeNotifier {
   int? getPosition() {
     return _prefs.getInt('position');
   }
-
-  Future<void> clearCache(BuildContext context) async {
-    if (context.mounted) {
-      context.read<ScannerService>().clearImages();
-    }
-    // try {
-    //   final directory = await getTemporaryDirectory();
-    //   final cacheDir = directory.path;
-    //   final cacheDirFile = Directory(cacheDir);
-    //   await cacheDirFile.delete(recursive: true);
-    // } catch (e) {
-    //   ScaffoldMessenger.of(context).showSnackBar(
-    //     const SnackBar(
-    //       content: Text('An error occurred when deleting cache'),
-    //     ),
-    //   );
-    // }
-  }
 }

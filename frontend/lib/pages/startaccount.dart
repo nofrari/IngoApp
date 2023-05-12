@@ -155,7 +155,7 @@ class _StartAccountState extends State<StartAccount> {
                                       ),
                                     );
                                   },
-                                  theme: ButtonColorTheme.secondaryDark),
+                                  theme: ButtonColorTheme.secondaryLight),
                             ),
                           )
                           //: Container(),

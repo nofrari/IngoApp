@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:frontend/constants/values.dart';
 import 'package:frontend/widgets/home_overview_card.dart';
 import 'package:frontend/widgets/total_amount_card.dart';
 import 'package:dio/dio.dart';
@@ -25,7 +26,7 @@ class _HomeState extends State<Home> {
   void _getTotalAmount() async {
     try {
       Response response =
-          await Dio().get('http://localhost:5432/accounts/totalAmount/1234');
+          await Dio().get('${Values.serverURL}/accounts/totalAmount/1');
       setState(() {
         _totalAmout = double.parse(response.data['totalAmount'].toString());
       });

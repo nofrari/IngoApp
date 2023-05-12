@@ -39,7 +39,7 @@ class _StartState extends State<Start> {
 
   void fetchDataFromDatabase() async {
     try {
-      Response response = await Dio().get('http://localhost:5432/users/1');
+      Response response = await Dio().get('${Values.serverURL}/users/1');
 
       setState(() {
         user = User(

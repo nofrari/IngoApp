@@ -28,7 +28,7 @@ class CheckboxField extends FormField<bool> {
                   style: Fonts.text150,
                 ),
                 activeColor: AppColor.activeMenu,
-                materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                //materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
                 visualDensity: const VisualDensity(horizontal: -4),
                 side: MaterialStateBorderSide.resolveWith((states) =>
                     BorderSide(width: 1.0, color: AppColor.activeMenu)),
