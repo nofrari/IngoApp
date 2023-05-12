@@ -50,6 +50,7 @@ class _AuthState extends State<Auth> {
                         bottomLeft: Radius.circular(11)),
                     color: AppColor.backgroundGray,
                   ),
+                  //FIXME: Toggle nur umändern, wenn noch nicht aktiviert
                   child: Column(children: [
                     Toggle(toggleView: toggleView),
                     Container(

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:email_validator/email_validator.dart';
+import 'package:dio/dio.dart';
 
 import '../widgets/input_fields/checkbox_field.dart';
 import '../widgets/input_fields/input_field.dart';
@@ -45,6 +46,19 @@ class _RegisterState extends State<Register> {
 
   final _formKey = GlobalKey<FormState>();
   final PageStorageBucket bucket = PageStorageBucket();
+  late bool mailExists;
+
+  Dio dio = Dio();
+
+  @override
+  void initState() {
+    super.initState();
+    controllerLastName.text = "selina";
+    controllerName.text = "lehner";
+    controllerMail.text = "lehner.selina9@gmail.com";
+    controllerPassword.text = "123selina";
+    controllerPasswordRepeat.text = "123selina";
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -126,7 +140,7 @@ class _RegisterState extends State<Register> {
               controller: controllerPassword,
               maxLength: 50,
               maxLines: 1,
-              hidePassword: false,
+              hidePassword: true,
               onFocusChanged: (hasFocus) {
                 if (hasFocus) {
                   // do stuff
@@ -147,7 +161,7 @@ class _RegisterState extends State<Register> {
               controller: controllerPasswordRepeat,
               maxLength: 50,
               maxLines: 1,
-              hidePassword: false,
+              hidePassword: true,
               onFocusChanged: (hasFocus) {
                 if (hasFocus) {
                   // do stuff
@@ -163,6 +177,7 @@ class _RegisterState extends State<Register> {
                 return null;
               },
             ),
+            //TODO: Datenschutzerklärung verlinken
             CheckboxField(
               validator: (valuePW) {
                 if (valuePW == false) {
@@ -175,20 +190,29 @@ class _RegisterState extends State<Register> {
               padding: EdgeInsets.only(top: 10),
               child: Button(
                   btnText: Strings.btnRegister,
-                  onTap: () {
+                  onTap: () async {
                     if (_formKey.currentState!.validate() != false) {
-                      // ScaffoldMessenger.of(context)
-                      //     .showSnackBar(
-                      //   const SnackBar(
-                      //       content: Text(
-                      //           'Daten werden gespeichert')),
-                      // );
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) => const Start(),
-                        ),
+                      // createUser();
+                      await _sendData(
+                        controllerName.text,
+                        controllerLastName.text,
+                        controllerMail.text,
+                        controllerPassword.text,
                       );
+                      debugPrint('existiert diese mail bereits? $mailExists');
+                      if (mailExists == false) {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => const Start(),
+                          ),
+                        );
+                      } else {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          const SnackBar(
+                              content: Text('Mailadresse existiert bereits')),
+                        );
+                      }
                     }
                   },
                   theme: ButtonColorTheme.secondary),
@@ -197,5 +221,39 @@ class _RegisterState extends State<Register> {
         ),
       ),
     );
+  }
+
+  Future _sendData(
+      String name, String sirname, String email, String password) async {
+    Map<String, dynamic> formData = {
+      "user_name": name,
+      "user_sirname": sirname,
+      "email": email,
+      "password": password,
+    };
+
+    try {
+      await dio.post("http://localhost:5432/users/register", data: formData);
+
+      mailExists = false;
+    } on DioError catch (dioError) {
+      debugPrint(dioError.toString());
+      if (dioError.response != null) {
+        switch (dioError.response!.statusCode) {
+          case 409:
+            debugPrint('error: 409 - Email already exists');
+            setState(() {
+              mailExists = true;
+            });
+            break;
+          default:
+            debugPrint(
+                'error: ${dioError.response!.statusCode} - Something went wrong while trying to connect with the server');
+            break;
+        }
+      }
+    } catch (e) {
+      debugPrint('error: Something went wrong : $e');
+    }
   }
 }

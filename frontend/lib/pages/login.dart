@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:email_validator/email_validator.dart';
+import 'package:dio/dio.dart';
 
 import '../start.dart';
 import '../constants/strings.dart';
@@ -28,11 +29,8 @@ class _LoginState extends State<Login> {
   TextInputType numeric = TextInputType.number;
   TextInputType text = TextInputType.text;
 
-  TextEditingController controllerName = TextEditingController();
-  TextEditingController controllerLastName = TextEditingController();
   TextEditingController controllerMail = TextEditingController();
   TextEditingController controllerPassword = TextEditingController();
-  TextEditingController controllerPasswordRepeat = TextEditingController();
 
   String? Function(String?) required = (value) {
     if (value == null) {
@@ -43,6 +41,17 @@ class _LoginState extends State<Login> {
 
   final _formKey = GlobalKey<FormState>();
   final PageStorageBucket bucket = PageStorageBucket();
+  late bool userExists;
+  late bool credentialsMatch;
+
+  Dio dio = Dio();
+
+  @override
+  void initState() {
+    super.initState();
+    controllerMail.text = "lehner.selina9@gmail.com";
+    controllerPassword.text = "123selina";
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -63,7 +72,6 @@ class _LoginState extends State<Login> {
                 if (hasFocus) {
                   // do stuff
                 }
-                ;
               },
               validator: (value) {
                 if (value == null || value.isEmpty) {
@@ -95,24 +103,31 @@ class _LoginState extends State<Login> {
                 return null;
               },
             ),
+            //TODO: Link Passwort vergessen
             Padding(
               padding: EdgeInsets.only(top: 10),
               child: Button(
                   btnText: Strings.btnLogin,
-                  onTap: () {
+                  onTap: () async {
                     if (_formKey.currentState!.validate() != false) {
-                      // ScaffoldMessenger.of(context)
-                      //     .showSnackBar(
-                      //   const SnackBar(
-                      //       content: Text(
-                      //           'Daten werden gespeichert')),
-                      // );
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) => const Start(),
-                        ),
-                      );
+                      await _sendData(
+                          controllerMail.text, controllerPassword.text);
+                      if (userExists == true) {
+                        debugPrint('los gehts');
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => const Start(),
+                          ),
+                        );
+                      } else {
+                        debugPrint('da passt was nicht');
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          const SnackBar(
+                              content: Text(
+                                  'Keinen User gefunden, bitte überprüfe deine Eingaben.')),
+                        );
+                      }
                     }
                   },
                   theme: ButtonColorTheme.secondary),
@@ -121,5 +136,42 @@ class _LoginState extends State<Login> {
         ),
       ),
     );
+  }
+
+  Future _sendData(String email, String password) async {
+    Map<String, dynamic> formData = {
+      "email": email,
+      "password": password,
+    };
+
+    try {
+      await dio.post("http://localhost:5432/users/login", data: formData);
+      debugPrint('user hat sich eingeloggt');
+      userExists = true;
+    } on DioError catch (dioError) {
+      debugPrint(dioError.toString());
+      if (dioError.response != null) {
+        switch (dioError.response!.statusCode) {
+          case 404:
+            debugPrint('error: 404 - User does not exist');
+            setState(() {
+              userExists = false;
+            });
+            break;
+          case 401:
+            debugPrint('error: 401 - Wrong email or password');
+            setState(() {
+              userExists = false;
+            });
+            break;
+          default:
+            debugPrint(
+                'error: ${dioError.response!.statusCode} - Something went wrong while trying to connect with the server');
+            break;
+        }
+      }
+    } catch (e) {
+      debugPrint('error: Something went wrong : $e');
+    }
   }
 }

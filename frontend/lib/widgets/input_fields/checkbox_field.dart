@@ -1,11 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import '../../constants/colors.dart';
 import '../../constants/fonts.dart';
-import 'package:frontend/widgets/text_google.dart';
-import '../../constants/values.dart';
-import 'package:google_fonts/google_fonts.dart';
-import 'package:control_style/control_style.dart';
 
 class CheckboxField extends FormField<bool> {
   CheckboxField(
