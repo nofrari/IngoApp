@@ -135,6 +135,8 @@ class _AccountCardState extends State<AccountCard> {
                               return null;
                             },
                             onEditingComplete: () {
+                              FocusScope.of(context).unfocus();
+
                               if (_balanceController.text != "" &&
                                   _headingController.text != "") {
                                 setState(() {
@@ -225,6 +227,8 @@ class _AccountCardState extends State<AccountCard> {
                           return null;
                         },
                         onEditingComplete: () {
+                          FocusScope.of(context).unfocus();
+
                           if (_balanceController.text != "" &&
                               _headingController.text != "") {
                             setState(() {
@@ -256,10 +260,16 @@ class _AccountCardState extends State<AccountCard> {
                           "user_id": "1",
                         };
 
-                        var response = await dio.post(
-                            "${Values.serverURL}/accounts/input",
-                            data: formData);
-                        debugPrint(response.toString());
+                        dynamic response;
+
+                        try {
+                          response = await dio.post(
+                              "${Values.serverURL}/accounts/input",
+                              data: formData);
+                          debugPrint(response.toString());
+                        } catch (e) {
+                          debugPrint(e.toString());
+                        }
 
                         setState(() {
                           _accountCardState = ThreeDotMenuState.done;
