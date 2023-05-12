@@ -18,7 +18,7 @@ class Transaction {
   final double amount;
   final String category;
   final DateTime date;
-  final int transactionType;
+  final String transactionType;
   final String description;
 
   String get formattedDate {
