@@ -56,6 +56,7 @@ class _DropdownState extends State<Dropdown> {
       alignment: Alignment.center,
       margin: const EdgeInsets.only(top: 10, bottom: 15),
       child: DropdownButtonFormField2(
+        autovalidateMode: AutovalidateMode.onUserInteraction,
         value: selectedValue,
         decoration: InputDecoration(
           label: Text(widget.label, style: Fonts.text300),
