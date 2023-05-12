@@ -41,7 +41,7 @@ class _HomeOverviewCardState extends State<HomeOverviewCard> {
                   response.data[i]['transaction_amount'].toString()),
               category: response.data[i]['category_id'].toString(),
               date: DateTime.parse(response.data[i]['date']),
-              transactionType: int.parse(response.data[i]['type_id']),
+              transactionType: (response.data[i]['type_id']).toString(),
               description: response.data[i]['description'].toString()),
         );
       }
@@ -49,6 +49,7 @@ class _HomeOverviewCardState extends State<HomeOverviewCard> {
         _latestTransactions = transactions;
       });
     } catch (e) {
+      print("fehler");
       print(e);
     }
   }
@@ -68,7 +69,6 @@ class _HomeOverviewCardState extends State<HomeOverviewCard> {
 
       setState(() {
         _allAccounts = accounts;
-        print(_allAccounts);
       });
     } catch (e) {
       print(e);
@@ -113,7 +113,7 @@ class _HomeOverviewCardState extends State<HomeOverviewCard> {
   @override
   Widget build(BuildContext context) {
     return Container(
-      margin: EdgeInsets.only(top: 20),
+      margin: const EdgeInsets.only(top: 20),
       decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(Values.cardRadius),
           color: AppColor.neutral500),
