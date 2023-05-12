@@ -140,8 +140,11 @@ class _StartAccountState extends State<StartAccount> {
                                     final refactoredAmount = controllerAmount
                                         .text
                                         .replaceAll("€", "")
+                                        .replaceAll(".", "")
                                         .replaceAll(" ", "")
                                         .replaceAll(",", ".");
+
+                                    print(refactoredAmount);
 
                                     _sendData(controllerTitle.text,
                                         double.parse(refactoredAmount));
@@ -152,7 +155,7 @@ class _StartAccountState extends State<StartAccount> {
                                       ),
                                     );
                                   },
-                                  theme: ButtonColorTheme.secondary),
+                                  theme: ButtonColorTheme.secondaryDark),
                             ),
                           )
                           //: Container(),
