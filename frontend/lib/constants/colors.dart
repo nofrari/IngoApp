@@ -19,4 +19,36 @@ class AppColor {
   static Color neutral700 = HexColor("#585550");
   static Color activeMenu = HexColor("#48BABF");
   static Color neutral800 = HexColor("#33312E");
+
+  static Color blueDark = HexColor("#3746B7");
+  static Color blueLight = HexColor("#37A3B7");
+  static Color yellowDark = HexColor("#FFC400");
+  static Color greenLight = HexColor("#77B737");
+  static Color greenAcid = HexColor("#BCC924");
+  static Color redDark = HexColor("#A34242");
+  static Color pink = HexColor("#B73786");
+  static Color orange = HexColor("#E07B16");
+  static Color violett = HexColor("#9886C1");
+  static Color greenKadmium = HexColor("#1F4B49");
+  static Color greenNavy = HexColor("#242F16");
+
+  static Map<String, Color> colors = {
+    'blueDark': blueDark,
+    'blueLight': blueLight,
+    'yellowDark': yellowDark,
+    'greenLight': greenLight,
+    'greenAcid': greenAcid,
+    'redDark': redDark,
+    'pink': pink,
+    'orange': orange,
+    'violett': violett,
+    'greenKadmium': greenKadmium,
+    'greenNavy': greenNavy
+    // add more color mappings as needed
+  };
+
+  static Color getColorFromString(String colorName) {
+    return colors[colorName] ??
+        neutral100; // return the corresponding color object if it exists, otherwise return black
+  }
 }
