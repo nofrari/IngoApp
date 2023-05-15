@@ -3,6 +3,10 @@ import 'package:frontend/constants/colors.dart';
 import 'package:frontend/constants/fonts.dart';
 import 'package:frontend/constants/icons.dart';
 import 'package:frontend/widgets/text_google.dart';
+import 'package:provider/provider.dart';
+
+import '../../models/icon.dart';
+import '../../services/initial_service.dart';
 
 class CategoryIconSelect extends StatefulWidget {
   CategoryIconSelect(
@@ -16,12 +20,9 @@ class CategoryIconSelect extends StatefulWidget {
 }
 
 class _CategoryIconSelectState extends State<CategoryIconSelect> {
-  String currentIcon = 'cookie';
-  final List<String> _defaultIcons = [
-    'cookie',
-    'add',
-    'delete',
-  ];
+  String currentIcon = "";
+
+  List<IconModel> icons = [];
 
   void changeIcon(String icon) {
     setState(() {
@@ -33,6 +34,7 @@ class _CategoryIconSelectState extends State<CategoryIconSelect> {
 
   @override
   Widget build(BuildContext context) {
+    icons = context.watch<InitialService>().getIcons();
     return Container(
       width: double.infinity,
       child: Column(
@@ -47,7 +49,7 @@ class _CategoryIconSelectState extends State<CategoryIconSelect> {
             height: 125,
             width: double.infinity,
             child: GridView.builder(
-              itemCount: _defaultIcons.length,
+              itemCount: icons.length,
               gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
                 crossAxisCount: 6,
                 mainAxisSpacing: 12,
@@ -58,8 +60,8 @@ class _CategoryIconSelectState extends State<CategoryIconSelect> {
                   decoration: BoxDecoration(
                     shape: BoxShape.circle,
                     border: Border.all(
-                      color: currentIcon == _defaultIcons[index] ||
-                              widget.selectedIcon == _defaultIcons[index]
+                      color: currentIcon == icons[index].name ||
+                              widget.selectedIcon == icons[index].name
                           ? AppColor.blueActive
                           : Colors.white,
                       width: 1,
@@ -71,14 +73,13 @@ class _CategoryIconSelectState extends State<CategoryIconSelect> {
                     child: IconButton(
                       onPressed: () {
                         setState(() {
-                          currentIcon = _defaultIcons[index];
+                          currentIcon = icons[index].name;
                         });
-                        changeIcon(_defaultIcons[index]);
+                        changeIcon(icons[index].name);
                       },
-                      icon: Icon(
-                          AppIcons.getIconFromString(_defaultIcons[index])),
-                      color: currentIcon == _defaultIcons[index] ||
-                              widget.selectedIcon == _defaultIcons[index]
+                      icon: Icon(AppIcons.getIconFromString(icons[index].name)),
+                      color: currentIcon == icons[index].name ||
+                              widget.selectedIcon == icons[index].name
                           ? AppColor.blueActive
                           : Colors.white,
                       iconSize: 35,
