@@ -19,6 +19,7 @@ class AppColor {
   static Color neutral700 = HexColor("#585550");
   static Color activeMenu = HexColor("#48BABF");
   static Color neutral800 = HexColor("#33312E");
+  static Color categorySelected = HexColor("#5068B8BD");
 
   static Color blueDark = HexColor("#3746B7");
   static Color blueLight = HexColor("#37A3B7");
