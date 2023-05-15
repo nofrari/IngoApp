@@ -14,7 +14,7 @@ class InitialService extends ChangeNotifier {
 
   static late final SharedPreferences _prefs;
 
-  Future<void> setCategories(List<Category> categories) async {
+  Future<void> setCategories(List<CategoryModel> categories) async {
     try {
       List<String> categoriesStrings =
           categories.map((category) => jsonEncode(category.toJson())).toList();
@@ -24,37 +24,40 @@ class InitialService extends ChangeNotifier {
     }
   }
 
-  List<Category> getCategories() {
+  List<CategoryModel> getCategories() {
     List<String> categoryStrings = _prefs.getStringList('categories') ?? [];
 
-    List<Category> categories = categoryStrings
-        .map((categoryString) => Category.fromJson(jsonDecode(categoryString)))
+    List<CategoryModel> categories = categoryStrings
+        .map((categoryString) =>
+            CategoryModel.fromJson(jsonDecode(categoryString)))
         .toList();
 
     return categories;
   }
 
-  Future<void> setColors(List<Color> colors) async {
+  Future<void> setColors(List<ColorModel> colors) async {
     try {
-      List<String> categoriesStrings =
+      List<String> colorStrings =
           colors.map((color) => jsonEncode(color.toJson())).toList();
-      _prefs.setStringList('colors', categoriesStrings);
+
+      debugPrint("length: ${colorStrings.length.toString()}");
+      _prefs.setStringList('colors', colorStrings);
     } catch (e) {
       debugPrint(e.toString());
     }
   }
 
-  List<Color> getColors() {
+  List<ColorModel> getColors() {
     List<String> colorStrings = _prefs.getStringList('colors') ?? [];
 
-    List<Color> colors = colorStrings
-        .map((colorString) => Color.fromJson(jsonDecode(colorString)))
+    List<ColorModel> colors = colorStrings
+        .map((colorString) => ColorModel.fromJson(jsonDecode(colorString)))
         .toList();
 
     return colors;
   }
 
-  Future<void> setIcons(List<icon.Icon> icons) async {
+  Future<void> setIcons(List<icon.IconModel> icons) async {
     try {
       List<String> iconsStrings =
           icons.map((icon) => jsonEncode(icon.toJson())).toList();
@@ -64,11 +67,11 @@ class InitialService extends ChangeNotifier {
     }
   }
 
-  List<icon.Icon> getIcons() {
+  List<icon.IconModel> getIcons() {
     List<String> iconsStrings = _prefs.getStringList('icons') ?? [];
 
-    List<icon.Icon> icons = iconsStrings
-        .map((iconString) => icon.Icon.fromJson(jsonDecode(iconString)))
+    List<icon.IconModel> icons = iconsStrings
+        .map((iconString) => icon.IconModel.fromJson(jsonDecode(iconString)))
         .toList();
 
     return icons;
