@@ -104,33 +104,35 @@ class _LoginState extends State<Login> {
               },
             ),
             //TODO: Link Passwort vergessen
-            Padding(
-              padding: EdgeInsets.only(top: 10),
-              child: Button(
-                  btnText: Strings.btnLogin,
-                  onTap: () async {
-                    if (_formKey.currentState!.validate() != false) {
-                      await _sendData(
-                          controllerMail.text, controllerPassword.text);
-                      if (userExists == true) {
-                        debugPrint('los gehts');
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) => const Start(),
-                          ),
-                        );
-                      } else {
-                        debugPrint('da passt was nicht');
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          const SnackBar(
-                              content: Text(
-                                  'Keinen User gefunden, bitte überprüfe deine Eingaben.')),
-                        );
+            Expanded(
+              child: Align(
+                alignment: Alignment.bottomCenter,
+                child: Button(
+                    btnText: Strings.btnLogin,
+                    onTap: () async {
+                      if (_formKey.currentState!.validate() != false) {
+                        await _sendData(
+                            controllerMail.text, controllerPassword.text);
+                        if (userExists == true) {
+                          debugPrint('los gehts');
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => const Start(),
+                            ),
+                          );
+                        } else {
+                          debugPrint('da passt was nicht');
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            const SnackBar(
+                                content: Text(
+                                    'Keinen User gefunden, bitte überprüfe deine Eingaben.')),
+                          );
+                        }
                       }
-                    }
-                  },
-                  theme: ButtonColorTheme.secondary),
+                    },
+                    theme: ButtonColorTheme.secondary),
+              ),
             ),
           ],
         ),

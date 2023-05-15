@@ -40,6 +40,7 @@ class _AuthState extends State<Auth> {
                   ),
                 ),
                 Container(
+                  height: MediaQuery.of(context).size.height * 0.7,
                   decoration: BoxDecoration(
                     border: Border.all(
                         color: AppColor.neutral500, style: BorderStyle.solid),
@@ -53,9 +54,12 @@ class _AuthState extends State<Auth> {
                   //FIXME: Toggle nur umändern, wenn noch nicht aktiviert
                   child: Column(children: [
                     Toggle(toggleView: toggleView),
-                    Container(
-                        margin: EdgeInsets.all(20),
-                        child: showSignIn ? Register() : Login())
+                    Expanded(
+                        child: Align(
+                            alignment: Alignment.bottomCenter,
+                            child: Container(
+                                margin: EdgeInsets.all(20),
+                                child: showSignIn ? Register() : Login())))
                   ]),
                 ),
               ],

@@ -186,36 +186,38 @@ class _RegisterState extends State<Register> {
                 return null;
               },
             ),
-            Padding(
-              padding: EdgeInsets.only(top: 10),
-              child: Button(
-                  btnText: Strings.btnRegister,
-                  onTap: () async {
-                    if (_formKey.currentState!.validate() != false) {
-                      // createUser();
-                      await _sendData(
-                        controllerName.text,
-                        controllerLastName.text,
-                        controllerMail.text,
-                        controllerPassword.text,
-                      );
-                      debugPrint('existiert diese mail bereits? $mailExists');
-                      if (mailExists == false) {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) => const Start(),
-                          ),
+            Expanded(
+              child: Align(
+                alignment: Alignment.bottomCenter,
+                child: Button(
+                    btnText: Strings.btnRegister,
+                    onTap: () async {
+                      if (_formKey.currentState!.validate() != false) {
+                        // createUser();
+                        await _sendData(
+                          controllerName.text,
+                          controllerLastName.text,
+                          controllerMail.text,
+                          controllerPassword.text,
                         );
-                      } else {
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          const SnackBar(
-                              content: Text('Mailadresse existiert bereits')),
-                        );
+                        debugPrint('existiert diese mail bereits? $mailExists');
+                        if (mailExists == false) {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => const Start(),
+                            ),
+                          );
+                        } else {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            const SnackBar(
+                                content: Text('Mailadresse existiert bereits')),
+                          );
+                        }
                       }
-                    }
-                  },
-                  theme: ButtonColorTheme.secondary),
+                    },
+                    theme: ButtonColorTheme.secondary),
+              ),
             ),
           ],
         ),
