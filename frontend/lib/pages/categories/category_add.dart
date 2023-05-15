@@ -1,10 +1,12 @@
 import 'dart:io';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:frontend/constants/colors.dart';
 import 'package:frontend/constants/fonts.dart';
 import 'package:frontend/constants/icons.dart';
 import 'package:frontend/constants/values.dart';
+import 'package:frontend/pages/categories/categories.dart';
 import 'package:frontend/widgets/button.dart';
 import 'package:frontend/widgets/button_transparent_container.dart';
 import 'package:frontend/widgets/categories/category_color_selector.dart';
@@ -14,12 +16,16 @@ import 'package:frontend/widgets/categories/category_toggle_black.dart';
 import 'package:frontend/widgets/header.dart';
 import 'package:dio/dio.dart';
 import 'package:frontend/widgets/input_fields/input_field.dart';
+import 'package:provider/provider.dart';
 
+import '../../models/color.dart';
+import '../../models/icon.dart';
+import '../../services/initial_service.dart';
 import '../../widgets/text_google.dart';
 
 class CategoryAdd extends StatefulWidget {
   const CategoryAdd({super.key});
-
+  // final Function updateCategoryList;
   @override
   State<CategoryAdd> createState() => _CategoryAddState();
 }
@@ -30,6 +36,8 @@ class _CategoryAddState extends State<CategoryAdd> {
   String icon = '';
   String? label;
   bool? border;
+  List<IconModel> icons = [];
+  List<ColorModel> colors = [];
 
   void _updateSelectedColor(String color) {
     setState(() {
@@ -57,8 +65,17 @@ class _CategoryAddState extends State<CategoryAdd> {
   TextInputType text = TextInputType.text;
   TextEditingController controllerCategoryName = TextEditingController();
 
+  bool isFormValid() {
+    return label != null &&
+        label!.isNotEmpty &&
+        bgColor.isNotEmpty &&
+        icon.isNotEmpty;
+  }
+
   @override
   Widget build(BuildContext context) {
+    colors = context.watch<InitialService>().getColors();
+    icons = context.watch<InitialService>().getIcons();
     return Scaffold(
       appBar: Header(
         onTap: () {
@@ -131,8 +148,20 @@ class _CategoryAddState extends State<CategoryAdd> {
               child: Button(
                   isTransparent: true,
                   btnText: "KATEGORIE HINZUFÜGEN",
-                  onTap: () async => await _createCategory(
-                      controllerCategoryName.text, "", isBlack, ""),
+                  onTap: () async {
+                    await _createCategory(
+                      controllerCategoryName.text,
+                      bgColor,
+                      isBlack,
+                      icon,
+                    );
+                    await Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => const Categories(),
+                      ),
+                    ); // Navigate back to the previous screen
+                  },
                   theme: ButtonColorTheme.secondary),
             ),
           ),
@@ -143,21 +172,25 @@ class _CategoryAddState extends State<CategoryAdd> {
 
   Future _createCategory(
     String label,
-    String color,
+    String colorName,
     bool isBlack,
-    String icon,
+    String iconName,
   ) async {
+    IconModel desiredIcon = icons.firstWhere((icon) => icon.name == iconName);
+    ColorModel desiredColor =
+        colors.firstWhere((color) => color.name == colorName);
+
     Map<String, dynamic> formData = {
       "category_name": label,
-      "color_id": "1",
+      "color_id": desiredColor.color_id,
       "is_black": isBlack,
-      "icon_id": "2",
+      "icon_id": desiredIcon.icon_id,
       "user_id": "1"
     };
 
-    var response = await dio.post("http://localhost:5432/categories/input",
-        data: formData);
-
-    debugPrint(response.toString());
+    var response = await dio.post(
+      "http://localhost:5432/categories/input",
+      data: formData,
+    );
   }
 }
