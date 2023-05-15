@@ -4,6 +4,9 @@ import 'package:frontend/constants/colors.dart';
 import 'package:flutter_colorpicker/flutter_colorpicker.dart';
 import 'package:frontend/constants/fonts.dart';
 import 'package:frontend/widgets/text_google.dart';
+import 'package:provider/provider.dart';
+import '../../models/color.dart' as model;
+import '../../services/initial_service.dart';
 
 class ColorSelector extends StatefulWidget {
   String? selectedColor;
@@ -16,38 +19,19 @@ class ColorSelector extends StatefulWidget {
 }
 
 class _ColorSelectorState extends State<ColorSelector> {
-  Dio dio = Dio();
-  String _currentColor = 'pink';
-  final List<String> _defaultColors = [
-    'blueDark',
-    'blueLight',
-    'yellowDark',
-    'greenLight',
-    'greenAcid',
-    'redDark',
-    'pink',
-    'orange',
-    'violett',
-    'greenKadmium',
-    'greenNavy'
-  ];
-
-  @override
-  void initState() {
-    super.initState();
-    _getDataForCategory();
-  }
+  String _currentColor = '';
+  List<model.ColorModel> colorList = [];
 
   void changeColor(String color) {
     setState(() {
       _currentColor = color;
     });
-
     widget.onColorSelected(_currentColor);
   }
 
   @override
   Widget build(BuildContext context) {
+    colorList = context.watch<InitialService>().getColors();
     return Container(
       width: double.infinity,
       child: Column(
@@ -69,7 +53,7 @@ class _ColorSelectorState extends State<ColorSelector> {
               pickerColor: AppColor.getColorFromString(_currentColor),
               layoutBuilder: (context, colors, child) {
                 return GridView.builder(
-                  itemCount: _defaultColors.length,
+                  itemCount: colorList.length,
                   gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
                     crossAxisCount: 6,
                     mainAxisSpacing: 12,
@@ -77,22 +61,22 @@ class _ColorSelectorState extends State<ColorSelector> {
                   ),
                   itemBuilder: (context, index) {
                     return Material(
-                      color: AppColor.getColorFromString(_defaultColors[index]),
+                      color: AppColor.getColorFromString(colorList[index].name),
                       shape: CircleBorder(
-                        side: _currentColor == _defaultColors[index] ||
-                                widget.selectedColor == _defaultColors[index]
+                        side: _currentColor == colorList[index].name ||
+                                widget.selectedColor == colorList[index].name
                             ? BorderSide(width: 2, color: AppColor.activeMenu)
                             : BorderSide.none,
                       ),
                       child: InkWell(
                         onTap: () {
                           setState(() {
-                            _currentColor = _defaultColors[index];
+                            _currentColor = colorList[index].name;
                           });
-                          changeColor(_defaultColors[index]);
+                          changeColor(colorList[index].name);
                         },
                         child: AppColor.getColorFromString(_currentColor) ==
-                                colors[index]
+                                colorList[index].name
                             ? Container(
                                 decoration: BoxDecoration(
                                   shape: BoxShape.circle,
@@ -114,13 +98,5 @@ class _ColorSelectorState extends State<ColorSelector> {
         ],
       ),
     );
-  }
-
-  Future _getDataForCategory() async {
-    var response = await dio.get(
-      "http://localhost:5432/categories/data",
-    );
-
-    debugPrint(response.toString());
   }
 }
