@@ -1,5 +1,5 @@
-class Color {
-  Color({
+class ColorModel {
+  ColorModel({
     required this.color_id,
     required this.name,
   });
@@ -9,9 +9,9 @@ class Color {
 
   Map<String, dynamic> toJson() => {
         'color_id': color_id,
-        'name': name,
+        'color_name': name,
       };
 
-  factory Color.fromJson(Map<String, dynamic> json) =>
-      Color(color_id: json["color_id"], name: json['name']);
+  factory ColorModel.fromJson(Map<String, dynamic> json) =>
+      ColorModel(color_id: json["color_id"], name: json['color_name']);
 }

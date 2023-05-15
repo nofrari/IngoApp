@@ -1,5 +1,5 @@
-class Category {
-  Category({
+class CategoryModel {
+  CategoryModel({
     required this.category_id,
     required this.bgColor,
     required this.isBlack,
@@ -21,7 +21,7 @@ class Category {
         'label': label,
       };
 
-  factory Category.fromJson(Map<String, dynamic> json) => Category(
+  factory CategoryModel.fromJson(Map<String, dynamic> json) => CategoryModel(
         category_id: json["category_id"],
         bgColor: json["bgColor"],
         isBlack: json["isBlack"],

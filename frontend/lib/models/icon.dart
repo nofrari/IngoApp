@@ -1,5 +1,5 @@
-class Icon {
-  Icon({
+class IconModel {
+  IconModel({
     required this.icon_id,
     required this.name,
   });
@@ -9,11 +9,11 @@ class Icon {
 
   Map<String, dynamic> toJson() => {
         'icon_id': icon_id,
-        'name': name,
+        'icon_name': name,
       };
 
-  factory Icon.fromJson(Map<String, dynamic> json) => Icon(
+  factory IconModel.fromJson(Map<String, dynamic> json) => IconModel(
         icon_id: json["icon_id"],
-        name: json["name"],
+        name: json["icon_name"],
       );
 }
