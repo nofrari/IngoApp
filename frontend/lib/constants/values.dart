@@ -15,6 +15,8 @@ class Values {
   static const double inputRadius = 5;
   static const double inputBorder = 2;
   static const double inputWidth = 315;
+  static const double roundButtonSize = 28;
+  static const double accountCardHeight = 120;
 
   static const EdgeInsets buttonPadding =
       EdgeInsets.symmetric(vertical: 15, horizontal: 20);
@@ -22,7 +24,14 @@ class Values {
       EdgeInsets.symmetric(vertical: 20, horizontal: 60);
   static const EdgeInsets bigCardPadding =
       EdgeInsets.symmetric(vertical: 10, horizontal: 10);
+  static const EdgeInsets bigCardMargin = EdgeInsets.all(20);
 
   static const EdgeInsets paddingHorizontal =
       EdgeInsets.symmetric(vertical: 0, horizontal: 25);
+
+  static const EdgeInsets accountHeading =
+      EdgeInsets.symmetric(vertical: 20, horizontal: 10);
+
+  static const String serverURL = //'https://data.ingoapp.at';
+      'http://10.0.2.2:5432';
 }

@@ -1,7 +1,7 @@
+import 'dart:developer';
 import 'dart:io';
 import 'dart:math';
 import 'package:flutter/material.dart';
-import 'package:flutter_cache_manager/flutter_cache_manager.dart';
 import 'package:frontend/constants/fonts.dart';
 import 'package:frontend/widgets/popup.dart';
 import 'package:frontend/widgets/round_button.dart';
@@ -110,7 +110,8 @@ class _PdfPreviewState extends State<PdfPreview> {
     }
 
     final output = await getTemporaryDirectory();
-    final fileName = 'pdf_file_${Random().nextInt(100000)}.pdf';
+    final fileName =
+        '${DateTime.now().millisecondsSinceEpoch}_${Random().nextInt(100000)}.pdf';
     final file = File('${output.path}/$fileName');
     final bytes = await doc.save();
     await file.writeAsBytes(bytes);
@@ -120,6 +121,8 @@ class _PdfPreviewState extends State<PdfPreview> {
     });
 
     getPDFSize(_pdfFile!.path);
+    PdfFile.setName(fileName);
+    PdfFile.setPath(_pdfFile!.path);
   }
 
   //get the pdf-size
@@ -139,50 +142,52 @@ class _PdfPreviewState extends State<PdfPreview> {
   @override
   Widget build(BuildContext context) {
     return (_pdfFile != null || widget.pdfUrl != null) && _showPdf
-        ? Container(
-            height: 450,
-            decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(Values.cardRadius),
-              border: Border.all(color: AppColor.blueActive, width: 2),
-            ),
-            child: Stack(
-              alignment: Alignment.bottomCenter,
-              children: [
-                ClipRRect(
-                  borderRadius: BorderRadius.circular(Values.cardRadius - 4),
-                  child: SingleChildScrollView(
-                    child: Container(
-                      height: (widget.pdfHeight != null)
-                          ? widget.pdfHeight!.ceilToDouble()
-                          : containerHeight,
-                      child: InteractiveViewer(
-                        clipBehavior: Clip.none,
-                        constrained: true,
-                        child: PDF(
-                          enableSwipe: true,
-                          swipeHorizontal: false,
-                          autoSpacing: true,
-                          pageFling: false,
-                          fitEachPage: false,
-                          onError: (error) {
-                            print(error.toString());
-                          },
-                          onPageError: (page, error) {
-                            print('$page: ${error.toString()}');
-                          },
-                        ).fromPath(widget.pdfUrl ?? _pdfFile!.path),
-                      ), //.fromAsset(_pdfFile!.path),
+        ? Focus(
+            child: Container(
+              height: 450,
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(Values.cardRadius),
+                border: Border.all(color: AppColor.blueActive, width: 2),
+              ),
+              child: Stack(
+                alignment: Alignment.bottomCenter,
+                children: [
+                  ClipRRect(
+                    borderRadius: BorderRadius.circular(Values.cardRadius - 4),
+                    child: SingleChildScrollView(
+                      child: Container(
+                        height: (widget.pdfHeight != null)
+                            ? widget.pdfHeight!.ceilToDouble()
+                            : containerHeight,
+                        child: InteractiveViewer(
+                          clipBehavior: Clip.none,
+                          constrained: true,
+                          child: PDF(
+                            enableSwipe: true,
+                            swipeHorizontal: false,
+                            autoSpacing: true,
+                            pageFling: false,
+                            fitEachPage: false,
+                            onError: (error) {
+                              print(error.toString());
+                            },
+                            onPageError: (page, error) {
+                              print('$page: ${error.toString()}');
+                            },
+                          ).fromPath(widget.pdfUrl ?? _pdfFile!.path),
+                        ), //.fromAsset(_pdfFile!.path),
+                      ),
                     ),
                   ),
-                ),
-                Container(
-                  margin: const EdgeInsets.only(bottom: 10),
-                  child: RoundButton(
-                    icon: Icons.delete,
-                    onTap: _deletePdf,
+                  Container(
+                    margin: const EdgeInsets.only(bottom: 10),
+                    child: RoundButton(
+                      icon: Icons.delete,
+                      onTap: _deletePdf,
+                    ),
                   ),
-                ),
-              ],
+                ],
+              ),
             ),
           )
         : Container(
@@ -218,14 +223,16 @@ class _PdfPreviewState extends State<PdfPreview> {
                                             _addPdf("camera");
                                             Navigator.pop(context);
                                           },
-                                          theme: ButtonColorTheme.secondary),
+                                          theme:
+                                              ButtonColorTheme.secondaryLight),
                                       Button(
                                           btnText: "GALLERY",
                                           onTap: () {
                                             _addPdf("gallery");
                                             Navigator.pop(context);
                                           },
-                                          theme: ButtonColorTheme.secondary),
+                                          theme:
+                                              ButtonColorTheme.secondaryLight),
                                     ],
                                   ),
                                 ),
@@ -245,4 +252,21 @@ class _PdfPreviewState extends State<PdfPreview> {
             ),
           );
   }
+}
+
+class PdfFile {
+  static String? _filename;
+  static String? _filePath;
+
+  static void setName(String name) {
+    _filename = name;
+  }
+
+  static String? getName() => _filename;
+
+  static void setPath(String path) {
+    _filePath = path;
+  }
+
+  static String? getPath() => _filePath;
 }

@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:frontend/services/accounts_service.dart';
 import 'package:frontend/services/initial_service.dart';
 import 'package:frontend/services/manualentry_service.dart';
 import 'package:provider/provider.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:frontend/services/scanner_service.dart';
+import 'pages/register.dart';
 import 'start.dart';
 
 final ImageCache testImageCache = ImageCache();
@@ -11,6 +13,7 @@ void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await ScannerService.init();
   await ManualEntryService.init();
+  await AccountsService.init();
   await InitialService.init();
   runApp(MultiProvider(
     providers: [
@@ -19,6 +22,9 @@ void main() async {
       ),
       ChangeNotifierProvider(
         create: (BuildContext context) => ManualEntryService(),
+      ),
+      ChangeNotifierProvider(
+        create: (BuildContext context) => AccountsService(),
       ),
       ChangeNotifierProvider(
         create: (BuildContext context) => InitialService(),
@@ -53,6 +59,6 @@ class _MyAppState extends State<MyApp> {
         theme: ThemeData(
           primarySwatch: Colors.blue,
         ),
-        home: const Start());
+        home: Start());
   }
 }

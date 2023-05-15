@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 //import constants
 import '../constants/colors.dart';
 import '../constants/values.dart';
@@ -33,11 +34,19 @@ class _TotalAmountCardState extends State<TotalAmountCard> {
             style: Fonts.text100,
           ),
           Text(
-            widget.totalAmount.toString(),
+            //widget.totalAmount.toString(),
+            formatedAmount(widget.totalAmount),
             style: Fonts.text400,
           )
         ],
       ),
     );
+  }
+
+  String formatedAmount(double amount) {
+    var formatter = NumberFormat('#,##0.00', 'de_DE');
+    String formattedNumber = formatter.format(amount);
+
+    return "$formattedNumber €";
   }
 }

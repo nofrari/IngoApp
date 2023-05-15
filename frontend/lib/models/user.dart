@@ -6,9 +6,9 @@ class User {
       required this.email});
 
   final int id;
-  final String firstName;
-  final String lastName;
-  final String email;
+  String firstName;
+  String lastName;
+  String email;
 
   String get abreviationName {
     return firstName[0] + lastName[0];

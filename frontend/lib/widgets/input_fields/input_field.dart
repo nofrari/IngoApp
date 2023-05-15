@@ -1,10 +1,36 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:intl/intl.dart';
 import '../../constants/colors.dart';
 import '../../constants/fonts.dart';
 import '../../constants/values.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:control_style/control_style.dart';
+
+TextInputFormatter currencyFormatter =
+    TextInputFormatter.withFunction((oldValue, newValue) {
+  String cleanText = newValue.text.replaceAll(RegExp(r'[^\d]'), '');
+  int value = int.tryParse(cleanText) ?? 0;
+  final formatter =
+      NumberFormat.currency(locale: 'de', name: "EUR", symbol: '€');
+  String newText = formatter.format(value / 100);
+  int cursorPos = newText.length;
+  if (newValue.selection.baseOffset == newValue.selection.extentOffset) {
+    cursorPos = formatter.format(value / 100).length - 2;
+  }
+  return TextEditingValue(
+    text: newText,
+    selection: TextSelection.collapsed(offset: cursorPos),
+  );
+});
+
+double currencyToDouble(String currency) {
+  final refactoredAmount =
+      currency.replaceAll("€", "").replaceAll(" ", "").replaceAll(",", ".");
+
+  final amount = double.tryParse(refactoredAmount);
+  return amount ?? 0;
+}
 
 class InputField extends StatefulWidget {
   const InputField(
@@ -14,9 +40,11 @@ class InputField extends StatefulWidget {
       required this.keyboardType,
       required this.controller,
       required this.maxLength,
+      required this.onFocusChanged,
       this.maxLines,
       this.alignLabelLeftCorner,
-      this.validator});
+      this.validator,
+      this.autovalidateMode});
 
   final String lblText;
   final TextInputFormatter reqFormatter;
@@ -26,6 +54,8 @@ class InputField extends StatefulWidget {
   final bool? alignLabelLeftCorner;
   final FormFieldValidator<String>? validator;
   final int maxLength;
+  final AutovalidateMode? autovalidateMode;
+  final ValueChanged<bool> onFocusChanged;
 
   @override
   State<InputField> createState() => _InputFieldState();
@@ -46,13 +76,12 @@ class _InputFieldState extends State<InputField> {
       color: AppColor.neutral500,
       child: TextFormField(
         validator: widget.validator,
-        //focusNode: _focusNode,
         controller: widget.controller,
-        autovalidateMode: AutovalidateMode.onUserInteraction,
         style: Fonts.text300,
         cursorColor: Colors.white,
         maxLines: widget.maxLines,
         maxLength: widget.maxLength,
+        autovalidateMode: widget.autovalidateMode,
         decoration: InputDecoration(
           contentPadding: const EdgeInsets.only(top: 30, left: 10),
           label: Text(
@@ -88,9 +117,13 @@ class _InputFieldState extends State<InputField> {
           ),
           counterText: "",
         ),
-
         inputFormatters: [widget.reqFormatter],
         keyboardType: widget.keyboardType,
+        onTap: () => widget.onFocusChanged(true),
+        onEditingComplete: () {
+          FocusScope.of(context).unfocus();
+          widget.onFocusChanged(false); //Tastatur schließen
+        },
       ),
     );
   }

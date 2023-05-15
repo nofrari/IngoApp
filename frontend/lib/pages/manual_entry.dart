@@ -1,10 +1,8 @@
-import 'dart:io';
-
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:flutter_cached_pdfview/flutter_cached_pdfview.dart';
 import 'package:frontend/constants/colors.dart';
 import 'package:frontend/constants/fonts.dart';
+import 'package:frontend/constants/strings.dart';
 import 'package:frontend/constants/values.dart';
 import 'package:frontend/pages/scanner/scanner_camera.dart';
 import 'package:frontend/services/custom_cache_manager.dart';
@@ -31,23 +29,6 @@ class ManualEntry extends StatefulWidget {
 }
 
 class _ManualEntryState extends State<ManualEntry> {
-  TextInputFormatter currency =
-      TextInputFormatter.withFunction((oldValue, newValue) {
-    String cleanText = newValue.text.replaceAll(RegExp(r'[^\d]'), '');
-    int value = int.tryParse(cleanText) ?? 0;
-    final formatter =
-        NumberFormat.currency(locale: 'de', name: "EUR", symbol: '€');
-    String newText = formatter.format(value / 100);
-    int cursorPos = newText.length;
-    if (newValue.selection.baseOffset == newValue.selection.extentOffset) {
-      cursorPos = formatter.format(value / 100).length - 2;
-    }
-    return TextEditingValue(
-      text: newText,
-      selection: TextSelection.collapsed(offset: cursorPos),
-    );
-  });
-
   TextInputFormatter digits = FilteringTextInputFormatter.digitsOnly;
   TextInputFormatter letters = FilteringTextInputFormatter.allow(
       RegExp(r"[a-zA-Z0-9#+:'()&/^\-{2}|\s]"));
@@ -55,7 +36,7 @@ class _ManualEntryState extends State<ManualEntry> {
   TextInputType numeric = TextInputType.number;
   TextInputType text = TextInputType.text;
 
-  TextEditingController controllerName = TextEditingController();
+  TextEditingController controllerTitle = TextEditingController();
   TextEditingController controllerAmount = TextEditingController();
   TextEditingController controllerDescription = TextEditingController();
   TextEditingController controllerDate = TextEditingController();
@@ -67,14 +48,44 @@ class _ManualEntryState extends State<ManualEntry> {
     return null;
   };
 
-  final DatepickerField datePicker =
-      DatepickerField(controller: TextEditingController());
-
-  final pdfPreview = PdfPreview();
-
   final _formKey = GlobalKey<FormState>();
 
   Dio dio = Dio();
+
+  bool _isFocused = false;
+  void onTextFieldFocusChanged(bool isFocused) {
+    setState(() {
+      _isFocused = isFocused;
+    });
+  }
+
+  String _selectedType = "";
+  void setSelectedType(String type) {
+    setState(() {
+      _selectedType = type;
+    });
+    debugPrint("Selected Type: $_selectedType");
+  }
+
+  @override
+  void initState() {
+    super.initState();
+  }
+
+  @override
+  void dispose() {
+    controllerTitle.dispose();
+    controllerAmount.dispose();
+    controllerDescription.dispose();
+    controllerDate.dispose();
+    super.dispose();
+  }
+
+  final DatepickerField datePicker = DatepickerField(
+    controller: TextEditingController(),
+  );
+
+  final pdfPreview = PdfPreview();
 
   @override
   Widget build(BuildContext context) {
@@ -83,14 +94,19 @@ class _ManualEntryState extends State<ManualEntry> {
     List<String> images = context.watch<ScannerService>().getImages();
 
     if (manualEntry.isNotEmpty) {
-      controllerName.text = manualEntry['supplier_name'];
+      controllerTitle.text = manualEntry['supplier_name'];
       controllerAmount.text = manualEntry['amount'].toString();
       controllerDate.text = DateFormat("dd / MM / yyyy")
           .format(DateFormat("yyyy-MM-dd").parse(manualEntry['date']));
     }
 
     return GestureDetector(
-      onTap: () => FocusManager.instance.primaryFocus?.unfocus(),
+      onTap: () {
+        setState(() {
+          _isFocused = false;
+        });
+        FocusManager.instance.primaryFocus?.unfocus();
+      },
       child: Scaffold(
         appBar: Header(
           onTap: () async {
@@ -111,7 +127,7 @@ class _ManualEntryState extends State<ManualEntry> {
                               onTap: () {
                                 Navigator.pop(context);
                               },
-                              theme: ButtonColorTheme.secondary),
+                              theme: ButtonColorTheme.secondaryLight),
                           Button(
                               btnText: "FORTFAHREN",
                               onTap: () async {
@@ -132,6 +148,7 @@ class _ManualEntryState extends State<ManualEntry> {
                                     builder: (context) => const ScannerCamera(),
                                   ),
                                 );
+                                deletePdfFile(manualEntry['pdf_name']);
                               },
                               theme: ButtonColorTheme.primary),
                         ],
@@ -150,7 +167,9 @@ class _ManualEntryState extends State<ManualEntry> {
             }
           },
           element: Text(
-            "neuer eintrag".toUpperCase(),
+            (controllerTitle.text.isNotEmpty)
+                ? controllerTitle.text.toUpperCase()
+                : "NEUER EINTRAG",
             style: Fonts.textHeadingBold,
           ),
         ),
@@ -160,26 +179,26 @@ class _ManualEntryState extends State<ManualEntry> {
           children: [
             Align(
               alignment: Alignment.topCenter,
-              child: Container(
-                padding: Values.bigCardPadding,
-                decoration: BoxDecoration(
-                    border: Border.all(
-                        color: AppColor.neutral500,
-                        width: 0,
-                        style: BorderStyle.solid),
-                    borderRadius: BorderRadius.circular(11),
-                    color: AppColor.neutral500),
-                margin: const EdgeInsets.all(20),
-                child: SingleChildScrollView(
+              child: SingleChildScrollView(
+                child: Container(
+                  padding: Values.bigCardPadding,
+                  decoration: BoxDecoration(
+                      border: Border.all(
+                          color: AppColor.neutral500,
+                          width: 0,
+                          style: BorderStyle.solid),
+                      borderRadius: BorderRadius.circular(11),
+                      color: AppColor.neutral500),
+                  margin: Values.bigCardMargin,
                   child: Form(
                     key: _formKey,
                     child: Column(
                       children: [
                         InputField(
-                          lblText: "Name",
+                          lblText: "Titel",
                           reqFormatter: letters,
                           keyboardType: text,
-                          controller: controllerName,
+                          controller: controllerTitle,
                           maxLines: 1,
                           validator: (value) {
                             if (value == null || value.isEmpty) {
@@ -188,10 +207,11 @@ class _ManualEntryState extends State<ManualEntry> {
                             return null;
                           },
                           maxLength: 50,
+                          onFocusChanged: onTextFieldFocusChanged,
                         ),
                         InputField(
-                          lblText: "Betrag",
-                          reqFormatter: currency,
+                          lblText: "Betrag in €",
+                          reqFormatter: currencyFormatter,
                           keyboardType: numeric,
                           controller: controllerAmount,
                           maxLines: 1,
@@ -202,17 +222,20 @@ class _ManualEntryState extends State<ManualEntry> {
                             return null;
                           },
                           maxLength: 15,
+                          onFocusChanged: onTextFieldFocusChanged,
                         ),
-                        InputField(
-                          lblText: "Beschreibung",
-                          reqFormatter: letters,
-                          keyboardType: text,
-                          controller: controllerDescription,
-                          maxLines: 4,
-                          alignLabelLeftCorner: true,
-                          maxLength: 250,
+                        Dropdown(
+                          label: Strings.dropdownTypeCategory,
+                          dropdownItems: const [
+                            'Einnahme',
+                            'Ausgabe',
+                            'Transfer',
+                          ],
+                          needsNewCategoryButton: false,
+                          setValue: setSelectedType,
                         ),
                         const Dropdown(
+                          label: Strings.dropdownCategory,
                           dropdownItems: [
                             'Essen',
                             'Freizeit',
@@ -223,105 +246,183 @@ class _ManualEntryState extends State<ManualEntry> {
                             'ölkdjföjrö',
                             'jkrgh alhfiu',
                           ],
+                          needsNewCategoryButton: true,
                         ),
+                        //TODO: Kontos aus DB holen
+                        const Dropdown(
+                          label: Strings.dropdownAccount1,
+                          dropdownItems: [
+                            'Gelbörse',
+                            'Bank',
+                            'Kreditkarte',
+                          ],
+                          needsNewCategoryButton: false,
+                        ),
+                        //TODO: String als Constante anlegen und bei Registrieren mitschicken
+                        (_selectedType == 'Transfer')
+                            ? const Dropdown(
+                                label: Strings.dropdownAccount2,
+                                dropdownItems: [
+                                  'Gelbörse',
+                                  'Bank',
+                                  'Kreditkarte',
+                                ],
+                                needsNewCategoryButton: false,
+                              )
+                            : Container(),
                         DatepickerField(
                           controller: controllerDate,
                           serverDate: manualEntry['date'],
+                        ),
+                        const Dropdown(
+                          dropdownItems: [
+                            'Nie',
+                            'Wöchentlich',
+                            'Alle zwei Wochen',
+                            'Monatlich',
+                            'Quartalsweise',
+                            'Jährlich',
+                          ],
+                          label: Strings.dropdownFrequency,
+                          needsNewCategoryButton: false,
+                          initialValue: 'Nie',
+                        ),
+                        InputField(
+                          lblText: "Beschreibung",
+                          reqFormatter: letters,
+                          keyboardType: text,
+                          controller: controllerDescription,
+                          maxLines: 4,
+                          alignLabelLeftCorner: true,
+                          maxLength: 250,
+                          onFocusChanged: onTextFieldFocusChanged,
                         ),
                         PdfPreview(
                           pdfUrl: manualEntry['pdf_path'],
                           pdfHeight: manualEntry['pdf_height'],
                         ),
+                        const SizedBox(
+                          height: 80,
+                        ),
+                        const SizedBox(
+                          height: 300,
+                        )
                       ],
                     ),
                   ),
                 ),
               ),
             ),
-            ButtonTransparentContainer(
-              child: Container(
-                margin: Values.buttonPadding,
-                child: Button(
-                    isTransparent: true,
-                    btnText: "SPEICHERN",
-                    onTap: () async {
-                      if (_formKey.currentState!.validate()) {
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          const SnackBar(
-                              content: Text('Daten werden gespeichert')),
-                        );
+            (_isFocused == false)
+                ? ButtonTransparentContainer(
+                    child: Container(
+                      margin: Values.buttonPadding,
+                      child: Button(
+                          isTransparent: true,
+                          btnText: "SPEICHERN",
+                          onTap: () async {
+                            if (_formKey.currentState!.validate()) {
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                const SnackBar(
+                                    content: Text('Daten werden gespeichert')),
+                              );
+                              final date = datePicker.selectedDate;
 
-                        final refactoredAmount = controllerAmount.text
-                            .replaceAll("€", "")
-                            .replaceAll(" ", "")
-                            .replaceAll(",", ".");
+                              String? pdf_name = PdfFile.getName();
 
-                        final amount = double.tryParse(refactoredAmount);
-                        final date = datePicker.selectedDate;
+                              if (manualEntry.isNotEmpty) {
+                                _sendData(
+                                    controllerTitle.text,
+                                    currencyToDouble(controllerAmount.text),
+                                    date,
+                                    controllerDescription.text,
+                                    manualEntry['pdf_name']);
+                              } else {
+                                _sendData(
+                                    controllerTitle.text,
+                                    currencyToDouble(controllerAmount.text),
+                                    date,
+                                    controllerDescription.text,
+                                    pdf_name!);
+                                savePDFToServer(PdfFile.getPath().toString());
+                              }
 
-                        String? pdf_path = ""; //PdfName.getName();
+                              // print("Name from Gallery: ${PdfFile.getName()}");
+                              // print("Path from Camera: " +
+                              //     manualEntry['pdf_name'].toString());
+                              // print(
+                              //     "Name from Gallery: ${PdfFile.getPath().toString()}");
+                              // print("Path from Camera: " +
+                              //     manualEntry['pdf_path'].toString());
 
-                        // final pdf_pathRefactored = pdf_path!
-                        //     .replaceAll('"', "")
-                        //     .replaceAll(
-                        //         "/Users/norariglthaler/Library/Developer/CoreSimulator/Devices/20E001D3-ECF9-4A9F-BDD3-1DD818636A4E/data/Containers/Data/Application",
-                        //         "");
+                              List<String> images =
+                                  context.read<ScannerService>().getImages();
 
-                        print(pdf_path);
+                              await CustomCacheManager.clearCache(
+                                  context, images);
 
-                        // final pdfFile = File(pdf_path!);
-                        // final pdfBytes = pdfFile.readAsBytes();
-
-                        // final List<int> codeUnits = pdf_path!.codeUnits;
-                        // final Uint8List unit8List =
-                        //     Uint8List.fromList(codeUnits);
-
-                        _sendText(controllerName.text, amount!, date,
-                            controllerDescription.text, pdf_path!);
-                        List<String> images =
-                            context.read<ScannerService>().getImages();
-
-                        await CustomCacheManager.clearCache(context, images);
-
-                        if (context.mounted) {
-                          await context
-                              .read<ManualEntryService>()
-                              .forgetManualEntry();
-                        }
-                        await Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) => const Start(),
-                          ),
-                        );
-                      }
-                    },
-                    theme: ButtonColorTheme.secondary),
-              ),
-            ),
+                              if (context.mounted) {
+                                await context
+                                    .read<ManualEntryService>()
+                                    .forgetManualEntry();
+                              }
+                              // ignore: use_build_context_synchronously
+                              await Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (context) => const Start(),
+                                ),
+                              );
+                            }
+                          },
+                          theme: ButtonColorTheme.secondaryLight),
+                    ),
+                  )
+                : Container(),
           ],
         ),
       ),
     );
   }
 
-  Future _sendText(String name, double amount, DateTime date,
-      String description, String pdf_name) async {
+  Future _sendData(String name, double amount, DateTime date,
+      String description, String pdfName) async {
     Map<String, dynamic> formData = {
       "transaction_name": name,
       "transaction_amount": amount,
       "date": date.toString(),
       "description": description,
-      "bill_url": pdf_name,
+      "bill_url": pdfName,
       "category_id": "1234",
       "type_id": "1234",
       "interval_id": "1234",
       "account_id": "1234"
     };
 
-    var response = await dio.post("http://localhost:5432/transactions/input",
+    var response = await dio.post("${Values.serverURL}/transactions/input",
         data: formData);
+    debugPrint(response.toString());
+  }
+
+  Future savePDFToServer(String filePath) async {
+    final formData = FormData.fromMap({
+      'pdf': await MultipartFile.fromFile(filePath),
+    });
+
+    var response = await dio.post("${Values.serverURL}/transactions/pdfUpload",
+        data: formData, options: Options(responseType: ResponseType.json));
 
     debugPrint(response.toString());
+  }
+
+  Future deletePdfFile(String pdfName) async {
+    try {
+      await dio.delete(
+        "${Values.serverURL}/transactions/$pdfName",
+      );
+      print('PDF file deleted successfully!');
+    } catch (e) {
+      print('Error while deleting PDF file: $e');
+    }
   }
 }

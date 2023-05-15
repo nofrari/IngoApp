@@ -65,8 +65,7 @@ class _ScannerPreviewState extends State<ScannerPreview>
           await MultipartFile.fromFile(images[i]),
         ));
       }
-      //var response = await dio.post("http://10.0.2.2:5432/scanner/upload",
-      var response = await dio.post("https://data.ingoapp.at/scanner/upload",
+      var response = await dio.post("${Values.serverURL}/scanner/upload",
           data: formData, options: Options(responseType: ResponseType.json));
       debugPrint(response.toString());
       //process pdf data from response
@@ -109,7 +108,7 @@ class _ScannerPreviewState extends State<ScannerPreview>
                           onTap: () {
                             Navigator.pop(context);
                           },
-                          theme: ButtonColorTheme.secondary),
+                          theme: ButtonColorTheme.secondaryLight),
                       Button(
                           btnText: "FORTFAHREN",
                           onTap: () async {
@@ -287,7 +286,7 @@ class _ScannerPreviewState extends State<ScannerPreview>
                                                     Navigator.pop(context);
                                                   },
                                                   theme: ButtonColorTheme
-                                                      .secondary),
+                                                      .secondaryLight),
                                               Button(
                                                   btnText: "FORTFAHREN",
                                                   onTap: () {

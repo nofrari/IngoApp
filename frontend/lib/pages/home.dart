@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:frontend/constants/values.dart';
 import 'package:frontend/widgets/home_overview_card.dart';
 import 'package:frontend/widgets/total_amount_card.dart';
 import 'package:frontend/models/category.dart';
@@ -18,13 +19,25 @@ class Home extends StatefulWidget {
 
 class _HomeState extends State<Home> {
   Dio dio = Dio();
+  double _totalAmout = 0;
 
   @override
   void initState() {
-    // TODO: implement initState
     super.initState();
+    _getTotalAmount();
     getData(context);
-    //liste categorien von der datenbank fetchen und in preferences schmeißen
+  }
+
+  void _getTotalAmount() async {
+    try {
+      Response response =
+          await Dio().get('${Values.serverURL}/accounts/totalAmount/1');
+      setState(() {
+        _totalAmout = double.parse(response.data['totalAmount'].toString());
+      });
+    } catch (e) {
+      print(e);
+    }
   }
 
   List<ColorModel> colors = [];
@@ -64,11 +77,11 @@ class _HomeState extends State<Home> {
   @override
   Widget build(BuildContext context) {
     return Container(
-      margin: const EdgeInsets.all(20),
+      margin: const EdgeInsets.fromLTRB(20, 20, 20, 0),
       child: SingleChildScrollView(
         child: Column(
           children: <Widget>[
-            TotalAmountCard(totalAmount: 2500),
+            TotalAmountCard(totalAmount: _totalAmout),
             HomeOverviewCard(),
           ],
         ),

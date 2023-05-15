@@ -1,5 +1,6 @@
 import 'dart:io';
 import 'package:flutter/material.dart';
+import 'package:frontend/constants/values.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:dio/dio.dart';
 
@@ -71,7 +72,7 @@ class _ScannerState extends State<Scanner> {
       },
     );
     var response =
-        await dio.post("http://10.0.2.2:5432/scanner/upload", data: formData);
+        await dio.post("${Values.serverURL}/scanner/upload", data: formData);
     debugPrint(response.toString());
   }
 }

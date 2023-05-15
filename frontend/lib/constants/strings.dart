@@ -12,4 +12,29 @@ class Strings {
   static const String dropdownTypeCategory = "Typ";
   static const String dropdownCategory = "Kategorie";
   static const String dropdownFrequency = "Wiederholen";
+  static const String dropdownAccount1 = "Ausgangskonto";
+  static const String dropdownAccount2 = "Zu Konto Transferieren";
+
+  //Registrieren
+  static const String registerFirstName = "Vorname";
+  static const String registerLastName = "Nachname";
+  static const String registerMail = "E-Mail";
+  static const String registerPassword = "Passwort";
+  static const String registerPasswordRepeat = "Passwort wiederholen";
+  static const String registerDataProtection =
+      "Ich stimme der Datenschutzerklärung zu";
+
+  static const String alertInputfieldEmpty = "Dieses Feld darf nicht leer sein";
+  static const String alertMail = "Dies ist keine gültige Mailadresse";
+  static const String alertPasswordWrong = "Passwort stimmt nicht überein";
+  static const String alertDataProtectionEmpty =
+      "Datenschutzerklärung muss akzeptiert werden";
+
+  //Buttons
+  static const String btnRegister = "Registrieren";
+  static const String btnSignIn = "Anmelden";
+
+  //Accounts
+  static const String accountsHeading = "KONTENÜBERSICHT";
+  static const String accountsButton = "KONTO HINZUFÜGEN";
 }
