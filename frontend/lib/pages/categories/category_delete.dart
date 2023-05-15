@@ -1,75 +1,52 @@
-import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:frontend/constants/colors.dart';
 import 'package:frontend/constants/fonts.dart';
-import 'package:frontend/start.dart';
+import 'package:frontend/pages/categories/categories.dart';
 import 'package:frontend/widgets/button.dart';
 import 'package:frontend/widgets/button_transparent_container.dart';
 import 'package:frontend/widgets/header.dart';
 import 'package:dio/dio.dart';
+import 'package:provider/provider.dart';
+import '../../models/category.dart';
+import '../../services/initial_service.dart';
 import '../../widgets/categories/category_item.dart';
 import '../../widgets/text_google.dart';
 
 class CategoryDelete extends StatefulWidget {
-  CategoryDelete({this.numberTransactions, super.key});
+  CategoryDelete(
+      {required this.category_id, this.numberTransactions, super.key});
   int? numberTransactions;
+  String category_id;
 
   @override
   State<CategoryDelete> createState() => _CategoryDeleteState();
 }
 
 class _CategoryDeleteState extends State<CategoryDelete> {
-  List<Map<String, dynamic>> categoryItemsData = [
-    {
-      'bgColor': 'pink',
-      'isBlack': true,
-      'icon': 'cookie',
-      'label': "Auto",
-    },
-    {
-      'bgColor': 'pink',
-      'isBlack': true,
-      'icon': 'delete',
-      'label': "Essen",
-    },
-    {
-      'bgColor': 'pink',
-      'isBlack': false,
-      'icon': 'add',
-      'label': "Studium",
-    },
-    {
-      'bgColor': 'pink',
-      'isBlack': false,
-      'icon': 'delete',
-      'label': "Running",
-    },
-    {
-      'bgColor': 'pink',
-      'isBlack': true,
-      'icon': 'add',
-      'label': "Auto",
-    },
-  ];
+  List<CategoryModel> categories = [];
+  String? selectedCategoryId;
 
-  String? selectedCategory;
-
-  void _selectNewCategory(String label) {
+  void _selectNewCategory(String category_id) {
     setState(() {
-      selectedCategory = label;
+      selectedCategoryId = category_id;
     });
-    debugPrint(selectedCategory);
+    debugPrint(selectedCategoryId);
   }
 
   void initState() {
     super.initState();
-    selectedCategory = "Coffee";
+
+    selectedCategoryId = "Coffee";
   }
 
   Dio dio = Dio();
 
   @override
   Widget build(BuildContext context) {
+    categories = context.watch<InitialService>().getCategories();
+    final filteredCategories = categories
+        .where((category) => category.category_id != widget.category_id)
+        .toList();
     int? transactionNumbers = widget.numberTransactions;
     return Scaffold(
       appBar: Header(
@@ -121,21 +98,27 @@ class _CategoryDeleteState extends State<CategoryDelete> {
                         borderRadius: BorderRadius.circular(30),
                         color: AppColor.neutral500,
                       ),
-                      child: Column(
-                        children: <Widget>[
-                          ...categoryItemsData
-                              .map((categoryItemsData) => CategoryItem(
-                                    onTap: () => _selectNewCategory(
-                                      categoryItemsData['label'],
-                                    ),
-                                    bgColor: categoryItemsData['bgColor'],
-                                    isBlack: categoryItemsData['isBlack'],
-                                    icon: categoryItemsData['icon'],
-                                    label: categoryItemsData['label'],
-                                    isSmall: true,
-                                  ))
-                              .toList(),
-                        ],
+                      child: ClipRRect(
+                        borderRadius: BorderRadius.circular(30),
+                        child: Column(
+                          children: <Widget>[
+                            ...filteredCategories.map((category) {
+                              var isSelected =
+                                  category.category_id == selectedCategoryId;
+
+                              return CategoryItem(
+                                onTap: () =>
+                                    _selectNewCategory(category.category_id),
+                                bgColor: category.bgColor,
+                                isBlack: category.isBlack,
+                                icon: category.icon,
+                                label: category.label,
+                                isSmall: true,
+                                isSelected: isSelected,
+                              );
+                            }).toList(),
+                          ],
+                        ),
                       ),
                     ),
                     const SizedBox(height: 150),
@@ -166,10 +149,15 @@ class _CategoryDeleteState extends State<CategoryDelete> {
                     isTransparent: true,
                     btnText: "SPEICHERN",
                     onTap: () async {
+                      _deleteCategory(
+                        widget.category_id,
+                        selectedCategoryId!,
+                        widget.numberTransactions!,
+                      );
                       await Navigator.push(
                         context,
                         MaterialPageRoute(
-                          builder: (context) => const Start(),
+                          builder: (context) => const Categories(),
                         ),
                       );
                     },
@@ -184,21 +172,16 @@ class _CategoryDeleteState extends State<CategoryDelete> {
     );
   }
 
-  Future _createCategory(
-    String label,
-    String color,
-    bool isBlack,
-    String icon,
-  ) async {
+  Future _deleteCategory(String current_category_id, String new_category_id,
+      int transactionCount) async {
     Map<String, dynamic> formData = {
-      "category_name": label,
-      "color": color,
-      "isBlack": isBlack,
-      "icon": icon,
-      "user_id": "1234"
+      "current_category_id": current_category_id,
+      "new_category_id": new_category_id,
+      "transactionCount": transactionCount
     };
 
-    var response = await dio.post("http://localhost:5432/categories/input",
+    var response = await dio.delete(
+        "http://localhost:5432/categories/${current_category_id}",
         data: formData);
 
     debugPrint(response.toString());
