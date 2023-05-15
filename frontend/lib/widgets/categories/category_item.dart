@@ -31,15 +31,16 @@ class CategoryItem extends StatelessWidget {
       child: Container(
         padding: const EdgeInsets.symmetric(vertical: 4),
         decoration: BoxDecoration(
-            border: Border(
-              bottom: BorderSide(
-                color: AppColor.neutral600,
-                width: 1.5, // adjust the width as per your need
-              ),
+          border: Border(
+            bottom: BorderSide(
+              color: AppColor.neutral600,
+              width: 1.5, // adjust the width as per your need
             ),
-            color: isSelected != null && isSelected == true
-                ? AppColor.neutral600
-                : Colors.transparent),
+          ),
+          color: isSelected != null && isSelected == true
+              ? AppColor.categorySelected
+              : Colors.transparent,
+        ),
         child: Row(
           children: <Widget>[
             Container(
@@ -52,7 +53,10 @@ class CategoryItem extends StatelessWidget {
               ),
             ),
             TextGoogle(
-                align: TextAlign.start, text: label, style: Fonts.text300)
+              align: TextAlign.start,
+              text: label,
+              style: Fonts.text300,
+            )
           ],
         ),
       ),
