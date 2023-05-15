@@ -2,7 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:email_validator/email_validator.dart';
 import 'package:dio/dio.dart';
+import 'package:frontend/constants/colors.dart';
+import 'package:frontend/widgets/checkbox.dart';
 
+import '../constants/fonts.dart';
 import '../widgets/input_fields/checkbox_field.dart';
 import '../widgets/input_fields/input_field.dart';
 import '../widgets/button.dart';
@@ -46,6 +49,13 @@ class _RegisterState extends State<Register> {
 
   final _formKey = GlobalKey<FormState>();
   final PageStorageBucket bucket = PageStorageBucket();
+  bool _isChecked = false;
+  // void onCheckboxChanged(bool isChecked) {
+  //   setState(() {
+  //     _isChecked = isChecked;
+  //   });
+  // }
+
   late bool mailExists;
 
   Dio dio = Dio();
@@ -178,12 +188,19 @@ class _RegisterState extends State<Register> {
               },
             ),
             //TODO: Datenschutzerklärung verlinken
-            CheckboxField(
-              validator: (valuePW) {
-                if (valuePW == false) {
+            CheckboxDataProtection(
+              value: _isChecked,
+              onCheckboxTapped: (bool? value) {
+                setState(() {
+                  _isChecked = value!;
+                });
+              },
+              validator: (value) {
+                if (!_isChecked) {
                   return Strings.alertDataProtectionEmpty;
+                } else {
+                  return null;
                 }
-                return null;
               },
             ),
             Expanded(
