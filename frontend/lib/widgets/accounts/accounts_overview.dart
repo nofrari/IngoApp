@@ -43,7 +43,7 @@ class _AccountsOverviewState extends State<AccountsOverview> {
             child: Button(
               btnText: "ZUR KONTOÜBERSICHT",
               onTap: () {},
-              theme: ButtonColorTheme.secondary,
+              theme: ButtonColorTheme.secondaryLight,
             ),
           )
         ],

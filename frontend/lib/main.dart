@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:frontend/services/accounts_service.dart';
 import 'package:frontend/services/manualentry_service.dart';
 import 'package:provider/provider.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
@@ -11,6 +12,7 @@ void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await ScannerService.init();
   await ManualEntryService.init();
+  await AccountsService.init();
   runApp(MultiProvider(
     providers: [
       ChangeNotifierProvider(
@@ -18,6 +20,9 @@ void main() async {
       ),
       ChangeNotifierProvider(
         create: (BuildContext context) => ManualEntryService(),
+      ),
+      ChangeNotifierProvider(
+        create: (BuildContext context) => AccountsService(),
       ),
     ],
     child: const MyApp(),
@@ -49,6 +54,6 @@ class _MyAppState extends State<MyApp> {
         theme: ThemeData(
           primarySwatch: Colors.blue,
         ),
-        home: Register());
+        home: Start());
   }
 }

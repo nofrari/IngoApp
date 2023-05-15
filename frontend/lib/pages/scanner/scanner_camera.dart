@@ -105,7 +105,7 @@ class _ScannerCameraState extends State<ScannerCamera>
                                   onTap: () {
                                     Navigator.pop(context);
                                   },
-                                  theme: ButtonColorTheme.secondary),
+                                  theme: ButtonColorTheme.secondaryLight),
                               Button(
                                   btnText: "FORTFAHREN",
                                   onTap: () async {
@@ -219,7 +219,7 @@ class _ScannerCameraState extends State<ScannerCamera>
                                   ),
                                 );
                               },
-                              theme: ButtonColorTheme.secondary,
+                              theme: ButtonColorTheme.secondaryDark,
                             ),
                           ),
                         ],

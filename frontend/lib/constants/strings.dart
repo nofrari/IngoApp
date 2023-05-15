@@ -33,4 +33,8 @@ class Strings {
   //Buttons
   static const String btnRegister = "Registrieren";
   static const String btnSignIn = "Anmelden";
+
+  //Accounts
+  static const String accountsHeading = "KONTENÜBERSICHT";
+  static const String accountsButton = "KONTO HINZUFÜGEN";
 }

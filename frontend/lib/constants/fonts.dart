@@ -50,6 +50,11 @@ class Fonts {
     fontSize: 16,
     fontWeight: FontWeight.bold,
   );
+  static TextStyle disabledButton = GoogleFonts.josefinSans(
+    color: AppColor.neutral300,
+    fontSize: 16,
+    fontWeight: FontWeight.bold,
+  );
 
   static TextStyle popupText = GoogleFonts.josefinSans(
       color: AppColor.neutral100, fontSize: 15, fontWeight: FontWeight.normal);
@@ -64,5 +69,18 @@ class Fonts {
     color: AppColor.backgroundFullScreen,
     fontSize: 16,
     fontWeight: FontWeight.w500,
+  );
+
+//ACCOUNTS
+  static TextStyle accountsHeading = GoogleFonts.josefinSans(
+    color: AppColor.blueActive,
+    fontSize: 16,
+    fontWeight: FontWeight.normal,
+  );
+
+  static TextStyle accountBalance = GoogleFonts.josefinSans(
+    color: AppColor.neutral100,
+    fontSize: 25,
+    fontWeight: FontWeight.bold,
   );
 }

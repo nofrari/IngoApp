@@ -1,4 +1,7 @@
+import 'dart:ffi';
+
 import 'package:flutter/material.dart';
+import 'package:dio/dio.dart';
 
 //import constants
 import 'constants/colors.dart';
@@ -26,11 +29,32 @@ class Start extends StatefulWidget {
 }
 
 class _StartState extends State<Start> {
-  final User user = User(
-      id: 1,
-      firstName: "Klaus",
-      lastName: "Temper",
-      email: "klaustemper@gmail.com");
+  @override
+  void initState() {
+    super.initState();
+    fetchDataFromDatabase();
+  }
+
+  User user = User(id: 0, firstName: " ", lastName: " ", email: " ");
+
+  void fetchDataFromDatabase() async {
+    try {
+      Response response = await Dio().get('${Values.serverURL}/users/1');
+
+      setState(() {
+        user = User(
+          id: int.parse(response.data['user_id']),
+          firstName: response.data['user_name'].toString(),
+          lastName: response.data['user_sirname'].toString(),
+          email: response.data['email'].toString(),
+        );
+      });
+    } catch (error, stackTrace) {
+      print('Error: $error');
+      print('Stacktrace: $stackTrace');
+    }
+  }
+
   //variable for current Tab
   int currentTab = 0;
 
@@ -86,6 +110,7 @@ class _StartState extends State<Start> {
                   backgroundColor: AppColor.blueActive),
               child: Text(
                 user.abreviationName,
+                // "Test",
                 style: Fonts.textNormalBlack18,
               ),
             ),
