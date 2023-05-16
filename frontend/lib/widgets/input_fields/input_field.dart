@@ -78,56 +78,55 @@ class _InputFieldState extends State<InputField> {
       margin: const EdgeInsets.only(top: 10, bottom: 15),
       color: AppColor.neutral500,
       child: TextFormField(
-        validator: widget.validator,
-        controller: widget.controller,
-        style: Fonts.text300,
-        cursorColor: Colors.white,
-        maxLines: widget.maxLines,
-        maxLength: widget.maxLength,
-        autovalidateMode: widget.autovalidateMode,
-        decoration: InputDecoration(
-          contentPadding: const EdgeInsets.only(top: 30, left: 10),
-          label: Text(
-            widget.lblText,
-            style: GoogleFonts.josefinSans(fontSize: 18),
+          validator: widget.validator,
+          controller: widget.controller,
+          onEditingComplete: () {
+            FocusScope.of(context).unfocus();
+            widget.onFocusChanged(false); // Tastatur schließen
+          },
+          style: Fonts.text300,
+          cursorColor: Colors.white,
+          maxLines: widget.maxLines,
+          maxLength: widget.maxLength,
+          autovalidateMode: widget.autovalidateMode,
+          decoration: InputDecoration(
+            contentPadding: const EdgeInsets.only(top: 30, left: 10),
+            label: Text(
+              widget.lblText,
+              style: GoogleFonts.josefinSans(fontSize: 18),
+            ),
+            labelStyle: TextStyle(color: AppColor.neutral100),
+            alignLabelWithHint: widget.alignLabelLeftCorner,
+            filled: true,
+            fillColor: AppColor.neutral400,
+            errorStyle: Fonts.errorMessage,
+            border: DecoratedInputBorder(
+              child: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(Values.inputRadius),
+                  borderSide: BorderSide.none),
+              shadow: const [
+                BoxShadow(
+                  color: Color.fromARGB(60, 0, 0, 0),
+                  blurRadius: 4,
+                  offset: Offset(0, 3),
+                )
+              ],
+            ),
+            focusedBorder: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(Values.inputRadius),
+              borderSide: BorderSide(
+                  color: AppColor.blueActive, width: Values.inputBorder),
+            ),
+            errorBorder: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(Values.inputRadius),
+              borderSide: const BorderSide(
+                  color: Colors.red, width: Values.inputBorder),
+            ),
+            counterText: "",
           ),
-          labelStyle: TextStyle(color: AppColor.neutral100),
-          alignLabelWithHint: widget.alignLabelLeftCorner,
-          filled: true,
-          fillColor: AppColor.neutral400,
-          errorStyle: Fonts.errorMessage,
-          border: DecoratedInputBorder(
-            child: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(Values.inputRadius),
-                borderSide: BorderSide.none),
-            shadow: const [
-              BoxShadow(
-                color: Color.fromARGB(60, 0, 0, 0),
-                blurRadius: 4,
-                offset: Offset(0, 3),
-              )
-            ],
-          ),
-          focusedBorder: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(Values.inputRadius),
-            borderSide: BorderSide(
-                color: AppColor.blueActive, width: Values.inputBorder),
-          ),
-          errorBorder: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(Values.inputRadius),
-            borderSide:
-                const BorderSide(color: Colors.red, width: Values.inputBorder),
-          ),
-          counterText: "",
-        ),
-        inputFormatters: [widget.reqFormatter],
-        keyboardType: widget.keyboardType,
-        onTap: () => widget.onFocusChanged(true),
-        onEditingComplete: () {
-          FocusScope.of(context).unfocus();
-          widget.onFocusChanged(false); //Tastatur schließen
-        },
-      ),
+          inputFormatters: [widget.reqFormatter],
+          keyboardType: widget.keyboardType,
+          onTap: () => widget.onFocusChanged(true)),
     );
   }
 }
