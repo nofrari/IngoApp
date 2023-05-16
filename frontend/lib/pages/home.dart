@@ -46,8 +46,8 @@ class _HomeState extends State<Home> {
 
   void getData(BuildContext context) async {
     try {
-      var response = await dio.get("http://localhost:5432/categories/1");
-      debugPrint(response.data['icons'].toString());
+      var response = await dio.get("${Values.serverURL}/categories/1");
+      debugPrint("icons: ${response.data['icons'].toString()}");
 
       if (response.data != null) {
         for (var color in response.data['colors']) {
@@ -57,13 +57,6 @@ class _HomeState extends State<Home> {
         for (var icon in response.data['icons']) {
           icons.add(IconModel.fromJson(icon));
         }
-
-        // for (var category in response.data['categories']) {
-        //   categoryList.add(CategoryModel.fromJson(category));
-        // }
-        debugPrint(response.data['categories'].toString());
-        debugPrint("colors length: ${colors.length.toString()}");
-        debugPrint("icons length: ${icons.length.toString()}");
 
         await context.read<InitialService>().setColors(colors);
         await context.read<InitialService>().setIcons(icons);
