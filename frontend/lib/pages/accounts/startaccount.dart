@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:frontend/constants/colors.dart';
+import 'package:frontend/constants/values.dart';
 import 'package:intl/intl.dart';
 import 'package:dio/dio.dart';
 
 //import constants
-import '../constants/colors.dart';
-import '../constants/values.dart';
 
 import 'package:frontend/constants/fonts.dart';
 import 'package:frontend/widgets/input_fields/input_field.dart';
@@ -114,6 +114,7 @@ class _StartAccountState extends State<StartAccount> {
                             },
                             maxLength: 50,
                             onFocusChanged: onTextFieldFocusChanged,
+                            hidePassword: false,
                           ),
                           InputField(
                             lblText: "Startkapital (Betrag)",
@@ -129,6 +130,7 @@ class _StartAccountState extends State<StartAccount> {
                             },
                             maxLength: 15,
                             onFocusChanged: onTextFieldFocusChanged,
+                            hidePassword: false,
                           ),
                           //(_isFocused == false)
                           Expanded(

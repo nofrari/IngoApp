@@ -55,6 +55,8 @@ dependencies:
   pdf: ^3.10.1
   pdf_render: ^1.3.8
   email_validator: ^2.1.17
+  flutter_colorpicker: ^1.0.3
+  font_awesome_flutter: ^10.4.0
 
 dev_dependencies:
   flutter_test:

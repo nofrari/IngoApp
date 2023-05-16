@@ -148,7 +148,7 @@ class _LoginState extends State<Login> {
                         }
                       }
                     },
-                    theme: ButtonColorTheme.secondary),
+                    theme: ButtonColorTheme.secondaryLight),
               ),
             ),
           ],
