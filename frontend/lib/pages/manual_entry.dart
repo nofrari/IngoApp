@@ -59,6 +59,17 @@ class _ManualEntryState extends State<ManualEntry> {
     });
   }
 
+  bool _enableDropdown(List<String> images) {
+    if (images.isNotEmpty ||
+        controllerTitle.text.isNotEmpty ||
+        controllerAmount.text.isNotEmpty ||
+        controllerDescription.text.isNotEmpty ||
+        controllerDate.text.isNotEmpty) {
+      return true;
+    }
+    return false;
+  }
+
   String _selectedType = "";
   void setSelectedType(String type) {
     setState(() {
@@ -110,7 +121,7 @@ class _ManualEntryState extends State<ManualEntry> {
       child: Scaffold(
         appBar: Header(
           onTap: () async {
-            if (images.isNotEmpty) {
+            if (_enableDropdown(images)) {
               // warning dialog
               showDialog(
                 context: context,
