@@ -5,6 +5,7 @@ import 'package:flutter/services.dart';
 import 'package:frontend/constants/colors.dart';
 import 'package:frontend/constants/fonts.dart';
 import 'package:frontend/constants/values.dart';
+import 'package:frontend/pages/accounts/accounts_delete.dart';
 import 'package:frontend/services/accounts_service.dart';
 import 'package:frontend/widgets/input_fields/input_field.dart';
 import 'package:frontend/widgets/round_button.dart';
@@ -17,13 +18,15 @@ class AccountCard extends StatefulWidget {
       {this.initialHeading,
       this.initialBalance,
       required this.accountId,
-      this.deleteCallback,
+      required this.deleteCallback,
+      required this.doneCallback,
       super.key});
 
   final String? initialHeading;
   final double? initialBalance;
   final String accountId;
-  final void Function()? deleteCallback;
+  final void Function() deleteCallback;
+  final void Function() doneCallback;
 
   @override
   State<AccountCard> createState() => _AccountCardState();
@@ -161,7 +164,8 @@ class _AccountCardState extends State<AccountCard> {
                                 },
                                 onDone: () async {
                                   setState(() {
-                                    _accountCardState = ThreeDotMenuState.done;
+                                    _accountCardState =
+                                        ThreeDotMenuState.collapsed;
                                     _isEditable = false;
                                   });
 
@@ -180,14 +184,33 @@ class _AccountCardState extends State<AccountCard> {
                                   debugPrint(response.toString());
                                 },
                                 onDelete: () async {
-                                  await dio.delete(
-                                    "${Values.serverURL}/accounts/${widget.accountId}",
-                                  );
-                                  await context
-                                      .read<AccountsService>()
-                                      .deleteAccount(widget.accountId);
-                                  if (widget.deleteCallback != null) {
-                                    widget.deleteCallback!();
+                                  dynamic response;
+                                  try {
+                                    response = await dio.get(
+                                        "${Values.serverURL}/transactions/account/${widget.accountId}");
+                                  } on DioError catch (e) {
+                                    debugPrint(e.message.toString());
+                                  }
+
+                                  debugPrint(response.data.toString());
+                                  if (response.data.length > 0) {
+                                    Navigator.push(
+                                      context,
+                                      MaterialPageRoute(
+                                        builder: (context) => AccountsDelete(
+                                            accountId: widget.accountId,
+                                            deleteCallback:
+                                                widget.deleteCallback),
+                                      ),
+                                    ).then((_) => widget.deleteCallback());
+                                  } else {
+                                    await dio.delete(
+                                      "${Values.serverURL}/accounts/${widget.accountId}",
+                                    );
+                                    await context
+                                        .read<AccountsService>()
+                                        .deleteAccount(id: widget.accountId);
+                                    widget.deleteCallback();
                                   }
                                 },
                                 onStateChange: onStateChanged,
@@ -272,21 +295,23 @@ class _AccountCardState extends State<AccountCard> {
                         }
 
                         setState(() {
-                          _accountCardState = ThreeDotMenuState.done;
+                          _accountCardState = ThreeDotMenuState.collapsed;
                           _isEditable = false;
                           _canFinishCreating = false;
                         });
+                        await context
+                            .read<AccountsService>()
+                            .deleteAccount(id: widget.accountId);
                         await context.read<AccountsService>().setAccount(
                             id: response.data["account_id"],
                             heading: _headingController.text,
                             balance: currencyToDouble(_balanceController.text));
+                        widget.doneCallback();
                       } else {
-                        if (widget.deleteCallback != null) {
-                          widget.deleteCallback!();
-                        }
+                        widget.deleteCallback();
                         await context
                             .read<AccountsService>()
-                            .deleteAccount(widget.accountId);
+                            .deleteAccount(id: widget.accountId);
                       }
                     },
                     icon: (_canFinishCreating)

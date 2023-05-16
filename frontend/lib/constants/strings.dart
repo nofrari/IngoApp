@@ -6,6 +6,10 @@ class Strings {
   static const String menuFinance = "Finanzen";
   static const String menuAccounts = "Accounts";
 
+//General
+  static const String abort = "ABBRECHEN";
+  static const String confirm = "FORTFAHREN";
+
   //Dropdown
   static const String dropdownBudget = "Budget für";
   static const String dropdownFurtherCategory = "Weitere Kategorie auswählen";
@@ -37,4 +41,5 @@ class Strings {
   //Accounts
   static const String accountsHeading = "KONTENÜBERSICHT";
   static const String accountsButton = "KONTO HINZUFÜGEN";
+  static const String accountsDelete = "KONTO LÖSCHEN";
 }

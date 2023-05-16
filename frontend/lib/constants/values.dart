@@ -29,9 +29,9 @@ class Values {
   static const EdgeInsets paddingHorizontal =
       EdgeInsets.symmetric(vertical: 0, horizontal: 25);
 
-  static const EdgeInsets accountHeading =
-      EdgeInsets.symmetric(vertical: 20, horizontal: 10);
+  static const EdgeInsets accountHeading = EdgeInsets.fromLTRB(10, 20, 10, 40);
 
   static const String serverURL = //'https://data.ingoapp.at';
-      'http://10.0.2.2:5432';
+      //'http://10.0.2.2:5432';
+      'http://localhost:5432';
 }

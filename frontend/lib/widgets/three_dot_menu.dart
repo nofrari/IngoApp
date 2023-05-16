@@ -3,7 +3,7 @@ import 'package:frontend/constants/colors.dart';
 import 'package:frontend/constants/values.dart';
 import 'package:frontend/widgets/round_button.dart';
 
-enum ThreeDotMenuState { collapsed, expanded, create, edit, done }
+enum ThreeDotMenuState { collapsed, expanded, create, edit }
 
 class ThreeDotMenu extends StatefulWidget {
   ThreeDotMenu(

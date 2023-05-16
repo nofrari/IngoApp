@@ -119,7 +119,7 @@ class AccountsService extends ChangeNotifier {
         .map((accountString) => Account.fromJson(jsonDecode(accountString)))
         .toList();
 
-    debugPrint(accounts.length.toString());
+    debugPrint("get accounts length: ${accounts.length.toString()}");
 
     return accounts;
   }
@@ -134,18 +134,37 @@ class AccountsService extends ChangeNotifier {
   }
 
   //delete account
-  Future<void> deleteAccount(String id) async {
+  Future<void> deleteAccount({required String id, String? newId}) async {
     try {
       List<Account> accounts = getAccounts();
 
       //get account where id == id
-      Account account = accounts.firstWhere((account) => account.id == id);
+      Account oldAccount = accounts.firstWhere((account) => account.id == id);
 
       //get index of account
-      int index = accounts.indexOf(account);
+      int indexOldAccount = accounts.indexOf(oldAccount);
+
+      //FIXME: this is not working
+      if (newId != null) {
+        //get account where id == id
+        Account newAccount =
+            accounts.firstWhere((account) => account.id == newId);
+
+        //get index of account
+        int indexNewAccount = accounts.indexOf(newAccount);
+
+        //add amounts together to new account
+        accounts[indexNewAccount].amount =
+            newAccount.amount + oldAccount.amount;
+      }
 
       //remove account from accounts
-      accounts.removeAt(index);
+      accounts.removeAt(indexOldAccount);
+
+      for (var account in accounts) {
+        debugPrint("account: ${account.name}");
+        debugPrint("account amount: ${account.amount}");
+      }
 
       setAccounts(accounts: accounts);
     } catch (e) {

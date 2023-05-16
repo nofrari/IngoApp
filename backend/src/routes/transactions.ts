@@ -55,6 +55,12 @@ const editSchema = z.object({
 });
 type EditSchema = z.infer<typeof editSchema>;
 
+const changeAccountSchema = z.object({
+    old_account_id: z.string(),
+    new_account_id: z.string(),
+});
+type changeAccountSchema = z.infer<typeof changeAccountSchema>;
+
 router.post('/transactions', (req, res) => {
     res.status(201).send('Hello world2');
 });
@@ -205,6 +211,82 @@ router.get('/transactions/list/:user_id', async (req, res) => {
     });
 
     res.send(transactions);
+});
+
+router.get('/transactions/account/:id', async (req, res) => {
+    console.log("called");
+    const id = req.params.id;
+
+    const transaction = await prisma.transaction.findMany({
+        where: {
+            account_id: id,
+        },
+    });
+    res.send(transaction);
+});
+
+router.post('/transactions/change', async (req, res) => {
+    const body = <changeAccountSchema>req.body;
+    const validationResult: any = changeAccountSchema.safeParse(body);
+
+    if (!validationResult.success) {
+        res.status(400).send();
+        return;
+    }
+
+    //First get sum of old account
+    const oldAccount = await prisma.account.findUnique({
+        where: {
+            account_id: body.old_account_id,
+        },
+    });
+
+    //First get sum of old account
+    const newAccount = await prisma.account.findUnique({
+        where: {
+            account_id: body.new_account_id,
+        },
+    });
+
+    const newAmount: number = (oldAccount ? oldAccount.account_balance : 0) + (newAccount ? newAccount.account_balance : 0);
+
+    //update amount
+    try {
+        await prisma.account.update({
+            where: {
+                account_id: body.new_account_id,
+            },
+            data: {
+                account_balance: newAmount,
+            }
+        });
+        res.status(200).send();
+
+    } catch (e) {
+        console.log(e);
+        res.status(404).send(e);
+        return;
+    }
+
+    //update transactions
+    try {
+        await prisma.transaction.updateMany({
+            where: {
+                account_id: body.old_account_id,
+            },
+            data: {
+                account_id: body.new_account_id,
+            }
+        });
+
+
+        res.status(200).send();
+
+    } catch (e) {
+        console.log(e);
+        res.status(404).send(e);
+        return;
+    }
 });
 
 export default router;

@@ -9,7 +9,7 @@ class Account {
 
   final String id;
   final String name;
-  final double amount;
+  double amount;
 
   String formatedAmount(double amount) {
     var formatter = NumberFormat('#,##0.00', 'de_DE');

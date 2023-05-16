@@ -25,8 +25,11 @@ TextInputFormatter currencyFormatter =
 });
 
 double currencyToDouble(String currency) {
-  final refactoredAmount =
-      currency.replaceAll("€", "").replaceAll(" ", "").replaceAll(",", ".");
+  final refactoredAmount = currency
+      .replaceAll("€", "")
+      .replaceAll(" ", "")
+      .replaceAll(".", "")
+      .replaceAll(",", ".");
 
   final amount = double.tryParse(refactoredAmount);
   return amount ?? 0;

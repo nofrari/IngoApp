@@ -11,7 +11,7 @@ import 'constants/fonts.dart';
 
 //menu-pages import
 import 'pages/home.dart';
-import 'pages/accounts.dart';
+import 'pages/accounts/accounts.dart';
 import 'pages/budget.dart';
 import 'pages/finances.dart';
 import 'pages/profile.dart';
@@ -22,7 +22,8 @@ import 'pages/manual_entry.dart';
 import 'package:frontend/models/user.dart';
 
 class Start extends StatefulWidget {
-  const Start({super.key});
+  const Start({this.pageId, super.key});
+  final int? pageId;
 
   @override
   State<Start> createState() => _StartState();
@@ -32,6 +33,9 @@ class _StartState extends State<Start> {
   @override
   void initState() {
     super.initState();
+    currentScreen = screens[widget.pageId != null ? widget.pageId! : 0];
+    //Just needed for accounts
+    currentTab = widget.pageId != null && widget.pageId == 1 ? 2 : 0;
     fetchDataFromDatabase();
   }
 
