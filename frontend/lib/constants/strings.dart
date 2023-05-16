@@ -42,4 +42,15 @@ class Strings {
   static const String accountsHeading = "KONTENÜBERSICHT";
   static const String accountsButton = "KONTO HINZUFÜGEN";
   static const String accountsDelete = "KONTO LÖSCHEN";
+
+  //Profile
+  static const String profileAccount = "KONTO";
+  static const String profileName = "NAME";
+  static const String profileMail = "E-MAIL";
+  static const String profileManage = "VERWALTUNG";
+  static const String profileMore = "MEHR";
+  static const String profileCategory = "Kategorien";
+  static const String profileTransactions = "Wiederkehrende Transaktionen";
+  static const String profileGuidelines = "Richtlinien";
+  static const String profileDataprotection = "Datenschutzerklärung";
 }

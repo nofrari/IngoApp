@@ -14,7 +14,7 @@ import 'pages/home.dart';
 import 'pages/accounts/accounts.dart';
 import 'pages/budget.dart';
 import 'pages/finances.dart';
-import 'pages/profile.dart';
+import 'pages/profile/profile.dart';
 import 'pages/scanner.dart';
 import 'pages/scanner/scanner_camera.dart';
 import 'pages/manual_entry.dart';
@@ -35,7 +35,9 @@ class _StartState extends State<Start> {
     super.initState();
     currentScreen = screens[widget.pageId != null ? widget.pageId! : 0];
     //Just needed for accounts
-    currentTab = widget.pageId != null && widget.pageId == 1 ? 2 : 0;
+    currentTab = widget.pageId != null && widget.pageId == 1
+        ? 2
+        : (widget.pageId == 4 ? 4 : 0);
     fetchDataFromDatabase();
   }
 

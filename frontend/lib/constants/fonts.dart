@@ -86,4 +86,8 @@ class Fonts {
 
   static TextStyle accountDeleteInfo = GoogleFonts.josefinSans(
       color: AppColor.neutral100, fontSize: 18, fontWeight: FontWeight.normal);
+
+  //PROFILE
+  static TextStyle optionTitle = GoogleFonts.josefinSans(
+      color: AppColor.neutral100, fontSize: 16, fontWeight: FontWeight.normal);
 }

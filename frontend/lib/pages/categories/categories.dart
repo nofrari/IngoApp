@@ -3,8 +3,9 @@ import 'package:frontend/constants/colors.dart';
 import 'package:frontend/constants/fonts.dart';
 import 'package:frontend/pages/categories/category_add.dart';
 import 'package:frontend/pages/categories/category_edit.dart';
-import 'package:frontend/pages/profile.dart';
+import 'package:frontend/pages/profile/profile.dart';
 import 'package:frontend/services/initial_service.dart';
+import 'package:frontend/start.dart';
 import 'package:frontend/widgets/button.dart';
 import 'package:frontend/widgets/button_transparent_container.dart';
 import 'package:frontend/widgets/categories/category_item.dart';
@@ -80,7 +81,7 @@ class _CategoriesState extends State<Categories> {
           Navigator.push(
             context,
             MaterialPageRoute(
-              builder: (context) => const Profile(),
+              builder: (context) => const Start(pageId: 4),
             ),
           );
         },
