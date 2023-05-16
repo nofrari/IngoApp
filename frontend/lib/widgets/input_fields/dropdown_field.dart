@@ -16,13 +16,15 @@ class Dropdown extends StatefulWidget {
       required this.label,
       required this.needsNewCategoryButton,
       this.setValue,
-      this.initialValue});
+      this.initialValue,
+      required this.validator});
 
   final List<String> dropdownItems;
   final String label;
   final bool needsNewCategoryButton;
   final String? initialValue;
   final ValueChanged<String>? setValue;
+  final FormFieldValidator<String>? validator;
 
   @override
   State<Dropdown> createState() => _DropdownState();
@@ -150,12 +152,13 @@ class _DropdownState extends State<Dropdown> {
                   ),
                 ),
               ),
-        validator: (value) {
-          if (value == null || value.isEmpty) {
-            return 'Das Feld darf nicht leer sein';
-          }
-          return null;
-        },
+        // validator: (value) {
+        //   if (value == null || value.isEmpty) {
+        //     return 'Das Feld darf nicht leer sein';
+        //   }
+        //   return null;
+        // },
+        validator: widget.validator,
         onChanged: (value) {
           debugPrint('changed');
           setState(() => selectedValue = value!);
