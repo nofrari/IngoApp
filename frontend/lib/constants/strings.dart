@@ -19,7 +19,7 @@ class Strings {
   static const String dropdownAccount1 = "Ausgangskonto";
   static const String dropdownAccount2 = "Zu Konto Transferieren";
 
-  //Registrieren
+  //Registrieren / Login
   static const String registerFirstName = "Vorname";
   static const String registerLastName = "Nachname";
   static const String registerMail = "E-Mail";
@@ -33,10 +33,18 @@ class Strings {
   static const String alertPasswordWrong = "Passwort stimmt nicht überein";
   static const String alertDataProtectionEmpty =
       "Datenschutzerklärung muss akzeptiert werden";
+  static const String passwordForgot = "Passwort vergessen?";
+  static const String passwordForgotInfo =
+      "Gib hier die E-Mail Adresse ein, um dein Passwort zurückzusetzen.";
+  static const String passwordForgotPopup =
+      "Passwort zurücksetzen wurde angefordert \n \n Wir haben dir gerade eine E-Mail mit einem Link zum Zurücksetzen gesendet. Bitte prüfe deine E-Mail und folge den Anweisungen.";
+  static const String notRegistered = "Noch nicht registriert? Klicke hier";
 
   //Buttons
   static const String btnRegister = "Registrieren";
-  static const String btnSignIn = "Anmelden";
+  static const String btnLogin = "Anmelden";
+  static const String btnPasswordReset = "Passwort zurücksetzen";
+  static const String btnBackToLogin = "Zurück zur Anmeldung";
 
   //Accounts
   static const String accountsHeading = "KONTENÜBERSICHT";

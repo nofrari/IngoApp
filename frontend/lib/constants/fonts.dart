@@ -71,6 +71,13 @@ class Fonts {
     fontWeight: FontWeight.w500,
   );
 
+  //LINKS (Passwort vergessen, Datenschutzerklärung)
+  static TextStyle textLink = GoogleFonts.josefinSans(
+      color: AppColor.neutral100,
+      fontSize: 12,
+      fontWeight: FontWeight.bold,
+      decoration: TextDecoration.underline);
+
 //ACCOUNTS
   static TextStyle accountsHeading = GoogleFonts.josefinSans(
     color: AppColor.blueActive,
