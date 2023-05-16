@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:frontend/constants/colors.dart';
 import 'package:frontend/constants/fonts.dart';
 import 'package:frontend/constants/icons.dart';
@@ -46,7 +47,7 @@ class _CategoryIconSelectState extends State<CategoryIconSelect> {
                 align: TextAlign.start, text: "Icon:", style: Fonts.text300),
           ),
           Container(
-            height: 125,
+            height: 400,
             width: double.infinity,
             child: GridView.builder(
               itemCount: icons.length,
@@ -77,12 +78,14 @@ class _CategoryIconSelectState extends State<CategoryIconSelect> {
                         });
                         changeIcon(icons[index].name);
                       },
-                      icon: Icon(AppIcons.getIconFromString(icons[index].name)),
+                      icon: FaIcon(
+                        AppIcons.getIconFromString(icons[index].name),
+                        size: 25,
+                      ),
                       color: currentIcon == icons[index].name ||
                               widget.selectedIcon == icons[index].name
                           ? AppColor.blueActive
                           : Colors.white,
-                      iconSize: 35,
                     ),
                   ),
                 );
