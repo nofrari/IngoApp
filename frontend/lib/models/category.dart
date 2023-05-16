@@ -16,7 +16,7 @@ class CategoryModel {
   Map<String, dynamic> toJson() => {
         'category_id': category_id,
         'bgColor': bgColor,
-        'isBlack': isWhite,
+        'isWhite': isWhite,
         'icon': icon,
         'label': label,
       };
