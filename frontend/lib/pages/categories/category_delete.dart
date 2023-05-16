@@ -25,6 +25,9 @@ class CategoryDelete extends StatefulWidget {
 class _CategoryDeleteState extends State<CategoryDelete> {
   List<CategoryModel> categories = [];
   String? selectedCategoryId;
+  bool isFormValid() {
+    return selectedCategoryId != null && selectedCategoryId != "";
+  }
 
   void _selectNewCategory(String category_id) {
     setState(() {
@@ -35,8 +38,6 @@ class _CategoryDeleteState extends State<CategoryDelete> {
 
   void initState() {
     super.initState();
-
-    selectedCategoryId = "Coffee";
   }
 
   Dio dio = Dio();
@@ -110,7 +111,7 @@ class _CategoryDeleteState extends State<CategoryDelete> {
                                 onTap: () =>
                                     _selectNewCategory(category.category_id),
                                 bgColor: category.bgColor,
-                                isBlack: category.isBlack,
+                                isWhite: category.isWhite,
                                 icon: category.icon,
                                 label: category.label,
                                 isSmall: true,
@@ -142,26 +143,30 @@ class _CategoryDeleteState extends State<CategoryDelete> {
                       onTap: () {
                         Navigator.pop(context);
                       },
-                      theme: ButtonColorTheme.secondary,
+                      theme: ButtonColorTheme.secondaryLight,
                     ),
                   ),
                   Button(
                     isTransparent: true,
                     btnText: "SPEICHERN",
-                    onTap: () async {
-                      _deleteCategory(
-                        widget.category_id,
-                        selectedCategoryId!,
-                        widget.numberTransactions!,
-                      );
-                      await Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) => const Categories(),
-                        ),
-                      );
-                    },
-                    theme: ButtonColorTheme.primary,
+                    onTap: isFormValid()
+                        ? () async {
+                            _deleteCategory(
+                              widget.category_id,
+                              selectedCategoryId!,
+                              widget.numberTransactions!,
+                            );
+                            await Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) => const Categories(),
+                              ),
+                            );
+                          }
+                        : () {},
+                    theme: isFormValid()
+                        ? ButtonColorTheme.primary
+                        : ButtonColorTheme.disabled,
                   ),
                 ],
               ),
