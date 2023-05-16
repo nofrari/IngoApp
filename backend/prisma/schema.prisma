@@ -34,7 +34,7 @@ model Account {
 model Category {
   category_id   String        @id @unique @default(cuid())
   category_name String
-  is_black      Boolean
+  is_white      Boolean
   transactions  Transaction[]
   user_id       String
   user          User          @relation(fields: [user_id], references: [user_id], onDelete: Cascade)
