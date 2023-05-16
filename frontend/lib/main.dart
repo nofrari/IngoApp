@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:frontend/services/accounts_service.dart';
 import 'package:frontend/services/initial_service.dart';
 import 'package:frontend/services/manualentry_service.dart';
+import 'package:frontend/services/transaction_service.dart';
 import 'package:provider/provider.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:frontend/services/scanner_service.dart';
@@ -15,6 +16,7 @@ void main() async {
   await ManualEntryService.init();
   await AccountsService.init();
   await InitialService.init();
+  await TransactionService.init();
   runApp(MultiProvider(
     providers: [
       ChangeNotifierProvider(
@@ -28,6 +30,9 @@ void main() async {
       ),
       ChangeNotifierProvider(
         create: (BuildContext context) => InitialService(),
+      ),
+      ChangeNotifierProvider(
+        create: (BuildContext context) => TransactionService(),
       ),
     ],
     child: const MyApp(),
