@@ -34,13 +34,15 @@ model Account {
 model Category {
   category_id   String        @id @unique @default(cuid())
   category_name String
-  color         String
+  is_white      Boolean
   transactions  Transaction[]
   user_id       String
   user          User          @relation(fields: [user_id], references: [user_id], onDelete: Cascade)
   budgets       Budget[]
   icon_id       String
+  color_id      String
   icon          Icon          @relation(fields: [icon_id], references: [icon_id], onDelete: Cascade)
+  color         Color         @relation(fields: [color_id], references: [color_id], onDelete: Cascade)
 }
 
 model Type {
@@ -89,5 +91,11 @@ model Budget {
 model Icon {
   icon_id   String     @id @unique @default(cuid())
   icon_name String
+  category  Category[]
+}
+
+model Color {
+  color_id   String     @id @unique @default(cuid())
+  color_name String
   category  Category[]
 }

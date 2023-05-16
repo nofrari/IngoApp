@@ -2,8 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:frontend/constants/colors.dart';
 
 class RoundButton extends StatelessWidget {
-  const RoundButton(
-      {required this.onTap,
+  RoundButton(
+      {this.isTransparent,
+      required this.onTap,
       required this.icon,
       this.padding,
       this.color,
@@ -17,6 +18,7 @@ class RoundButton extends StatelessWidget {
   final Color? color;
   final double? iconSize;
   final double? borderWidth;
+  bool? isTransparent;
 
   @override
   Widget build(BuildContext context) {
@@ -24,7 +26,9 @@ class RoundButton extends StatelessWidget {
       onPressed: onTap,
       style: ElevatedButton.styleFrom(
         tapTargetSize: MaterialTapTargetSize.shrinkWrap,
-        backgroundColor: AppColor.neutral800,
+        backgroundColor: isTransparent != null && isTransparent == true
+            ? Colors.transparent
+            : AppColor.neutral800,
         padding: EdgeInsets.all((padding != null) ? padding! : 8),
         shape: const CircleBorder(),
         side: BorderSide(
