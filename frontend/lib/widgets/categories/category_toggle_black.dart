@@ -4,20 +4,20 @@ import 'package:frontend/constants/fonts.dart';
 import 'package:frontend/widgets/text_google.dart';
 
 class CategoryToggleBlack extends StatefulWidget {
-  CategoryToggleBlack({this.isBlack, required this.onToggleChange, super.key});
+  CategoryToggleBlack({this.isWhite, required this.onToggleChange, super.key});
   final void Function() onToggleChange;
-  bool? isBlack;
+  bool? isWhite;
 
   @override
   _CategoryToggleBlackState createState() => _CategoryToggleBlackState();
 }
 
 class _CategoryToggleBlackState extends State<CategoryToggleBlack> {
-  bool isBlack = false;
+  bool isWhite = false;
 
   void changeIsBlack(bool isBlackToggle) {
     setState(() {
-      isBlack = isBlackToggle;
+      isWhite = isBlackToggle;
     });
 
     widget.onToggleChange();
@@ -37,13 +37,14 @@ class _CategoryToggleBlackState extends State<CategoryToggleBlack> {
             style: Fonts.text300,
           ),
           Switch(
-              activeColor: AppColor.neutral700,
-              activeTrackColor: Color.fromARGB(255, 76, 76, 76),
-              inactiveThumbColor: Colors.white,
-              inactiveTrackColor: Colors.grey.shade400,
-              splashRadius: 60.0,
-              value: widget.isBlack ?? isBlack,
-              onChanged: (value) => changeIsBlack(value)),
+            activeColor: Color.fromARGB(255, 255, 255, 255),
+            activeTrackColor: Colors.white,
+            inactiveThumbColor: Color.fromARGB(255, 76, 76, 76),
+            inactiveTrackColor: Color.fromARGB(255, 173, 173, 173),
+            splashRadius: 60.0,
+            value: widget.isWhite ?? isWhite,
+            onChanged: (value) => changeIsBlack(value),
+          ),
         ],
       ),
     );
