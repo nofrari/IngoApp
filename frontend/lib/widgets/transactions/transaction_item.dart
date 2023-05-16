@@ -1,15 +1,31 @@
 import 'package:flutter/material.dart';
+import 'package:frontend/constants/icons.dart';
+import 'package:frontend/models/category.dart';
+import 'package:frontend/models/icon.dart';
 import 'package:frontend/models/transaction.dart';
+import 'package:frontend/widgets/categories/category_icon.dart';
+import 'package:provider/provider.dart';
 import '../../constants/colors.dart';
 import '../../constants/fonts.dart';
+import '../../services/initial_service.dart';
 
-class TransactionItem extends StatelessWidget {
+class TransactionItem extends StatefulWidget {
   const TransactionItem({super.key, required this.transaction});
 
-  final Transaction transaction;
+  final TransactionModel transaction;
 
   @override
+  State<TransactionItem> createState() => _TransactionItemState();
+}
+
+class _TransactionItemState extends State<TransactionItem> {
+  List<CategoryModel> categories = [];
+  @override
   Widget build(BuildContext context) {
+    categories = context.watch<InitialService>().getCategories();
+    CategoryModel desiredCategory = categories.firstWhere(
+        (category) => category.category_id == widget.transaction.category_id);
+
     return Container(
       decoration: BoxDecoration(
         border: Border(
@@ -25,20 +41,11 @@ class TransactionItem extends StatelessWidget {
               constraints: const BoxConstraints(
                 maxWidth: 80,
               ),
-              child: ElevatedButton(
-                onPressed: null,
-                style: ElevatedButton.styleFrom(
-                  shape: const CircleBorder(),
-                  foregroundColor: Colors.red,
-                  backgroundColor: Colors.blue,
-                  padding: const EdgeInsets.all(15),
-                  elevation: 5,
-                  shadowColor: Colors.red,
-                ),
-                child: Text(
-                  transaction.category,
-                  style: TextStyle(color: AppColor.neutral100),
-                ),
+              child: CategoryIcon(
+                isSmall: true,
+                bgColor: AppColor.getColorFromString(desiredCategory.bgColor),
+                isWhite: true,
+                icon: AppIcons.getIconFromString(desiredCategory.icon),
               ),
             ),
             Expanded(
@@ -47,7 +54,7 @@ class TransactionItem extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      transaction.formattedDate,
+                      widget.transaction.formattedDate,
                       style: Fonts.textDateSmall,
                     ),
                     const SizedBox(
@@ -56,14 +63,9 @@ class TransactionItem extends StatelessWidget {
                     Row(
                       children: [
                         Text(
-                          transaction.name,
+                          widget.transaction.transaction_name,
                           style: Fonts.textTransactionName,
                         ),
-                        Text(" - ", style: Fonts.textTransactionDescription),
-                        Text(
-                          transaction.name,
-                          style: Fonts.textTransactionDescription,
-                        )
                       ],
                     )
                   ],
@@ -72,8 +74,9 @@ class TransactionItem extends StatelessWidget {
             ),
             Container(
               child: Text(
-                transaction.formattedAmount(
-                    transaction.amount, transaction.transactionType.toString()),
+                widget.transaction.formattedAmount(
+                    widget.transaction.transaction_amount,
+                    widget.transaction.type_id.toString()),
                 style: Fonts.textHeadingBold,
               ),
             ),
