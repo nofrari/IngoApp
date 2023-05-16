@@ -2,21 +2,21 @@ class CategoryModel {
   CategoryModel({
     required this.category_id,
     required this.bgColor,
-    required this.isBlack,
+    required this.isWhite,
     required this.icon,
     required this.label,
   });
 
   String category_id;
   String bgColor;
-  bool isBlack;
+  bool isWhite;
   String icon;
   String label;
 
   Map<String, dynamic> toJson() => {
         'category_id': category_id,
         'bgColor': bgColor,
-        'isBlack': isBlack,
+        'isBlack': isWhite,
         'icon': icon,
         'label': label,
       };
@@ -24,7 +24,7 @@ class CategoryModel {
   factory CategoryModel.fromJson(Map<String, dynamic> json) => CategoryModel(
         category_id: json["category_id"],
         bgColor: json["bgColor"],
-        isBlack: json["isBlack"],
+        isWhite: json["isWhite"],
         icon: json["icon"],
         label: json['label'],
       );
