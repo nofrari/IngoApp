@@ -3,6 +3,7 @@ import 'package:flutter/services.dart';
 import 'package:email_validator/email_validator.dart';
 import 'package:dio/dio.dart';
 import 'package:frontend/constants/colors.dart';
+import 'package:frontend/constants/values.dart';
 import 'package:frontend/widgets/checkbox.dart';
 
 import '../constants/fonts.dart';
@@ -64,11 +65,11 @@ class _RegisterState extends State<Register> {
   @override
   void initState() {
     super.initState();
-    controllerLastName.text = "selina";
-    controllerName.text = "lehner";
-    controllerMail.text = "lehner.selina9@gmail.com";
-    controllerPassword.text = "123selina";
-    controllerPasswordRepeat.text = "123selina";
+    // controllerLastName.text = "selina";
+    // controllerName.text = "lehner";
+    // controllerMail.text = "lehner.selina9@gmail.com";
+    // controllerPassword.text = "123selina";
+    // controllerPasswordRepeat.text = "123selina";
   }
 
   @override
@@ -241,7 +242,7 @@ class _RegisterState extends State<Register> {
                         }
                       }
                     },
-                    theme: ButtonColorTheme.secondaryDark),
+                    theme: ButtonColorTheme.secondaryLight),
               ),
             ),
           ],
@@ -260,9 +261,11 @@ class _RegisterState extends State<Register> {
     };
 
     try {
-      await dio.post("http://localhost:5432/users/register", data: formData);
+      await dio.post("${Values.serverURL}/users/register", data: formData);
 
-      mailExists = false;
+      setState(() {
+        mailExists = false;
+      });
     } on DioError catch (dioError) {
       debugPrint(dioError.toString());
       if (dioError.response != null) {

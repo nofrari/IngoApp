@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:email_validator/email_validator.dart';
 import 'package:dio/dio.dart';
+import 'package:frontend/constants/values.dart';
 import 'package:frontend/pages/password_reset.dart';
 
 import '../constants/fonts.dart';
@@ -51,8 +52,8 @@ class _LoginState extends State<Login> {
   @override
   void initState() {
     super.initState();
-    controllerMail.text = "lehner.selina9@gmail.com";
-    controllerPassword.text = "123selina";
+    // controllerMail.text = "lehner.selina9@gmail.com";
+    // controllerPassword.text = "123selina";
   }
 
   @override
@@ -164,9 +165,11 @@ class _LoginState extends State<Login> {
     };
 
     try {
-      await dio.post("http://localhost:5432/users/login", data: formData);
+      await dio.post("${Values.serverURL}/users/login", data: formData);
       debugPrint('user hat sich eingeloggt');
-      userExists = true;
+      setState(() {
+        userExists = true;
+      });
     } on DioError catch (dioError) {
       debugPrint(dioError.toString());
       if (dioError.response != null) {
