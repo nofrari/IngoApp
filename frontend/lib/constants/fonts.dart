@@ -90,4 +90,10 @@ class Fonts {
   //PROFILE
   static TextStyle optionTitle = GoogleFonts.josefinSans(
       color: AppColor.neutral100, fontSize: 16, fontWeight: FontWeight.normal);
+
+  static TextStyle guidelines = GoogleFonts.josefinSans(
+      color: AppColor.neutral100,
+      fontSize: 14,
+      fontWeight: FontWeight.normal,
+      height: 2);
 }
