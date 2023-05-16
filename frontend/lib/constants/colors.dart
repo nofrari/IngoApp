@@ -32,6 +32,7 @@ class AppColor {
   static Color violett = HexColor("#9886C1");
   static Color greenKadmium = HexColor("#1F4B49");
   static Color greenNavy = HexColor("#242F16");
+  static Color gray = HexColor("#d2d2d2");
 
   static Map<String, Color> colors = {
     'blueDark': blueDark,
@@ -44,7 +45,8 @@ class AppColor {
     'orange': orange,
     'violett': violett,
     'greenKadmium': greenKadmium,
-    'greenNavy': greenNavy
+    'greenNavy': greenNavy,
+    'gray': gray
     // add more color mappings as needed
   };
 
