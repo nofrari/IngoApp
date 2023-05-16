@@ -9,7 +9,7 @@ class CategoryItem extends StatelessWidget {
   CategoryItem(
       {required this.onTap,
       required this.bgColor,
-      required this.isBlack,
+      required this.isWhite,
       required this.icon,
       required this.label,
       required this.isSmall,
@@ -18,7 +18,7 @@ class CategoryItem extends StatelessWidget {
 
   final String icon;
   final String bgColor;
-  final bool isBlack;
+  final bool isWhite;
   final void Function() onTap;
   final String label;
   final bool isSmall;
@@ -47,7 +47,7 @@ class CategoryItem extends StatelessWidget {
               padding: const EdgeInsets.only(right: 15),
               child: CategoryIcon(
                 bgColor: AppColor.getColorFromString(bgColor),
-                isBlack: isBlack,
+                isWhite: isWhite,
                 icon: AppIcons.getIconFromString(icon),
                 isSmall: isSmall,
               ),
