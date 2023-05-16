@@ -32,7 +32,7 @@ class CategoryAdd extends StatefulWidget {
 
 class _CategoryAddState extends State<CategoryAdd> {
   String bgColor = '';
-  bool isBlack = false;
+  bool isWhite = false;
   String icon = '';
   String? label;
   bool? border;
@@ -55,7 +55,14 @@ class _CategoryAddState extends State<CategoryAdd> {
 
   void _updateIsBlack() {
     setState(() {
-      isBlack = !isBlack;
+      isWhite = !isWhite;
+    });
+  }
+
+  bool _isFocused = false;
+  void onTextFieldFocusChanged(bool isFocused) {
+    setState(() {
+      _isFocused = isFocused;
     });
   }
 
@@ -66,10 +73,7 @@ class _CategoryAddState extends State<CategoryAdd> {
   TextEditingController controllerCategoryName = TextEditingController();
 
   bool isFormValid() {
-    return label != null &&
-        label!.isNotEmpty &&
-        bgColor.isNotEmpty &&
-        icon.isNotEmpty;
+    return controllerCategoryName.text != "" && bgColor != "" && icon != "";
   }
 
   @override
@@ -105,7 +109,7 @@ class _CategoryAddState extends State<CategoryAdd> {
                         bgColor: bgColor != ""
                             ? AppColor.getColorFromString(bgColor)
                             : AppColor.neutral600,
-                        isBlack: isBlack,
+                        isWhite: isWhite,
                         icon: icon != ""
                             ? AppIcons.getIconFromString(icon)
                             : null,
@@ -114,6 +118,7 @@ class _CategoryAddState extends State<CategoryAdd> {
                       ),
                     ),
                     InputField(
+                      onFocusChanged: onTextFieldFocusChanged,
                       lblText: "KATEGORIENAME",
                       reqFormatter: letters,
                       keyboardType: text,
@@ -148,21 +153,25 @@ class _CategoryAddState extends State<CategoryAdd> {
               child: Button(
                   isTransparent: true,
                   btnText: "KATEGORIE HINZUFÜGEN",
-                  onTap: () async {
-                    await _createCategory(
-                      controllerCategoryName.text,
-                      bgColor,
-                      isBlack,
-                      icon,
-                    );
-                    await Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) => const Categories(),
-                      ),
-                    ); // Navigate back to the previous screen
-                  },
-                  theme: ButtonColorTheme.secondary),
+                  onTap: isFormValid()
+                      ? () async {
+                          await _createCategory(
+                            controllerCategoryName.text,
+                            bgColor,
+                            isWhite,
+                            icon,
+                          );
+                          await Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => const Categories(),
+                            ),
+                          ); // Navigate back to the previous screen
+                        }
+                      : () {},
+                  theme: isFormValid()
+                      ? ButtonColorTheme.secondaryLight
+                      : ButtonColorTheme.disabled),
             ),
           ),
         ],
@@ -173,7 +182,7 @@ class _CategoryAddState extends State<CategoryAdd> {
   Future _createCategory(
     String label,
     String colorName,
-    bool isBlack,
+    bool is_white,
     String iconName,
   ) async {
     IconModel desiredIcon = icons.firstWhere((icon) => icon.name == iconName);
@@ -183,7 +192,7 @@ class _CategoryAddState extends State<CategoryAdd> {
     Map<String, dynamic> formData = {
       "category_name": label,
       "color_id": desiredColor.color_id,
-      "is_black": isBlack,
+      "is_white": is_white,
       "icon_id": desiredIcon.icon_id,
       "user_id": "1"
     };
