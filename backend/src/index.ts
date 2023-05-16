@@ -16,7 +16,6 @@ import sharp from 'sharp';
 //const imgToPDF = require('image-to-pdf');
 // const PDFDocument = require('pdfkit');
 // const sharp = require('sharp');
-import transactionsRouter from './routes/transactions';
 import accountsRouter from './routes/accounts';
 
 const app = express();
@@ -28,6 +27,7 @@ app.use(express.json());
 app.use(usersRouter);
 app.use(transactionsRouter);
 app.use(accountsRouter);
+app.use(categoriesRouter);
 
 var storage = multer.diskStorage({
   destination: function (req, file, cb) {
