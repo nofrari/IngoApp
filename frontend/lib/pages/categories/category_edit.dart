@@ -6,7 +6,6 @@ import 'package:frontend/constants/fonts.dart';
 import 'package:frontend/constants/icons.dart';
 import 'package:frontend/constants/values.dart';
 import 'package:frontend/pages/categories/category_delete.dart';
-import 'package:frontend/start.dart';
 import 'package:frontend/widgets/button.dart';
 import 'package:frontend/widgets/button_transparent_container.dart';
 import 'package:frontend/widgets/categories/category_color_selector.dart';
@@ -19,7 +18,6 @@ import 'package:frontend/widgets/input_fields/input_field.dart';
 import 'package:frontend/widgets/round_button.dart';
 import 'package:frontend/models/category.dart';
 import 'package:provider/provider.dart';
-
 import '../../models/color.dart';
 import '../../models/icon.dart';
 import '../../services/initial_service.dart';
@@ -50,7 +48,6 @@ class _CategoryEditState extends State<CategoryEdit> {
     try {
       var response = await dio.get(
           "http://localhost:5432/categories/transactions/${widget.category.category_id}");
-      // move the declaration here
       setState(() {
         transactionCount = response.data;
         debugPrint(transactionCount.toString());
@@ -74,7 +71,7 @@ class _CategoryEditState extends State<CategoryEdit> {
 
   void _updateIsBlack() {
     setState(() {
-      widget.category.isBlack = !widget.category.isBlack;
+      widget.category.isWhite = !widget.category.isWhite;
     });
   }
 
@@ -82,6 +79,13 @@ class _CategoryEditState extends State<CategoryEdit> {
     super.initState();
     getData(context);
     controllerCategoryName.text = widget.category.label;
+  }
+
+  bool _isFocused = false;
+  void onTextFieldFocusChanged(bool isFocused) {
+    setState(() {
+      _isFocused = isFocused;
+    });
   }
 
   @override
@@ -116,12 +120,13 @@ class _CategoryEditState extends State<CategoryEdit> {
                       child: CategoryIcon(
                         bgColor: AppColor.getColorFromString(
                             widget.category.bgColor),
-                        isBlack: widget.category.isBlack,
+                        isWhite: widget.category.isWhite,
                         icon: AppIcons.getIconFromString(widget.category.icon),
                         isSmall: false,
                       ),
                     ),
                     InputField(
+                      onFocusChanged: onTextFieldFocusChanged,
                       lblText: "KATEGORIENAME",
                       reqFormatter: letters,
                       keyboardType: text,
@@ -139,7 +144,7 @@ class _CategoryEditState extends State<CategoryEdit> {
                     ),
                     CategoryToggleBlack(
                       onToggleChange: _updateIsBlack,
-                      isBlack: widget.category.isBlack,
+                      isWhite: widget.category.isWhite,
                     ),
                     const SizedBox(
                       height: 10,
@@ -173,7 +178,7 @@ class _CategoryEditState extends State<CategoryEdit> {
                             );
                           }
                         : () async {
-                            _deleteCategory(
+                            await _deleteCategory(
                               widget.category.category_id,
                               transactionCount!,
                             );
@@ -195,7 +200,7 @@ class _CategoryEditState extends State<CategoryEdit> {
                           await _editCategory(
                             widget.category.category_id,
                             controllerCategoryName.text,
-                            widget.category.isBlack,
+                            widget.category.isWhite,
                             widget.category.bgColor,
                             widget.category.icon,
                           );
@@ -206,7 +211,7 @@ class _CategoryEditState extends State<CategoryEdit> {
                             ),
                           );
                         },
-                        theme: ButtonColorTheme.secondary),
+                        theme: ButtonColorTheme.secondaryLight),
                   ),
                 ],
               ),
@@ -220,7 +225,7 @@ class _CategoryEditState extends State<CategoryEdit> {
   Future _editCategory(
     String category_id,
     String category_name,
-    bool is_black,
+    bool is_white,
     String colorName,
     String iconName,
   ) async {
@@ -230,7 +235,7 @@ class _CategoryEditState extends State<CategoryEdit> {
     Map<String, dynamic> formData = {
       "category_id": category_id,
       "category_name": category_name,
-      "is_black": is_black,
+      "is_white": is_white,
       "color_id": desiredColor.color_id,
       "icon_id": desiredIcon.icon_id,
       "user_id": "1234"
