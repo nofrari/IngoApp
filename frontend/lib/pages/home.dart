@@ -28,6 +28,9 @@ class _HomeState extends State<Home> {
     getData(context);
   }
 
+  List<ColorModel> colors = [];
+  List<IconModel> icons = [];
+
   void _getTotalAmount() async {
     try {
       Response response =
@@ -39,10 +42,6 @@ class _HomeState extends State<Home> {
       print(e);
     }
   }
-
-  List<ColorModel> colors = [];
-  List<IconModel> icons = [];
-  List<CategoryModel> categoryList = [];
 
   void getData(BuildContext context) async {
     try {
