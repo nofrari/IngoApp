@@ -69,7 +69,7 @@ class Fonts {
   //LINKS (Passwort vergessen, Datenschutzerklärung)
   static TextStyle textLink = GoogleFonts.josefinSans(
       color: AppColor.neutral100,
-      fontSize: 15,
+      fontSize: 12,
       fontWeight: FontWeight.bold,
       decoration: TextDecoration.underline);
 }

@@ -4,7 +4,6 @@ import 'package:provider/provider.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:frontend/services/scanner_service.dart';
 import 'pages/userauth.dart';
-import 'start.dart';
 
 final ImageCache testImageCache = ImageCache();
 void main() async {

@@ -12,6 +12,7 @@ import '../widgets/button.dart';
 
 import '../constants/strings.dart';
 import '../start.dart';
+import 'data_protection.dart';
 
 class Register extends StatefulWidget {
   const Register({
@@ -189,6 +190,13 @@ class _RegisterState extends State<Register> {
             ),
             //TODO: Datenschutzerklärung verlinken
             CheckboxDataProtection(
+              linkText: 'Ich stimme der Datenschutzbestimmung zu',
+              linkTo: () => Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => const DataProtection(),
+                ),
+              ),
               value: _isChecked,
               onCheckboxTapped: (bool? value) {
                 setState(() {
@@ -207,7 +215,7 @@ class _RegisterState extends State<Register> {
               child: Align(
                 alignment: Alignment.bottomCenter,
                 child: Button(
-                    btnText: Strings.btnRegister,
+                    btnText: Strings.btnRegister.toUpperCase(),
                     onTap: () async {
                       if (_formKey.currentState!.validate() != false) {
                         // createUser();

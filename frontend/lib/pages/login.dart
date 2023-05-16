@@ -2,7 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:email_validator/email_validator.dart';
 import 'package:dio/dio.dart';
+import 'package:frontend/pages/password_reset.dart';
 
+import '../constants/fonts.dart';
 import '../start.dart';
 import '../constants/strings.dart';
 import '../widgets/input_fields/input_field.dart';
@@ -104,11 +106,26 @@ class _LoginState extends State<Login> {
               },
             ),
             //TODO: Link Passwort vergessen
+            Align(
+              alignment: Alignment.centerLeft,
+              child: GestureDetector(
+                onTap: () => Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => PasswordReset(),
+                  ),
+                ),
+                child: Text(
+                  Strings.passwordForgot,
+                  style: Fonts.textLink,
+                ),
+              ),
+            ),
             Expanded(
               child: Align(
                 alignment: Alignment.bottomCenter,
                 child: Button(
-                    btnText: Strings.btnLogin,
+                    btnText: Strings.btnLogin.toUpperCase(),
                     onTap: () async {
                       if (_formKey.currentState!.validate() != false) {
                         await _sendData(

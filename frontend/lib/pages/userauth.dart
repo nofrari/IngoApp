@@ -44,11 +44,7 @@ class _AuthState extends State<Auth> {
                   decoration: BoxDecoration(
                     border: Border.all(
                         color: AppColor.neutral500, style: BorderStyle.solid),
-                    borderRadius: const BorderRadius.only(
-                        topRight: Radius.circular(20),
-                        topLeft: Radius.circular(20),
-                        bottomRight: Radius.circular(11),
-                        bottomLeft: Radius.circular(11)),
+                    borderRadius: const BorderRadius.all(Radius.circular(20)),
                     color: AppColor.backgroundGray,
                   ),
                   //FIXME: Toggle nur umändern, wenn noch nicht aktiviert
