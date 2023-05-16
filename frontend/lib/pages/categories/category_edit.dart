@@ -132,6 +132,7 @@ class _CategoryEditState extends State<CategoryEdit> {
                       keyboardType: text,
                       controller: controllerCategoryName,
                       maxLength: 30,
+                      hidePassword: false,
                     ),
                     const SizedBox(
                       height: 20,

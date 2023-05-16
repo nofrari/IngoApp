@@ -159,12 +159,12 @@ class _PasswordResetState extends State<PasswordReset> {
                                                           );
                                                         },
                                                         theme: ButtonColorTheme
-                                                            .secondary,
+                                                            .secondaryLight,
                                                       )),
                                                 ]));
                                   }
                                 },
-                                theme: ButtonColorTheme.secondary,
+                                theme: ButtonColorTheme.secondaryLight,
                               ),
                             ),
                           )

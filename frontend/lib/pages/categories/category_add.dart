@@ -124,6 +124,7 @@ class _CategoryAddState extends State<CategoryAdd> {
                       keyboardType: text,
                       controller: controllerCategoryName,
                       maxLength: 30,
+                      hidePassword: false,
                     ),
                     const SizedBox(
                       height: 20,
