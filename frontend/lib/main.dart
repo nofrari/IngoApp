@@ -5,8 +5,7 @@ import 'package:frontend/services/manualentry_service.dart';
 import 'package:provider/provider.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:frontend/services/scanner_service.dart';
-import 'pages/register.dart';
-import 'start.dart';
+import 'pages/userauth.dart';
 
 final ImageCache testImageCache = ImageCache();
 void main() async {
@@ -59,6 +58,6 @@ class _MyAppState extends State<MyApp> {
         theme: ThemeData(
           primarySwatch: Colors.blue,
         ),
-        home: Start());
+        home: Auth());
   }
 }

@@ -1,10 +1,11 @@
 import 'package:flutter/material.dart';
-import 'package:frontend/constants/colors.dart';
-import 'package:google_fonts/google_fonts.dart';
+
+import '../constants/colors.dart';
 import '../constants/fonts.dart';
 
 class Toggle extends StatefulWidget {
-  const Toggle({super.key});
+  const Toggle({super.key, required this.toggleView});
+  final Function toggleView;
 
   //final List<Widget> selectedScreen;
 
@@ -65,6 +66,7 @@ class _ToggleState extends State<Toggle> {
             GestureDetector(
               onTap: () {
                 setState(() {
+                  widget.toggleView();
                   xAlign = loginAlign;
                   //selectedScreen[index] = !selectedScreen[index];
                   //loginColor = selectedColor;
@@ -86,6 +88,7 @@ class _ToggleState extends State<Toggle> {
             ),
             GestureDetector(
               onTap: () {
+                widget.toggleView();
                 setState(() {
                   xAlign = signInAlign;
                   //signInColor = selectedColor;
