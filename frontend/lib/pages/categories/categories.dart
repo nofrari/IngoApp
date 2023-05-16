@@ -15,6 +15,7 @@ import 'package:frontend/models/category.dart';
 import 'package:frontend/models/color.dart';
 import 'package:provider/provider.dart';
 
+import '../../constants/values.dart';
 import '../../models/icon.dart';
 
 class Categories extends StatefulWidget {
@@ -39,7 +40,7 @@ class _CategoriesState extends State<Categories> {
 
   Future<List<CategoryModel>> getData() async {
     try {
-      var response = await dio.get("http://localhost:5432/categories/1");
+      Response response = await dio.get('${Values.serverURL}/categories/1');
       List<CategoryModel> categoryList = []; // move the declaration here
       if (response.data['categories'] != null) {
         for (var category in response.data['categories']) {
@@ -51,7 +52,7 @@ class _CategoriesState extends State<Categories> {
             CategoryModel(
               category_id: category['category_id'],
               bgColor: desiredColor.name,
-              isBlack: category['is_black'],
+              isWhite: category['is_white'],
               icon: desiredIcon.name,
               label: category['category_name'],
             ),
@@ -132,7 +133,7 @@ class _CategoriesState extends State<Categories> {
                                           );
                                         },
                                         bgColor: categoryItemsData.bgColor,
-                                        isBlack: categoryItemsData.isBlack,
+                                        isWhite: categoryItemsData.isWhite,
                                         icon: categoryItemsData.icon,
                                         label: categoryItemsData.label,
                                         isSmall: true,
@@ -163,7 +164,7 @@ class _CategoriesState extends State<Categories> {
                             ),
                           );
                         },
-                        theme: ButtonColorTheme.secondary),
+                        theme: ButtonColorTheme.secondaryLight),
                   ),
                 ),
               ],
