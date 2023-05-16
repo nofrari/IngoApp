@@ -4,7 +4,9 @@ import 'package:frontend/constants/colors.dart';
 import 'package:frontend/constants/fonts.dart';
 import 'package:frontend/constants/strings.dart';
 import 'package:frontend/constants/values.dart';
+import 'package:frontend/models/account.dart';
 import 'package:frontend/pages/scanner/scanner_camera.dart';
+import 'package:frontend/services/accounts_service.dart';
 import 'package:frontend/services/custom_cache_manager.dart';
 import 'package:frontend/services/manualentry_service.dart';
 import 'package:frontend/services/scanner_service.dart';
@@ -103,6 +105,13 @@ class _ManualEntryState extends State<ManualEntry> {
     Map<String, dynamic> manualEntry =
         context.watch<ManualEntryService>().getManualEntry();
     List<String> images = context.watch<ScannerService>().getImages();
+
+    List<Account> _allAccounts = context.read<AccountsService>().getAccounts();
+    List<String> accountNames =
+        _allAccounts.map((account) => account.name).toList();
+
+    String? value1;
+    String? value2;
 
     if (manualEntry.isNotEmpty) {
       controllerTitle.text = manualEntry['supplier_name'];
@@ -244,10 +253,16 @@ class _ManualEntryState extends State<ManualEntry> {
                           ],
                           needsNewCategoryButton: false,
                           setValue: setSelectedType,
+                          validator: (value) {
+                            if (value == null || value.isEmpty) {
+                              return 'Das Feld darf nicht leer sein';
+                            }
+                            return null;
+                          },
                         ),
-                        const Dropdown(
+                        Dropdown(
                           label: Strings.dropdownCategory,
-                          dropdownItems: [
+                          dropdownItems: const [
                             'Essen',
                             'Freizeit',
                             'Lebensmittel',
@@ -258,35 +273,56 @@ class _ManualEntryState extends State<ManualEntry> {
                             'jkrgh alhfiu',
                           ],
                           needsNewCategoryButton: true,
+                          validator: (value) {
+                            if (value == null || value.isEmpty) {
+                              return 'Das Feld darf nicht leer sein';
+                            }
+                            return null;
+                          },
                         ),
                         //TODO: Kontos aus DB holen
-                        const Dropdown(
+                        Dropdown(
                           label: Strings.dropdownAccount1,
-                          dropdownItems: [
-                            'Gelbörse',
-                            'Bank',
-                            'Kreditkarte',
-                          ],
+                          dropdownItems: accountNames,
                           needsNewCategoryButton: false,
+                          validator: (value) {
+                            value1 = value;
+                            if (value == null || value.isEmpty) {
+                              return 'Das Feld darf nicht leer sein';
+                            }
+
+                            if (value1 == value2) {
+                              return 'Zeimal dasselbe Konto ausgewählt';
+                            }
+                            return null;
+                          },
                         ),
+
                         //TODO: String als Constante anlegen und bei Registrieren mitschicken
                         (_selectedType == 'Transfer')
-                            ? const Dropdown(
+                            ? Dropdown(
                                 label: Strings.dropdownAccount2,
-                                dropdownItems: [
-                                  'Gelbörse',
-                                  'Bank',
-                                  'Kreditkarte',
-                                ],
+                                dropdownItems: accountNames,
                                 needsNewCategoryButton: false,
+                                validator: (value) {
+                                  value2 = value;
+                                  if (value == null || value.isEmpty) {
+                                    return 'Das Feld darf nicht leer sein';
+                                  }
+
+                                  if (value1 == value2) {
+                                    return 'Zeimal dasselbe Konto ausgewählt';
+                                  }
+                                  return null;
+                                },
                               )
                             : Container(),
                         DatepickerField(
                           controller: controllerDate,
                           serverDate: manualEntry['date'],
                         ),
-                        const Dropdown(
-                          dropdownItems: [
+                        Dropdown(
+                          dropdownItems: const [
                             'Nie',
                             'Wöchentlich',
                             'Alle zwei Wochen',
@@ -297,6 +333,12 @@ class _ManualEntryState extends State<ManualEntry> {
                           label: Strings.dropdownFrequency,
                           needsNewCategoryButton: false,
                           initialValue: 'Nie',
+                          validator: (value) {
+                            if (value == null || value.isEmpty) {
+                              return 'Das Feld darf nicht leer sein';
+                            }
+                            return null;
+                          },
                         ),
                         InputField(
                           lblText: "Beschreibung",
