@@ -241,7 +241,7 @@ class _RegisterState extends State<Register> {
                         }
                       }
                     },
-                    theme: ButtonColorTheme.secondary),
+                    theme: ButtonColorTheme.secondaryDark),
               ),
             ),
           ],
