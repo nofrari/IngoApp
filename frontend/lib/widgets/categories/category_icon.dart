@@ -1,10 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:frontend/constants/colors.dart';
 
 class CategoryIcon extends StatelessWidget {
   CategoryIcon(
       {required this.bgColor,
-      required this.isBlack,
+      required this.isWhite,
       this.icon,
       this.border,
       required this.isSmall,
@@ -12,15 +13,17 @@ class CategoryIcon extends StatelessWidget {
 
   IconData? icon;
   final Color bgColor;
-  final bool isBlack;
+  final bool isWhite;
   final bool isSmall;
   bool? border;
 
   @override
   Widget build(BuildContext context) {
     return Container(
+      width: isSmall ? 50 : 150,
+      height: isSmall ? 50 : 150,
       margin: const EdgeInsets.only(left: 10),
-      padding: isSmall ? const EdgeInsets.all(8) : const EdgeInsets.all(28),
+      padding: isSmall ? const EdgeInsets.all(10) : const EdgeInsets.all(28),
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(100),
         color: bgColor,
@@ -28,10 +31,12 @@ class CategoryIcon extends StatelessWidget {
             ? Border.all(color: AppColor.blueActive, width: 2)
             : null,
       ),
-      child: Icon(
-        icon,
-        color: isBlack ? AppColor.neutral600 : AppColor.neutral100,
-        size: isSmall ? 25 : 80,
+      child: Center(
+        child: FaIcon(
+          icon,
+          color: isWhite ? AppColor.neutral100 : AppColor.neutral600,
+          size: isSmall ? 25 : 80,
+        ),
       ),
     );
   }
