@@ -18,6 +18,8 @@ class Strings {
   static const String dropdownFrequency = "Wiederholen";
   static const String dropdownAccount1 = "Ausgangskonto";
   static const String dropdownAccount2 = "Zu Konto Transferieren";
+  static const String dropdownFinancesAccount = "Konto";
+  static const String dropdownFinancesCategories = "Kategorie";
 
   //Registrieren
   static const String registerFirstName = "Vorname";
