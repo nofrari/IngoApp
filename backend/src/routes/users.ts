@@ -155,6 +155,15 @@ router.get('/users/:id', async (req, res) => {
     res.send(user);
 });
 
+router.get('/users/delete/:id', async (req, res) => {
+    try {
+        await prisma.user.delete({ where: { user_id: req.params.id } });
+        res.send(200);
+    } catch (error) {
+        res.send(error);
+    }
+});
+
 //user login
 router.post('/users/login', async (req, res) => {
     const body = <LoginSchema>req.body;

@@ -63,6 +63,7 @@ class Strings {
   static const String profileDataprotection = "Datenschutzerklärung";
   static const String profileLogout = "ABMELDEN";
   static const String profileEdit = "PROFIL BEARBEITEN";
+  static const String profileDelete = "KONTO LÖSCHEN";
   static const String profileEditPassword = "PASSWORT ÄNDERN";
   static const String profileOldPassword = "Altes Passwort";
   static const String profileNewPassword = "Neues Passwort";

@@ -48,7 +48,8 @@ class InputField extends StatefulWidget {
       this.maxLines,
       this.alignLabelLeftCorner,
       this.validator,
-      this.autovalidateMode});
+      this.autovalidateMode,
+      this.onDispose});
 
   final String lblText;
   final TextInputFormatter reqFormatter;
@@ -61,6 +62,7 @@ class InputField extends StatefulWidget {
   final AutovalidateMode? autovalidateMode;
   final ValueChanged<bool> onFocusChanged;
   final bool hidePassword;
+  final void Function()? onDispose;
 
   @override
   State<InputField> createState() => _InputFieldState();
@@ -69,7 +71,8 @@ class InputField extends StatefulWidget {
 class _InputFieldState extends State<InputField> {
   @override
   void dispose() {
-    widget.controller.dispose();
+    //needed this for profile delete, no idea why it works
+    widget.onDispose ?? widget.controller.dispose();
     super.dispose();
   }
 
