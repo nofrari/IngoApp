@@ -8,11 +8,13 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:control_style/control_style.dart';
 
 class DatepickerField extends StatefulWidget {
-  DatepickerField({super.key, required this.controller, this.serverDate});
+  DatepickerField(
+      {super.key, this.label, required this.controller, this.serverDate});
 
   final TextEditingController controller;
   String? serverDate;
   DateTime _selectedDate = DateTime.now();
+  String? label;
 
   DateTime get selectedDate => _selectedDate;
   set selectedDate(DateTime value) {
@@ -50,7 +52,8 @@ class _DatepickerFieldState extends State<DatepickerField> {
         decoration: InputDecoration(
           contentPadding:
               const EdgeInsets.only(top: 15, bottom: 12, left: 12, right: 12),
-          label: Text("Datum", style: GoogleFonts.josefinSans(fontSize: 18)),
+          label: Text(widget.label ?? "Datum",
+              style: GoogleFonts.josefinSans(fontSize: 18)),
           labelStyle: TextStyle(color: AppColor.neutral100),
           filled: true,
           fillColor: AppColor.neutral400,
