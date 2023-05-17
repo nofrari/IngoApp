@@ -1,7 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:frontend/models/user.dart';
 import 'package:frontend/services/accounts_service.dart';
 import 'package:frontend/services/initial_service.dart';
 import 'package:frontend/services/manualentry_service.dart';
+import 'package:frontend/services/profile_service.dart';
+import 'package:frontend/start.dart';
 import 'package:provider/provider.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:frontend/services/scanner_service.dart';
@@ -14,6 +17,7 @@ void main() async {
   await ManualEntryService.init();
   await AccountsService.init();
   await InitialService.init();
+  await ProfileService.init();
   runApp(MultiProvider(
     providers: [
       ChangeNotifierProvider(
@@ -27,6 +31,9 @@ void main() async {
       ),
       ChangeNotifierProvider(
         create: (BuildContext context) => InitialService(),
+      ),
+      ChangeNotifierProvider(
+        create: (BuildContext context) => ProfileService(),
       ),
     ],
     child: const MyApp(),
@@ -44,6 +51,7 @@ class _MyAppState extends State<MyApp> {
   // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
+    User user = context.read<ProfileService>().getUser();
     return MaterialApp(
         localizationsDelegates: const [
           GlobalMaterialLocalizations.delegate,
@@ -58,6 +66,6 @@ class _MyAppState extends State<MyApp> {
         theme: ThemeData(
           primarySwatch: Colors.blue,
         ),
-        home: Auth());
+        home: user.id == "" ? Auth() : const Start());
   }
 }

@@ -4,6 +4,8 @@ import 'package:email_validator/email_validator.dart';
 import 'package:dio/dio.dart';
 import 'package:frontend/constants/values.dart';
 import 'package:frontend/pages/password_reset.dart';
+import 'package:frontend/services/profile_service.dart';
+import 'package:provider/provider.dart';
 
 import '../constants/fonts.dart';
 import '../start.dart';
@@ -44,7 +46,7 @@ class _LoginState extends State<Login> {
 
   final _formKey = GlobalKey<FormState>();
   final PageStorageBucket bucket = PageStorageBucket();
-  late bool userExists;
+  late bool userExists = false;
   late bool credentialsMatch;
 
   Dio dio = Dio();
@@ -165,8 +167,14 @@ class _LoginState extends State<Login> {
     };
 
     try {
-      await dio.post("${Values.serverURL}/users/login", data: formData);
-      debugPrint('user hat sich eingeloggt');
+      dynamic response =
+          await dio.post("${Values.serverURL}/users/login", data: formData);
+      debugPrint('user hat sich eingeloggt: ${response.data}');
+      await context.read<ProfileService>().setUser(
+          id: response.data['user_id'],
+          firstname: response.data['user_name'],
+          lastname: response.data['user_sirname'],
+          email: response.data['email']);
       setState(() {
         userExists = true;
       });
