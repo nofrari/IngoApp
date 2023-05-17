@@ -22,7 +22,7 @@ class CategoryIcon extends StatelessWidget {
     return Container(
       width: isSmall ? 50 : 150,
       height: isSmall ? 50 : 150,
-      margin: const EdgeInsets.only(left: 10),
+      margin: const EdgeInsets.symmetric(horizontal: 10),
       padding: isSmall ? const EdgeInsets.all(10) : const EdgeInsets.all(28),
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(100),
@@ -35,7 +35,7 @@ class CategoryIcon extends StatelessWidget {
         child: FaIcon(
           icon,
           color: isWhite ? AppColor.neutral100 : AppColor.neutral600,
-          size: isSmall ? 25 : 80,
+          size: isSmall ? 23 : 80,
         ),
       ),
     );
