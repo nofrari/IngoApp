@@ -1,5 +1,9 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:frontend/models/category.dart';
+import 'package:frontend/pages/categories/categories.dart';
 import 'package:frontend/services/accounts_service.dart';
+import 'package:frontend/services/initial_service.dart';
 import 'package:frontend/services/manualentry_service.dart';
 import 'package:frontend/widgets/accounts/accounts_overview.dart';
 import 'package:frontend/widgets/transactions/latest_transactions_list.dart';
@@ -9,6 +13,7 @@ import 'package:provider/provider.dart';
 import '../constants/colors.dart';
 import '../constants/values.dart';
 import '../constants/fonts.dart';
+import '../models/interval.dart' as TransactionInterval;
 import '../models/transaction.dart';
 import '../models/account.dart';
 
@@ -28,6 +33,7 @@ class _HomeOverviewCardState extends State<HomeOverviewCard> {
   }
 
   final List<Account> accounts = [];
+  final List<TransactionInterval.Interval> interval = [];
 
   void _getTransactions() async {
     try {
@@ -73,7 +79,7 @@ class _HomeOverviewCardState extends State<HomeOverviewCard> {
       await context.read<AccountsService>().setAccounts(accounts: accounts);
 
       setState(() {
-        _allAccounts = accounts;
+        allAccounts = accounts;
       });
     } catch (e) {
       print(e);
@@ -81,7 +87,7 @@ class _HomeOverviewCardState extends State<HomeOverviewCard> {
   }
 
   List<Transaction> _latestTransactions = [];
-  List<Account> _allAccounts = [];
+  List<Account> allAccounts = [];
 
   //  List<Transaction> _latestTransactions = [
   //   Transaction(
