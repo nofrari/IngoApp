@@ -54,36 +54,14 @@ router.post('/users/edit', async (req, res) => {
     }
 
     //if blocks to check which parameter is sent in the request body and then update the database
-    if (body.user_name) {
+    if (body.user_name && body.user_sirname && body.email) {
         await prisma.user.update({
             where: {
                 user_id: body.user_id
             },
             data: {
-                user_name: body.user_name
-            }
-        });
-
-        res.status(200).send();
-
-    } else if (body.user_sirname) {
-        await prisma.user.update({
-            where: {
-                user_id: body.user_id
-            },
-            data: {
-                user_sirname: body.user_sirname
-            }
-        });
-
-        res.status(200).send();
-
-    } else if (body.email) {
-        await prisma.user.update({
-            where: {
-                user_id: body.user_id
-            },
-            data: {
+                user_name: body.user_name,
+                user_sirname: body.user_sirname,
                 email: body.email
             }
         });

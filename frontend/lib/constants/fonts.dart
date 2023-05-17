@@ -103,4 +103,7 @@ class Fonts {
       fontSize: 14,
       fontWeight: FontWeight.normal,
       height: 2);
+
+  static TextStyle userIconBig = GoogleFonts.josefinSans(
+      color: AppColor.neutral600, fontSize: 40, fontWeight: FontWeight.normal);
 }
