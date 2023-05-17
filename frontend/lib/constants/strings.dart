@@ -61,4 +61,5 @@ class Strings {
   static const String profileTransactions = "Wiederkehrende Transaktionen";
   static const String profileGuidelines = "Richtlinien";
   static const String profileDataprotection = "Datenschutzerklärung";
+  static const String profileLogout = "ABMELDEN";
 }
