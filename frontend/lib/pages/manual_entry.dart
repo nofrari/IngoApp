@@ -5,9 +5,13 @@ import 'package:frontend/constants/fonts.dart';
 import 'package:frontend/constants/strings.dart';
 import 'package:frontend/constants/values.dart';
 import 'package:frontend/models/account.dart';
+import 'package:frontend/models/category.dart';
+import 'package:frontend/models/interval.dart' as transaction_interval;
+import 'package:frontend/models/transaction_type.dart';
 import 'package:frontend/pages/scanner/scanner_camera.dart';
 import 'package:frontend/services/accounts_service.dart';
 import 'package:frontend/services/custom_cache_manager.dart';
+import 'package:frontend/services/initial_service.dart';
 import 'package:frontend/services/manualentry_service.dart';
 import 'package:frontend/services/scanner_service.dart';
 import 'package:frontend/start.dart';
@@ -51,6 +55,10 @@ class _ManualEntryState extends State<ManualEntry> {
   };
 
   final _formKey = GlobalKey<FormState>();
+
+  String? selectedAccount;
+  String? selectedCategory;
+  String? selectedInterval;
 
   Dio dio = Dio();
 
@@ -106,12 +114,26 @@ class _ManualEntryState extends State<ManualEntry> {
         context.watch<ManualEntryService>().getManualEntry();
     List<String> images = context.watch<ScannerService>().getImages();
 
-    List<Account> _allAccounts = context.read<AccountsService>().getAccounts();
+    List<Account> allAccounts = context.watch<AccountsService>().getAccounts();
     List<String> accountNames =
-        _allAccounts.map((account) => account.name).toList();
+        allAccounts.map((account) => account.name).toList();
 
-    String? value1;
-    String? value2;
+    List<CategoryModel> allCategories =
+        context.watch<InitialService>().getCategories();
+    List<String> categoryNames =
+        allCategories.map((category) => category.label).toList();
+
+    List<transaction_interval.Interval> allIntervals =
+        context.watch<InitialService>().getInterval();
+    List<String> intervalNames =
+        allIntervals.map((interval) => interval.name).toList();
+
+    List<TransactionType> allTypes =
+        context.watch<InitialService>().getTransactionType();
+    List<String> typeNames = allTypes.map((type) => type.name).toList();
+
+    String? valueAccount1;
+    String? valueAccount2;
 
     if (manualEntry.isNotEmpty) {
       controllerTitle.text = manualEntry['supplier_name'];
@@ -248,11 +270,7 @@ class _ManualEntryState extends State<ManualEntry> {
                         ),
                         Dropdown(
                           label: Strings.dropdownTypeCategory,
-                          dropdownItems: const [
-                            'Einnahme',
-                            'Ausgabe',
-                            'Transfer',
-                          ],
+                          dropdownItems: typeNames,
                           needsNewCategoryButton: false,
                           setValue: setSelectedType,
                           validator: (value) {
@@ -264,22 +282,16 @@ class _ManualEntryState extends State<ManualEntry> {
                         ),
                         Dropdown(
                           label: Strings.dropdownCategory,
-                          dropdownItems: const [
-                            'Essen',
-                            'Freizeit',
-                            'Lebensmittel',
-                            'Shopping',
-                            'awef',
-                            'asdfasdfasdf',
-                            'ölkdjföjrö',
-                            'jkrgh alhfiu',
-                          ],
+                          dropdownItems: categoryNames,
                           needsNewCategoryButton: true,
                           validator: (value) {
                             if (value == null || value.isEmpty) {
                               return 'Das Feld darf nicht leer sein';
                             }
                             return null;
+                          },
+                          setValue: (value) {
+                            selectedCategory = value;
                           },
                         ),
                         //TODO: Kontos aus DB holen
@@ -288,15 +300,18 @@ class _ManualEntryState extends State<ManualEntry> {
                           dropdownItems: accountNames,
                           needsNewCategoryButton: false,
                           validator: (value) {
-                            value1 = value;
+                            valueAccount1 = value;
                             if (value == null || value.isEmpty) {
                               return 'Das Feld darf nicht leer sein';
                             }
 
-                            if (value1 == value2) {
+                            if (valueAccount1 == valueAccount2) {
                               return 'Zeimal dasselbe Konto ausgewählt';
                             }
                             return null;
+                          },
+                          setValue: (value) {
+                            selectedAccount = value;
                           },
                         ),
 
@@ -307,12 +322,12 @@ class _ManualEntryState extends State<ManualEntry> {
                                 dropdownItems: accountNames,
                                 needsNewCategoryButton: false,
                                 validator: (value) {
-                                  value2 = value;
+                                  valueAccount2 = value;
                                   if (value == null || value.isEmpty) {
                                     return 'Das Feld darf nicht leer sein';
                                   }
 
-                                  if (value1 == value2) {
+                                  if (valueAccount1 == valueAccount2) {
                                     return 'Zeimal dasselbe Konto ausgewählt';
                                   }
                                   return null;
@@ -324,22 +339,18 @@ class _ManualEntryState extends State<ManualEntry> {
                           serverDate: manualEntry['date'],
                         ),
                         Dropdown(
-                          dropdownItems: const [
-                            'Nie',
-                            'Wöchentlich',
-                            'Alle zwei Wochen',
-                            'Monatlich',
-                            'Quartalsweise',
-                            'Jährlich',
-                          ],
+                          dropdownItems: intervalNames,
                           label: Strings.dropdownFrequency,
                           needsNewCategoryButton: false,
-                          initialValue: 'Nie',
+                          initialValue: intervalNames[0],
                           validator: (value) {
                             if (value == null || value.isEmpty) {
                               return 'Das Feld darf nicht leer sein';
                             }
                             return null;
+                          },
+                          setValue: (value) {
+                            selectedInterval = value;
                           },
                         ),
                         InputField(
@@ -386,30 +397,78 @@ class _ManualEntryState extends State<ManualEntry> {
 
                               String? pdf_name = PdfFile.getName();
 
+                              late String selectedAccountID;
+                              late String selectedCategoryID;
+                              late String selectedIntervalID;
+                              late String selectedTypeID;
+
+                              for (Account account in allAccounts) {
+                                if (account.name == selectedAccount) {
+                                  selectedAccountID = account.id;
+                                  break;
+                                }
+                              }
+
+                              for (CategoryModel category in allCategories) {
+                                if (category.label == selectedCategory) {
+                                  selectedCategoryID = category.category_id;
+                                  break;
+                                }
+                              }
+
+                              for (transaction_interval.Interval interval
+                                  in allIntervals) {
+                                if (interval.name == selectedInterval) {
+                                  selectedIntervalID = interval.interval_id;
+                                  break;
+                                }
+                              }
+
+                              for (TransactionType type in allTypes) {
+                                if (type.name == _selectedType) {
+                                  selectedTypeID = type.type_id;
+                                  break;
+                                }
+                              }
+
                               if (manualEntry.isNotEmpty) {
                                 _sendData(
                                     controllerTitle.text,
                                     currencyToDouble(controllerAmount.text),
                                     date,
                                     controllerDescription.text,
-                                    manualEntry['pdf_name']);
+                                    manualEntry['pdf_name'],
+                                    selectedCategoryID,
+                                    selectedTypeID,
+                                    selectedIntervalID,
+                                    selectedAccountID);
                               } else {
-                                _sendData(
-                                    controllerTitle.text,
-                                    currencyToDouble(controllerAmount.text),
-                                    date,
-                                    controllerDescription.text,
-                                    pdf_name!);
-                                savePDFToServer(PdfFile.getPath().toString());
-                              }
+                                if (pdf_name != null) {
+                                  _sendData(
+                                      controllerTitle.text,
+                                      currencyToDouble(controllerAmount.text),
+                                      date,
+                                      controllerDescription.text,
+                                      pdf_name,
+                                      selectedCategoryID,
+                                      selectedTypeID,
+                                      selectedIntervalID,
+                                      selectedAccountID);
 
-                              // print("Name from Gallery: ${PdfFile.getName()}");
-                              // print("Path from Camera: " +
-                              //     manualEntry['pdf_name'].toString());
-                              // print(
-                              //     "Name from Gallery: ${PdfFile.getPath().toString()}");
-                              // print("Path from Camera: " +
-                              //     manualEntry['pdf_path'].toString());
+                                  savePDFToServer(PdfFile.getPath().toString());
+                                } else {
+                                  _sendData(
+                                      controllerTitle.text,
+                                      currencyToDouble(controllerAmount.text),
+                                      date,
+                                      controllerDescription.text,
+                                      " ",
+                                      selectedCategoryID,
+                                      selectedTypeID,
+                                      selectedIntervalID,
+                                      selectedAccountID);
+                                }
+                              }
 
                               List<String> images =
                                   context.read<ScannerService>().getImages();
@@ -441,18 +500,26 @@ class _ManualEntryState extends State<ManualEntry> {
     );
   }
 
-  Future _sendData(String name, double amount, DateTime date,
-      String description, String pdfName) async {
+  Future _sendData(
+      String name,
+      double amount,
+      DateTime date,
+      String description,
+      String pdfName,
+      String categoryID,
+      String typeID,
+      String intervalID,
+      String accountID) async {
     Map<String, dynamic> formData = {
       "transaction_name": name,
       "transaction_amount": amount,
       "date": date.toString(),
       "description": description,
       "bill_url": pdfName,
-      "category_id": "1234",
-      "type_id": "1234",
-      "interval_id": "1234",
-      "account_id": "1234"
+      "category_id": categoryID,
+      "type_id": typeID,
+      "interval_id": intervalID,
+      "account_id": accountID
     };
 
     var response = await dio.post("${Values.serverURL}/transactions/input",

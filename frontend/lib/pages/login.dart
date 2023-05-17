@@ -172,7 +172,7 @@ class _LoginState extends State<Login> {
       debugPrint('user hat sich eingeloggt: ${response.data}');
       await context.read<ProfileService>().setUser(
           id: response.data['user_id'],
-          firstname: response.data['user_name'],
+          firstname: response.data['user_name'].toString(),
           lastname: response.data['user_sirname'],
           email: response.data['email']);
       setState(() {

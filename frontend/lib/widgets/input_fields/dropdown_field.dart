@@ -36,11 +36,11 @@ class _DropdownState extends State<Dropdown> {
   @override
   void initState() {
     super.initState();
-    WidgetsBinding.instance.addPostFrameCallback((_) => selectedValue = null);
     setState(() {
       (widget.initialValue != null)
           ? selectedValue = widget.initialValue
-          : selectedValue = null;
+          : WidgetsBinding.instance
+              .addPostFrameCallback((_) => selectedValue = null);
     });
   }
 
