@@ -39,26 +39,47 @@ class _HomeOverviewCardState extends State<HomeOverviewCard> {
     try {
       Response response =
           await Dio().get('${Values.serverURL}/transactions/list/1');
-      List<TransactionModel> transactions = [];
 
-      for (var i = 0; i < 5 && i < response.data.length; i++) {
+      var latestFiveTransactions =
+          await Dio().get('${Values.serverURL}/transactions/fivelatest/1');
+
+      List<TransactionModel> transactions = [];
+      List<TransactionModel> latestTransactions = [];
+
+      for (var transaction in response.data) {
         transactions.add(
           TransactionModel(
-              transaction_id: response.data[i]['transaction_id'].toString(),
-              transaction_name: response.data[i]['transaction_name'].toString(),
+              transaction_id: transaction['transaction_id'].toString(),
+              transaction_name: transaction['transaction_name'].toString(),
+              transaction_amount:
+                  double.parse(transaction['transaction_amount'].toString()),
+              category_id: transaction['category_id'].toString(),
+              date: DateTime.parse(transaction['date']),
+              type_id: (transaction['type_id']).toString(),
+              description: transaction['description'].toString(),
+              interval_id: transaction['interval_id'].toString(),
+              account_id: transaction['account_id'].toString()),
+        );
+      }
+      for (var latestTransaction in latestFiveTransactions.data) {
+        latestTransactions.add(
+          TransactionModel(
+              transaction_id: latestTransaction['transaction_id'].toString(),
+              transaction_name:
+                  latestTransaction['transaction_name'].toString(),
               transaction_amount: double.parse(
-                  response.data[i]['transaction_amount'].toString()),
-              category_id: response.data[i]['category_id'].toString(),
-              date: DateTime.parse(response.data[i]['date']),
-              type_id: (response.data[i]['type_id']).toString(),
-              description: response.data[i]['description'].toString(),
-              interval_id: response.data[i]['interval_id'].toString(),
-              account_id: response.data[i]['account_id'].toString()),
+                  latestTransaction['transaction_amount'].toString()),
+              category_id: latestTransaction['category_id'].toString(),
+              date: DateTime.parse(latestTransaction['date']),
+              type_id: (latestTransaction['type_id']).toString(),
+              description: latestTransaction['description'].toString(),
+              interval_id: latestTransaction['interval_id'].toString(),
+              account_id: latestTransaction['account_id'].toString()),
         );
       }
       await context.read<TransactionService>().setTransactions(transactions);
       setState(() {
-        _latestTransactions = transactions;
+        _latestTransactions = latestTransactions;
       });
     } catch (e) {
       print("fehler");
@@ -123,38 +144,6 @@ class _HomeOverviewCardState extends State<HomeOverviewCard> {
 
   List<Account> _allAccounts = [];
 
-  //  List<Transaction> _latestTransactions = [
-  //   Transaction(
-  //     id: 1,
-  //     name: "EBI",
-  //     amount: 20.00,
-  //     category: "Shop",
-  //     date: DateTime(2022, 9, 9),
-  //     description: "Description",
-  //     transactionType: 0,
-  //   ),
-  //   Transaction(
-  //     id: 2,
-  //     name: "EBI 2",
-  //     amount: 30.30,
-  //     category: "Shop",
-  //     date: DateTime(2021, 9, 9),
-  //     description: "Description",
-  //     transactionType: 1,
-  //   ),
-  // ];
-  // final List<Account> _accounts = [
-  //   Account(
-  //     id: 1,
-  //     name: "EBI",
-  //     amount: 20,
-  //   ),
-  //   Account(
-  //     id: 2,
-  //     name: "EBI 2",
-  //     amount: 30.30,
-  //   ),
-  // ];
   @override
   Widget build(BuildContext context) {
     colors = context.watch<InitialService>().getColors();
