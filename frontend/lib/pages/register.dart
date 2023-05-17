@@ -4,7 +4,9 @@ import 'package:email_validator/email_validator.dart';
 import 'package:dio/dio.dart';
 import 'package:frontend/constants/colors.dart';
 import 'package:frontend/constants/values.dart';
+import 'package:frontend/services/profile_service.dart';
 import 'package:frontend/widgets/checkbox.dart';
+import 'package:provider/provider.dart';
 
 import '../constants/fonts.dart';
 import '../widgets/input_fields/checkbox_field.dart';
@@ -261,7 +263,13 @@ class _RegisterState extends State<Register> {
     };
 
     try {
-      await dio.post("${Values.serverURL}/users/register", data: formData);
+      dynamic response =
+          await dio.post("${Values.serverURL}/users/register", data: formData);
+      await context.read<ProfileService>().setUser(
+          id: response.data['user_id'],
+          firstname: response.data['user_name'],
+          lastname: response.data['user_sirname'],
+          email: response.data['email']);
 
       setState(() {
         mailExists = false;

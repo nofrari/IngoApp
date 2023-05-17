@@ -205,15 +205,14 @@ router.post('/users/login', async (req, res) => {
         return;
     }
 
-    const token = jwt.sign({
-        userId: user.user_id,
-        exp: Math.floor(Date.now() / 1000) + (60 * 60 * 24 * 30)
-    }, <string>process.env.JWT_SECRET);
+    // const token = jwt.sign({
+    //     userId: user.user_id,
+    //     exp: Math.floor(Date.now() / 1000) + (60 * 60 * 24 * 30)
+    // }, <string>process.env.JWT_SECRET);
 
     res.status(200).send({
-        accessToken: token,
         user_id: user.user_id,
-        username: user.user_name,
+        user_name: user.user_name,
         user_sirname: user.user_sirname,
         email: user.email,
         pin: user.pin
