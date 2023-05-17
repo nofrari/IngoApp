@@ -1,11 +1,14 @@
 import 'dart:convert';
 
 import 'package:flutter/material.dart';
+import 'package:frontend/models/transaction_type.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import '../models/category.dart';
 import '../models/color.dart';
 import '../models/icon.dart' as icon;
+import '../models/interval.dart' as interval;
+import '../models/transaction_type.dart' as type;
 
 class InitialService extends ChangeNotifier {
   static init() async {
@@ -75,5 +78,47 @@ class InitialService extends ChangeNotifier {
         .toList();
 
     return icons;
+  }
+
+  Future<void> setInterval(List<interval.Interval> interval) async {
+    try {
+      List<String> intervalStrings =
+          interval.map((interval) => jsonEncode(interval.toJson())).toList();
+      _prefs.setStringList('interval', intervalStrings);
+    } catch (e) {
+      debugPrint(e.toString());
+    }
+  }
+
+  List<interval.Interval> getInterval() {
+    List<String> intervalStrings = _prefs.getStringList('interval') ?? [];
+
+    List<interval.Interval> intervals = intervalStrings
+        .map((intervalStrings) =>
+            interval.Interval.fromJson(jsonDecode(intervalStrings)))
+        .toList();
+
+    return intervals;
+  }
+
+  Future<void> setTransactionType(List<type.TransactionType> type) async {
+    try {
+      List<String> typeStrings =
+          type.map((type) => jsonEncode(type.toJson())).toList();
+      _prefs.setStringList('transactionType', typeStrings);
+    } catch (e) {
+      debugPrint(e.toString());
+    }
+  }
+
+  List<type.TransactionType> getTransactionType() {
+    List<String> typeStrings = _prefs.getStringList('transactionType') ?? [];
+
+    List<type.TransactionType> types = typeStrings
+        .map((typeStrings) =>
+            type.TransactionType.fromJson(jsonDecode(typeStrings)))
+        .toList();
+
+    return types;
   }
 }
