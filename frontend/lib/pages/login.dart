@@ -3,6 +3,7 @@ import 'package:flutter/services.dart';
 import 'package:email_validator/email_validator.dart';
 import 'package:dio/dio.dart';
 import 'package:frontend/pages/password_reset.dart';
+import 'package:frontend/widgets/linkIntern.dart';
 
 import '../constants/fonts.dart';
 import '../start.dart';
@@ -106,21 +107,9 @@ class _LoginState extends State<Login> {
               },
             ),
             //TODO: Link Passwort vergessen
-            Align(
-              alignment: Alignment.centerLeft,
-              child: GestureDetector(
-                onTap: () => Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => PasswordReset(),
-                  ),
-                ),
-                child: Text(
-                  Strings.passwordForgot,
-                  style: Fonts.textLink,
-                ),
-              ),
-            ),
+            LinkIntern(
+                linkInternTo: PasswordReset(),
+                linkInternText: Strings.passwordForgot),
             Expanded(
               child: Align(
                 alignment: Alignment.bottomCenter,
@@ -132,10 +121,11 @@ class _LoginState extends State<Login> {
                             controllerMail.text, controllerPassword.text);
                         if (userExists == true) {
                           debugPrint('los gehts');
+                          //Navigate to Start
                           Navigator.push(
                             context,
                             MaterialPageRoute(
-                              builder: (context) => const Start(),
+                              builder: (context) => Start(),
                             ),
                           );
                         } else {
@@ -166,7 +156,9 @@ class _LoginState extends State<Login> {
     try {
       await dio.post("http://localhost:5432/users/login", data: formData);
       debugPrint('user hat sich eingeloggt');
-      userExists = true;
+      setState(() {
+        userExists = true;
+      });
     } on DioError catch (dioError) {
       debugPrint(dioError.toString());
       if (dioError.response != null) {

@@ -261,8 +261,9 @@ class _RegisterState extends State<Register> {
 
     try {
       await dio.post("http://localhost:5432/users/register", data: formData);
-
-      mailExists = false;
+      setState(() {
+        mailExists = false;
+      });
     } on DioError catch (dioError) {
       debugPrint(dioError.toString());
       if (dioError.response != null) {
