@@ -69,7 +69,7 @@ class _ManualEntryState extends State<ManualEntry> {
     });
   }
 
-  bool _enableDropdown(List<String> images) {
+  bool _enableExitPopUp(List<String> images) {
     if (images.isNotEmpty ||
         controllerTitle.text.isNotEmpty ||
         controllerAmount.text.isNotEmpty ||
@@ -123,7 +123,7 @@ class _ManualEntryState extends State<ManualEntry> {
     List<String> categoryNames =
         allCategories.map((category) => category.label).toList();
 
-    List<transaction_interval.Interval> allIntervals =
+    List<transaction_interval.IntervalModel> allIntervals =
         context.watch<InitialService>().getInterval();
     List<String> intervalNames =
         allIntervals.map((interval) => interval.name).toList();
@@ -152,7 +152,7 @@ class _ManualEntryState extends State<ManualEntry> {
       child: Scaffold(
         appBar: Header(
           onTap: () async {
-            if (_enableDropdown(images)) {
+            if (_enableExitPopUp(images)) {
               // warning dialog
               showDialog(
                 context: context,
@@ -184,13 +184,13 @@ class _ManualEntryState extends State<ManualEntry> {
                                     debugPrint(e.toString());
                                   }
                                 }
+                                await deletePdfFile(manualEntry['pdf_name']);
                                 Navigator.push(
                                   context,
                                   MaterialPageRoute(
                                     builder: (context) => const ScannerCamera(),
                                   ),
                                 );
-                                deletePdfFile(manualEntry['pdf_name']);
                               },
                               theme: ButtonColorTheme.primary),
                         ],
@@ -200,12 +200,14 @@ class _ManualEntryState extends State<ManualEntry> {
                 ),
               );
             } else {
-              Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (context) => const Start(),
-                ),
-              );
+              //TODO: check if this causes problems
+              // Navigator.push(
+              //   context,
+              //   MaterialPageRoute(
+              //     builder: (context) => const Start(),
+              //   ),
+              // );
+              Navigator.pop(context);
             }
           },
           element: Text(
@@ -416,7 +418,7 @@ class _ManualEntryState extends State<ManualEntry> {
                                 }
                               }
 
-                              for (transaction_interval.Interval interval
+                              for (transaction_interval.IntervalModel interval
                                   in allIntervals) {
                                 if (interval.name == selectedInterval) {
                                   selectedIntervalID = interval.interval_id;

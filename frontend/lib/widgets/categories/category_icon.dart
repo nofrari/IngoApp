@@ -20,8 +20,8 @@ class CategoryIcon extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      width: isSmall ? 50 : 150,
-      height: isSmall ? 50 : 150,
+      width: isSmall ? 35 : 150,
+      height: isSmall ? 35 : 150,
       margin: const EdgeInsets.symmetric(horizontal: 10),
       padding: isSmall ? const EdgeInsets.all(10) : const EdgeInsets.all(28),
       decoration: BoxDecoration(
@@ -35,7 +35,7 @@ class CategoryIcon extends StatelessWidget {
         child: FaIcon(
           icon,
           color: isWhite ? AppColor.neutral100 : AppColor.neutral600,
-          size: isSmall ? 23 : 80,
+          size: isSmall ? 15 : 80,
         ),
       ),
     );

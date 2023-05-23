@@ -24,7 +24,7 @@ class CategoryModel {
   factory CategoryModel.fromJson(Map<String, dynamic> json) => CategoryModel(
         category_id: json["category_id"],
         bgColor: json["bgColor"],
-        isWhite: json["isBlack"],
+        isWhite: json["isWhite"],
         icon: json["icon"],
         label: json['label'],
       );

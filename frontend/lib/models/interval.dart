@@ -1,5 +1,5 @@
-class Interval {
-  Interval({
+class IntervalModel {
+  IntervalModel({
     required this.interval_id,
     required this.name,
   });
@@ -12,6 +12,6 @@ class Interval {
         'name': name,
       };
 
-  factory Interval.fromJson(Map<String, dynamic> json) =>
-      Interval(interval_id: json["interval_id"], name: json['name']);
+  factory IntervalModel.fromJson(Map<String, dynamic> json) =>
+      IntervalModel(interval_id: json["interval_id"], name: json['name']);
 }

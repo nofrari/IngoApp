@@ -82,10 +82,10 @@ class _RegisterState extends State<Register> {
   void _getIntervals() async {
     try {
       Response response = await Dio().get('${Values.serverURL}/intervals');
-      List<transaction_interval.Interval> interval = [];
+      List<transaction_interval.IntervalModel> interval = [];
 
       for (var i = 0; i < response.data.length; i++) {
-        interval.add(transaction_interval.Interval(
+        interval.add(transaction_interval.IntervalModel(
           interval_id: response.data[i]['interval_id'].toString(),
           name: response.data[i]['interval_name'].toString(),
         ));

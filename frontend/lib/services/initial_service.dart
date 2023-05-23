@@ -80,7 +80,7 @@ class InitialService extends ChangeNotifier {
     return icons;
   }
 
-  Future<void> setInterval(List<interval.Interval> interval) async {
+  Future<void> setInterval(List<interval.IntervalModel> interval) async {
     try {
       List<String> intervalStrings =
           interval.map((interval) => jsonEncode(interval.toJson())).toList();
@@ -90,12 +90,12 @@ class InitialService extends ChangeNotifier {
     }
   }
 
-  List<interval.Interval> getInterval() {
+  List<interval.IntervalModel> getInterval() {
     List<String> intervalStrings = _prefs.getStringList('interval') ?? [];
 
-    List<interval.Interval> intervals = intervalStrings
+    List<interval.IntervalModel> intervals = intervalStrings
         .map((intervalStrings) =>
-            interval.Interval.fromJson(jsonDecode(intervalStrings)))
+            interval.IntervalModel.fromJson(jsonDecode(intervalStrings)))
         .toList();
 
     return intervals;

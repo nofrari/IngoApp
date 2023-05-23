@@ -10,9 +10,12 @@ import '../../constants/fonts.dart';
 import '../../services/initial_service.dart';
 
 class TransactionItem extends StatefulWidget {
-  const TransactionItem({super.key, required this.transaction});
+  TransactionItem(
+      {super.key, required this.transaction, this.hasBorder, this.isSmall});
 
   final TransactionModel transaction;
+  bool? hasBorder;
+  bool? isSmall;
 
   @override
   State<TransactionItem> createState() => _TransactionItemState();
@@ -28,12 +31,15 @@ class _TransactionItemState extends State<TransactionItem> {
 
     return Container(
       decoration: BoxDecoration(
-        border: Border(
-          top: BorderSide(width: 2, color: AppColor.neutral600),
-        ),
+        border: (widget.hasBorder != null && widget.hasBorder!)
+            ? Border(
+                top: BorderSide(width: 2, color: AppColor.neutral600),
+              )
+            : null,
       ),
       child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+        padding: EdgeInsets.symmetric(
+            horizontal: 10, vertical: (widget.isSmall == true ? 0 : 4)),
         child: Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
@@ -49,27 +55,29 @@ class _TransactionItemState extends State<TransactionItem> {
               ),
             ),
             Expanded(
-              child: Container(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      widget.transaction.formattedDate,
-                      style: Fonts.textDateSmall,
-                    ),
-                    const SizedBox(
-                      height: 4,
-                    ),
-                    Row(
-                      children: [
-                        Text(
-                          widget.transaction.transaction_name,
-                          style: Fonts.textTransactionName,
+              child: Column(
+                crossAxisAlignment: widget.isSmall == true
+                    ? CrossAxisAlignment.center
+                    : CrossAxisAlignment.start,
+                children: [
+                  widget.isSmall == true
+                      ? Container()
+                      : Container(
+                          margin: const EdgeInsets.only(bottom: 4),
+                          child: Text(
+                            widget.transaction.formattedDate,
+                            style: Fonts.textDateSmall,
+                          ),
                         ),
-                      ],
-                    )
-                  ],
-                ),
+                  Row(
+                    children: [
+                      Text(
+                        widget.transaction.transaction_name,
+                        style: Fonts.textTransactionName,
+                      ),
+                    ],
+                  )
+                ],
               ),
             ),
             Container(

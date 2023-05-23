@@ -136,7 +136,7 @@ router.post('/users/register', async (req, res) => {
     res.send({
         //accessToken: token,
         user_id: user.user_id,
-        username: user.user_name,
+        user_name: user.user_name,
         user_sirname: user.user_sirname,
         email: user.email
     });

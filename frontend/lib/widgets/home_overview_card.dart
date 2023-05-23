@@ -38,7 +38,7 @@ class _HomeOverviewCardState extends State<HomeOverviewCard> {
   }
 
   final List<Account> accounts = [];
-  final List<TransactionInterval.Interval> interval = [];
+  final List<TransactionInterval.IntervalModel> interval = [];
   List<TransactionModel> _latestTransactions = [];
 
   void _getTransactions() async {

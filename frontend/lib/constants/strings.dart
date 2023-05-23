@@ -71,4 +71,9 @@ class Strings {
   static const String profileNewPassword = "Neues Passwort";
   static const String profileNewPassword2 = "Neues Passwort wiederholen";
   static const String profileSave = "Speichern";
+
+  //Transactions
+  static const String transactionsReoccuringHeading =
+      "Wiederkehrende\nTransaktionen";
+  static const String transactionsAdd = "Transaktion hinzuügen";
 }
