@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:frontend/constants/colors.dart';
 import 'package:frontend/constants/values.dart';
+import 'package:frontend/services/profile_service.dart';
 import 'package:intl/intl.dart';
 import 'package:dio/dio.dart';
 
@@ -12,6 +13,7 @@ import 'package:frontend/widgets/input_fields/input_field.dart';
 import 'package:frontend/widgets/button.dart';
 
 import 'package:frontend/start.dart';
+import 'package:provider/provider.dart';
 
 class StartAccount extends StatefulWidget {
   const StartAccount({super.key});
@@ -21,23 +23,6 @@ class StartAccount extends StatefulWidget {
 }
 
 class _StartAccountState extends State<StartAccount> {
-  TextInputFormatter currency =
-      TextInputFormatter.withFunction((oldValue, newValue) {
-    String cleanText = newValue.text.replaceAll(RegExp(r'[^\d]'), '');
-    int value = int.tryParse(cleanText) ?? 0;
-    final formatter =
-        NumberFormat.currency(locale: 'de', name: "EUR", symbol: '€');
-    String newText = formatter.format(value / 100);
-    int cursorPos = newText.length;
-    if (newValue.selection.baseOffset == newValue.selection.extentOffset) {
-      cursorPos = formatter.format(value / 100).length - 2;
-    }
-    return TextEditingValue(
-      text: newText,
-      selection: TextSelection.collapsed(offset: cursorPos),
-    );
-  });
-
   TextInputFormatter letters = FilteringTextInputFormatter.allow(
       RegExp(r"[a-zA-Z0-9#+:'()&/^\-{2}|\s]"));
 
@@ -118,7 +103,7 @@ class _StartAccountState extends State<StartAccount> {
                           ),
                           InputField(
                             lblText: "Startkapital (Betrag)",
-                            reqFormatter: currency,
+                            reqFormatter: currencyFormatter,
                             keyboardType: numeric,
                             controller: controllerAmount,
                             maxLines: 1,
@@ -138,18 +123,11 @@ class _StartAccountState extends State<StartAccount> {
                               alignment: Alignment.bottomCenter,
                               child: Button(
                                   btnText: "Startkonto erstellen".toUpperCase(),
-                                  onTap: () {
-                                    final refactoredAmount = controllerAmount
-                                        .text
-                                        .replaceAll("€", "")
-                                        .replaceAll(".", "")
-                                        .replaceAll(" ", "")
-                                        .replaceAll(",", ".");
-
-                                    print(refactoredAmount);
-
-                                    _sendData(controllerTitle.text,
-                                        double.parse(refactoredAmount));
+                                  onTap: () async {
+                                    await _sendData(
+                                        controllerTitle.text,
+                                        currencyToDouble(
+                                            controllerAmount.text));
                                     Navigator.push(
                                       context,
                                       MaterialPageRoute(
@@ -178,7 +156,7 @@ class _StartAccountState extends State<StartAccount> {
     Map<String, dynamic> formData = {
       "account_name": name,
       "account_balance": amount,
-      "user_id": "1234"
+      "user_id": context.read<ProfileService>().getUser().id
     };
 
     var response =

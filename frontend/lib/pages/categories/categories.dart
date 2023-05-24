@@ -5,6 +5,7 @@ import 'package:frontend/pages/categories/category_add.dart';
 import 'package:frontend/pages/categories/category_edit.dart';
 import 'package:frontend/pages/profile/profile.dart';
 import 'package:frontend/services/initial_service.dart';
+import 'package:frontend/services/profile_service.dart';
 import 'package:frontend/start.dart';
 import 'package:frontend/widgets/button.dart';
 import 'package:frontend/widgets/button_transparent_container.dart';
@@ -41,7 +42,8 @@ class _CategoriesState extends State<Categories> {
 
   Future<List<CategoryModel>> getData() async {
     try {
-      Response response = await dio.get('${Values.serverURL}/categories/1');
+      Response response = await dio.get(
+          '${Values.serverURL}/categories/${context.read<ProfileService>().getUser().id}');
       List<CategoryModel> categoryList = []; // move the declaration here
       if (response.data['categories'] != null) {
         for (var category in response.data['categories']) {

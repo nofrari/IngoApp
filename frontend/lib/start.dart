@@ -48,7 +48,8 @@ class _StartState extends State<Start> {
 //TODO: löschen falls nicht mehr gebraucht
   void fetchDataFromDatabase() async {
     try {
-      Response response = await Dio().get('${Values.serverURL}/users/1');
+      Response response = await Dio().get(
+          '${Values.serverURL}/users/${context.read<ProfileService>().getUser().id}');
 
       setState(() {
         user = User(

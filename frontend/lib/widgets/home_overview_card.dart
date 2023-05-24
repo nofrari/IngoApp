@@ -5,6 +5,7 @@ import 'package:frontend/pages/categories/categories.dart';
 import 'package:frontend/services/accounts_service.dart';
 import 'package:frontend/services/initial_service.dart';
 import 'package:frontend/services/manualentry_service.dart';
+import 'package:frontend/services/profile_service.dart';
 import 'package:frontend/services/transaction_service.dart';
 import 'package:frontend/widgets/accounts/accounts_overview.dart';
 import 'package:frontend/widgets/transactions/latest_transactions_list.dart';
@@ -43,11 +44,11 @@ class _HomeOverviewCardState extends State<HomeOverviewCard> {
 
   void _getTransactions() async {
     try {
-      Response response =
-          await Dio().get('${Values.serverURL}/transactions/list/1');
+      Response response = await Dio().get(
+          '${Values.serverURL}/transactions/list/${context.read<ProfileService>().getUser().id}');
 
-      var latestFiveTransactions =
-          await Dio().get('${Values.serverURL}/transactions/fivelatest/1');
+      var latestFiveTransactions = await Dio().get(
+          '${Values.serverURL}/transactions/fivelatest/${context.read<ProfileService>().getUser().id}');
 
       List<TransactionModel> transactions = [];
       List<TransactionModel> latestTransactions = [];
@@ -98,7 +99,8 @@ class _HomeOverviewCardState extends State<HomeOverviewCard> {
 
   void _getCategories() async {
     try {
-      Response response = await Dio().get('${Values.serverURL}/categories/1');
+      Response response = await Dio().get(
+          '${Values.serverURL}/categories/${context.read<ProfileService>().getUser().id}');
       List<CategoryModel> categoryList = [];
 
       if (response.data['categories'] != null) {
@@ -127,8 +129,8 @@ class _HomeOverviewCardState extends State<HomeOverviewCard> {
 
   void _getAccounts() async {
     try {
-      Response response =
-          await Dio().get('${Values.serverURL}/accounts/list/1');
+      Response response = await Dio().get(
+          '${Values.serverURL}/accounts/list/${context.read<ProfileService>().getUser().id}');
 
       for (var i = 0; i < response.data.length; i++) {
         accounts.add(Account(

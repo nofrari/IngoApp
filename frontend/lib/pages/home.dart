@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:frontend/constants/values.dart';
+import 'package:frontend/services/profile_service.dart';
 import 'package:frontend/widgets/home_overview_card.dart';
 import 'package:frontend/widgets/total_amount_card.dart';
 import 'package:frontend/models/category.dart';
@@ -33,8 +34,8 @@ class _HomeState extends State<Home> {
 
   void _getTotalAmount() async {
     try {
-      Response response =
-          await Dio().get('${Values.serverURL}/accounts/totalAmount/1');
+      Response response = await Dio().get(
+          '${Values.serverURL}/accounts/totalAmount/${context.read<ProfileService>().getUser().id}');
       setState(() {
         _totalAmout = double.parse(response.data['totalAmount'].toString());
       });
@@ -45,7 +46,8 @@ class _HomeState extends State<Home> {
 
   void getData(BuildContext context) async {
     try {
-      var response = await dio.get("${Values.serverURL}/categories/1");
+      var response = await dio.get(
+          "${Values.serverURL}/categories/${context.read<ProfileService>().getUser().id}");
       debugPrint("icons: ${response.data['icons'].toString()}");
 
       if (response.data != null) {

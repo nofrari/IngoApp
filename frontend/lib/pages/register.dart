@@ -5,6 +5,7 @@ import 'package:dio/dio.dart';
 import 'package:frontend/constants/colors.dart';
 import 'package:frontend/constants/values.dart';
 import 'package:frontend/models/interval_subtype.dart';
+import 'package:frontend/pages/accounts/startaccount.dart';
 import 'package:frontend/services/profile_service.dart';
 import 'package:frontend/widgets/checkbox.dart';
 import 'package:provider/provider.dart';
@@ -51,7 +52,8 @@ class _RegisterState extends State<Register> {
 
   void _getCategories() async {
     try {
-      Response response = await Dio().get('${Values.serverURL}/categories/1');
+      Response response = await Dio().get(
+          '${Values.serverURL}/categories/${context.read<ProfileService>().getUser().id}');
       List<CategoryModel> categories = [];
 
       for (var i = 0; i < response.data["categories"].length; i++) {
@@ -327,7 +329,7 @@ class _RegisterState extends State<Register> {
                           Navigator.push(
                             context,
                             MaterialPageRoute(
-                              builder: (context) => const Start(),
+                              builder: (context) => const StartAccount(),
                             ),
                           );
                         } else {

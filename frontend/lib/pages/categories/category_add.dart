@@ -7,6 +7,7 @@ import 'package:frontend/constants/fonts.dart';
 import 'package:frontend/constants/icons.dart';
 import 'package:frontend/constants/values.dart';
 import 'package:frontend/pages/categories/categories.dart';
+import 'package:frontend/services/profile_service.dart';
 import 'package:frontend/widgets/button.dart';
 import 'package:frontend/widgets/button_transparent_container.dart';
 import 'package:frontend/widgets/categories/category_color_selector.dart';
@@ -195,7 +196,7 @@ class _CategoryAddState extends State<CategoryAdd> {
       "color_id": desiredColor.color_id,
       "is_white": is_white,
       "icon_id": desiredIcon.icon_id,
-      "user_id": "1"
+      "user_id": context.read<ProfileService>().getUser().id
     };
 
     var response = await dio.post(
