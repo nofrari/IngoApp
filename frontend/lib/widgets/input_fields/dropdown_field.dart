@@ -3,6 +3,7 @@ import 'package:dropdown_button2/dropdown_button2.dart';
 import 'package:frontend/constants/fonts.dart';
 import 'package:frontend/constants/values.dart';
 import 'package:frontend/customIcons/dropdown_arrows_icons.dart';
+import 'package:frontend/pages/categories/category_add.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../../constants/colors.dart';
 import '../../constants/strings.dart';
@@ -128,7 +129,8 @@ class _DropdownState extends State<Dropdown> {
                               await Navigator.push(
                                 context,
                                 MaterialPageRoute(
-                                  builder: (context) => const Home(),
+                                  builder: (context) => const CategoryAdd(
+                                      lastPage: "ManualEntry"),
                                 ),
                               );
                             }),

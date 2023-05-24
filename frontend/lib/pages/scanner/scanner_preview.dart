@@ -220,7 +220,6 @@ class _ScannerPreviewState extends State<ScannerPreview>
                               RoundButton(
                                 icon: Icons.delete,
                                 onTap: () async {
-                                  debugPrint("Length1: ${images.length}");
                                   if (context.mounted) {
                                     context
                                         .read<ScannerService>()
@@ -235,7 +234,6 @@ class _ScannerPreviewState extends State<ScannerPreview>
                                         ? images.last
                                         : null; // Hier aktualisieren Sie die `selectedImage`-Variable
                                   }
-                                  debugPrint("Length2: ${images.length}");
 
                                   setState(() {
                                     if (images.isNotEmpty) {

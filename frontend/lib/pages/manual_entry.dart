@@ -8,6 +8,7 @@ import 'package:frontend/models/account.dart';
 import 'package:frontend/models/category.dart';
 import 'package:frontend/models/interval.dart' as transaction_interval;
 import 'package:frontend/models/interval_subtype.dart';
+import 'package:frontend/models/transaction.dart';
 import 'package:frontend/models/transaction_type.dart';
 import 'package:frontend/pages/scanner/scanner_camera.dart';
 import 'package:frontend/services/accounts_service.dart';
@@ -96,10 +97,12 @@ class _ManualEntryState extends State<ManualEntry> {
 
   final _formKey = GlobalKey<FormState>();
 
-  String? selectedAccount;
-  String? selectedCategory;
-  String? selectedInterval;
-  String? selectedIntervalSubtype;
+  Account? selectedAccount; // = Account(id: "", name: "", amount: 0);
+  CategoryModel?
+      selectedCategory; //= CategoryModel(category_id: "", bgColor: "", isWhite: false, icon: icon, label: label);
+  transaction_interval.IntervalModel? selectedInterval;
+  IntervalSubtypeModel? selectedIntervalSubtype;
+  TransactionType? selectedType;
 
   Dio dio = Dio();
 
@@ -108,6 +111,7 @@ class _ManualEntryState extends State<ManualEntry> {
     setState(() {
       _isFocused = isFocused;
     });
+    updateCurrentTransaction();
   }
 
   bool _enableExitPopUp(List<String> images) {
@@ -121,12 +125,36 @@ class _ManualEntryState extends State<ManualEntry> {
     return false;
   }
 
-  String _selectedType = "";
-  void setSelectedType(String type) {
+  TransactionModel _currentTransaction = TransactionModel(
+      transaction_id: "",
+      transaction_name: "",
+      transaction_amount: 0,
+      date: DateTime(2000),
+      category_id: "",
+      type_id: "",
+      interval_id: "",
+      account_id: "");
+
+  void updateCurrentTransaction() {
     setState(() {
-      _selectedType = type;
+      _currentTransaction = TransactionModel(
+          transaction_id: "",
+          transaction_name: controllerTitle.text,
+          transaction_amount: currencyToDouble(controllerAmount.text),
+          description: controllerDescription.text,
+          date: controllerDate.text != ""
+              ? DateFormat("dd / MM / yyyy").parse(controllerDate.text)
+              : DateTime(2000),
+          account_id: selectedAccount != null ? selectedAccount!.id : "",
+          category_id:
+              selectedCategory != null ? selectedCategory!.category_id : "",
+          interval_id:
+              selectedInterval != null ? selectedInterval!.interval_id : "1",
+          interval_subtype_id: selectedIntervalSubtype != null
+              ? selectedIntervalSubtype!.interval_subtype_id
+              : "",
+          type_id: selectedType != null ? selectedType!.type_id : "");
     });
-    debugPrint("Selected Type: $_selectedType");
   }
 
   @override
@@ -175,7 +203,7 @@ class _ManualEntryState extends State<ManualEntry> {
     List<String> allIntervalSubtypesNames() {
       //montalich, quartalsweise, halbjärhlich, jährlich
       List<String> names = [];
-      if (selectedInterval == "Monatlich") {
+      if (selectedInterval != null && selectedInterval!.name == "Monatlich") {
         names.clear();
         names.add("${DateTime.now().day}. des Monats");
         names.add("${getWeekdayCount()}. ${getWeekDay()} des Monats");
@@ -239,7 +267,10 @@ class _ManualEntryState extends State<ManualEntry> {
                                     debugPrint(e.toString());
                                   }
                                 }
-                                await deletePdfFile(manualEntry['pdf_name']);
+                                manualEntry.isNotEmpty
+                                    ? await deletePdfFile(
+                                        manualEntry['pdf_name'])
+                                    : null;
                                 Navigator.push(
                                   context,
                                   MaterialPageRoute(
@@ -329,7 +360,13 @@ class _ManualEntryState extends State<ManualEntry> {
                           label: Strings.dropdownTypeCategory,
                           dropdownItems: typeNames,
                           needsNewCategoryButton: false,
-                          setValue: setSelectedType,
+                          setValue: (value) {
+                            setState(() {
+                              selectedType = allTypes
+                                  .firstWhere((type) => type.name == value);
+                            });
+                            updateCurrentTransaction();
+                          },
                           validator: (value) {
                             if (value == null || value.isEmpty) {
                               return 'Das Feld darf nicht leer sein';
@@ -348,7 +385,11 @@ class _ManualEntryState extends State<ManualEntry> {
                             return null;
                           },
                           setValue: (value) {
-                            selectedCategory = value;
+                            setState(() {
+                              selectedCategory = allCategories.firstWhere(
+                                  (category) => category.label == value);
+                            });
+                            updateCurrentTransaction();
                           },
                         ),
                         Dropdown(
@@ -367,10 +408,15 @@ class _ManualEntryState extends State<ManualEntry> {
                             return null;
                           },
                           setValue: (value) {
-                            selectedAccount = value;
+                            setState(() {
+                              selectedAccount = allAccounts.firstWhere(
+                                  (account) => account.name == value);
+                            });
+                            updateCurrentTransaction();
                           },
                         ),
-                        (_selectedType == 'Transfer')
+                        (selectedType != null &&
+                                selectedType!.name == 'Transfer')
                             ? Dropdown(
                                 label: Strings.dropdownAccount2,
                                 dropdownItems: accountNames,
@@ -386,11 +432,15 @@ class _ManualEntryState extends State<ManualEntry> {
                                   }
                                   return null;
                                 },
+                                setValue: (value) {
+                                  updateCurrentTransaction();
+                                },
                               )
                             : Container(),
                         DatepickerField(
                           controller: controllerDate,
                           serverDate: manualEntry['date'],
+                          //TODO: Add callback to call updateCurrentTransaction
                         ),
                         Dropdown(
                           dropdownItems: intervalNames,
@@ -405,11 +455,14 @@ class _ManualEntryState extends State<ManualEntry> {
                           },
                           setValue: (value) {
                             setState(() {
-                              selectedInterval = value;
+                              selectedInterval = allIntervals.firstWhere(
+                                  (interval) => interval.name == value);
                             });
+                            updateCurrentTransaction();
                           },
                         ),
-                        (selectedInterval == intervalNames[2])
+                        (selectedInterval != null &&
+                                selectedInterval!.name == intervalNames[2])
                             ? Dropdown(
                                 dropdownItems: allIntervalSubtypesNames(),
                                 label: Strings.dropdownPattern,
@@ -422,8 +475,14 @@ class _ManualEntryState extends State<ManualEntry> {
                                 },
                                 setValue: (value) {
                                   setState(() {
-                                    selectedIntervalSubtype = value;
+                                    selectedIntervalSubtype =
+                                        allIntervalSubtypes[
+                                            allIntervalSubtypesNames()
+                                                .indexOf(value)];
                                   });
+                                  debugPrint(
+                                      "Selected interval subtype: ${selectedIntervalSubtype!.name} id: ${selectedIntervalSubtype!.interval_subtype_id}");
+                                  updateCurrentTransaction();
                                 },
                               )
                             : Container(),
@@ -462,6 +521,7 @@ class _ManualEntryState extends State<ManualEntry> {
                           isTransparent: true,
                           btnText: "SPEICHERN",
                           onTap: () async {
+                            updateCurrentTransaction();
                             if (_formKey.currentState!.validate()) {
                               ScaffoldMessenger.of(context).showSnackBar(
                                 const SnackBar(
@@ -471,91 +531,16 @@ class _ManualEntryState extends State<ManualEntry> {
 
                               String? pdf_name = PdfFile.getName();
 
-                              late String selectedAccountID;
-                              late String selectedCategoryID;
-                              late String selectedIntervalID;
-                              late String selectedIntervalSubtypeID;
-                              late String selectedTypeID;
-
-                              for (Account account in allAccounts) {
-                                if (account.name == selectedAccount) {
-                                  selectedAccountID = account.id;
-                                  break;
-                                }
-                              }
-
-                              for (CategoryModel category in allCategories) {
-                                if (category.label == selectedCategory) {
-                                  selectedCategoryID = category.category_id;
-                                  break;
-                                }
-                              }
-
-                              for (transaction_interval.IntervalModel interval
-                                  in allIntervals) {
-                                if (interval.name == selectedInterval) {
-                                  selectedIntervalID = interval.interval_id;
-                                  break;
-                                }
-                              }
-
-                              for (IntervalSubtypeModel intervalSubtype
-                                  in allIntervalSubtypes) {
-                                if (intervalSubtype.name ==
-                                    selectedIntervalSubtype) {
-                                  selectedIntervalSubtypeID =
-                                      intervalSubtype.interval_subtype_id;
-                                  break;
-                                }
-                              }
-
-                              for (TransactionType type in allTypes) {
-                                if (type.name == _selectedType) {
-                                  selectedTypeID = type.type_id;
-                                  break;
-                                }
-                              }
-
-                              if (manualEntry.isNotEmpty) {
+                              if (_currentTransaction.isCompleted()) {
+                                //! is allowed because isCompleted() checks if thats empty
                                 _sendData(
-                                    controllerTitle.text,
-                                    currencyToDouble(controllerAmount.text),
-                                    date,
-                                    controllerDescription.text,
-                                    manualEntry['pdf_name'],
-                                    selectedCategoryID,
-                                    selectedTypeID,
-                                    selectedIntervalID,
-                                    selectedIntervalSubtypeID,
-                                    selectedAccountID);
+                                    manualEntry.isNotEmpty
+                                        ? manualEntry['pdf_name']
+                                        : pdf_name ?? " ",
+                                    _currentTransaction);
                               } else {
-                                if (pdf_name != null) {
-                                  _sendData(
-                                      controllerTitle.text,
-                                      currencyToDouble(controllerAmount.text),
-                                      date,
-                                      controllerDescription.text,
-                                      pdf_name,
-                                      selectedCategoryID,
-                                      selectedTypeID,
-                                      selectedIntervalID,
-                                      selectedIntervalSubtypeID,
-                                      selectedAccountID);
-
-                                  savePDFToServer(PdfFile.getPath().toString());
-                                } else {
-                                  _sendData(
-                                      controllerTitle.text,
-                                      currencyToDouble(controllerAmount.text),
-                                      date,
-                                      controllerDescription.text,
-                                      " ",
-                                      selectedCategoryID,
-                                      selectedTypeID,
-                                      selectedIntervalID,
-                                      selectedIntervalSubtypeID,
-                                      selectedAccountID);
-                                }
+                                debugPrint(
+                                    "current Transaction Id: ${_currentTransaction.transaction_id} name: ${_currentTransaction.transaction_name} amount: ${_currentTransaction.transaction_amount} date: ${_currentTransaction.date} description: ${_currentTransaction.description} category_id: ${_currentTransaction.category_id} type_id: ${_currentTransaction.type_id} interval_id: ${_currentTransaction.interval_id} interval_subtype_id: ${_currentTransaction.interval_subtype_id} account_id: ${_currentTransaction.account_id}");
                               }
 
                               List<String> images =
@@ -588,28 +573,18 @@ class _ManualEntryState extends State<ManualEntry> {
     );
   }
 
-  Future _sendData(
-      String name,
-      double amount,
-      DateTime date,
-      String description,
-      String pdfName,
-      String categoryID,
-      String typeID,
-      String intervalID,
-      String intervalSubtypeID,
-      String accountID) async {
+  Future _sendData(String pdfName, TransactionModel transaction) async {
     Map<String, dynamic> formData = {
-      "transaction_name": name,
-      "transaction_amount": amount,
-      "date": date.toString(),
-      "description": description,
+      "transaction_name": transaction.transaction_name,
+      "transaction_amount": transaction.transaction_amount,
+      "date": transaction.date.toString(),
+      "description": transaction.description,
       "bill_url": pdfName,
-      "category_id": categoryID,
-      "type_id": typeID,
-      "interval_id": intervalID,
-      "interval_subtype_id": intervalSubtypeID,
-      "account_id": accountID
+      "category_id": transaction.category_id,
+      "type_id": transaction.type_id,
+      "interval_id": transaction.interval_id,
+      "interval_subtype_id": transaction.interval_subtype_id,
+      "account_id": transaction.account_id
     };
 
     var response = await dio.post("${Values.serverURL}/transactions/input",

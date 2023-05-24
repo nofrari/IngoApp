@@ -107,7 +107,8 @@ class _RegisterState extends State<Register> {
 
       for (var i = 0; i < response.data.length; i++) {
         intervalSubtypes.add(IntervalSubtypeModel(
-          interval_subtype_id: response.data[i]['interval_id'].toString(),
+          interval_subtype_id:
+              response.data[i]['interval_subtype_id'].toString(),
           name: response.data[i]['interval_subtype_name'].toString(),
         ));
       }

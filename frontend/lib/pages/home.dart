@@ -48,7 +48,6 @@ class _HomeState extends State<Home> {
     try {
       var response = await dio.get(
           "${Values.serverURL}/categories/${context.read<ProfileService>().getUser().id}");
-      debugPrint("icons: ${response.data['icons'].toString()}");
 
       if (response.data != null) {
         for (var color in response.data['colors']) {

@@ -13,6 +13,7 @@ class TransactionModel {
     required this.category_id,
     required this.type_id,
     required this.interval_id,
+    this.interval_subtype_id,
     required this.account_id,
   });
 
@@ -25,6 +26,7 @@ class TransactionModel {
   String category_id;
   String type_id;
   String interval_id;
+  String? interval_subtype_id;
   String account_id;
 
   Map<String, dynamic> toJson() => {
@@ -37,6 +39,7 @@ class TransactionModel {
         'category_id': category_id,
         'type_id': type_id,
         'interval_id': interval_id,
+        'interval_subtype_id': interval_subtype_id,
         'account_id': account_id,
       };
 
@@ -51,6 +54,7 @@ class TransactionModel {
         category_id: json['category_id'],
         type_id: json['type_id'],
         interval_id: json['interval_id'],
+        interval_subtype_id: json['interval_subtype_id'],
         account_id: json['account_id'],
       );
 
@@ -63,6 +67,20 @@ class TransactionModel {
       return "- ${amount?.toStringAsFixed(2)} € ";
     } else {
       return " ${amount?.toStringAsFixed(2)} € ";
+    }
+  }
+
+  bool isCompleted() {
+    if (transaction_name != "" &&
+        transaction_amount != 0 &&
+        date != DateTime(2000) &&
+        category_id != "" &&
+        type_id != "" &&
+        interval_id != "" &&
+        account_id != "") {
+      return true;
+    } else {
+      return false;
     }
   }
 }

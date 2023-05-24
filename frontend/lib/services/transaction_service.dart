@@ -33,4 +33,30 @@ class TransactionService extends ChangeNotifier {
 
     return transactions;
   }
+
+  Future<void> setTransaction(TransactionModel transaction) async {
+    try {
+      String transactionString = jsonEncode(transaction.toJson());
+      _prefs.setString('transaction', transactionString);
+    } catch (e) {
+      debugPrint(e.toString());
+    }
+  }
+
+  TransactionModel getTransaction() {
+    String transactionString = _prefs.getString('transaction') ?? "";
+
+    TransactionModel transaction =
+        TransactionModel.fromJson(jsonDecode(transactionString));
+
+    return transaction;
+  }
+
+  Future<void> clearTransaction() async {
+    try {
+      _prefs.remove('transaction');
+    } catch (e) {
+      debugPrint(e.toString());
+    }
+  }
 }

@@ -25,8 +25,11 @@ import '../../services/initial_service.dart';
 import '../../widgets/text_google.dart';
 
 class CategoryAdd extends StatefulWidget {
-  const CategoryAdd({super.key});
+  const CategoryAdd({super.key, this.lastPage});
   // final Function updateCategoryList;
+
+  final String? lastPage;
+
   @override
   State<CategoryAdd> createState() => _CategoryAddState();
 }
@@ -163,12 +166,17 @@ class _CategoryAddState extends State<CategoryAdd> {
                             isWhite,
                             icon,
                           );
-                          await Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (context) => const Categories(),
-                            ),
-                          ); // Navigate back to the previous screen
+
+                          if (widget.lastPage == "ManualEntry") {
+                            Navigator.pop(context);
+                          } else {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) => const Categories(),
+                              ),
+                            ); // Navigate back to the previous screen
+                          }
                         }
                       : () {},
                   theme: isFormValid()
@@ -200,7 +208,7 @@ class _CategoryAddState extends State<CategoryAdd> {
     };
 
     var response = await dio.post(
-      "http://localhost:5432/categories/input",
+      "${Values.serverURL}/categories/input",
       data: formData,
     );
   }

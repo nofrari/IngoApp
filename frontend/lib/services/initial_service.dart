@@ -43,8 +43,6 @@ class InitialService extends ChangeNotifier {
     try {
       List<String> colorStrings =
           colors.map((color) => jsonEncode(color.toJson())).toList();
-
-      debugPrint("length: ${colorStrings.length.toString()}");
       _prefs.setStringList('colors', colorStrings);
     } catch (e) {
       debugPrint(e.toString());

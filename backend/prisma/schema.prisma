@@ -88,6 +88,7 @@ model Transaction {
   type                Type             @relation(fields: [type_id], references: [type_id], onDelete: Cascade)
 
   @@index([account_id], map: "Transaction_account_id_fkey")
+  @@index([interval_subtype_id], map: "Transaction_interval_subtype_id_fkey")
   @@index([category_id], map: "Transaction_category_id_fkey")
   @@index([interval_id], map: "Transaction_interval_id_fkey")
   @@index([type_id], map: "Transaction_type_id_fkey")

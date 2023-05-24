@@ -75,6 +75,11 @@ router.post('/transactions/input', async (req, res) => {
     return;
   }
 
+  // console.log(typeof (body.interval_subtype_id));
+  // console.log(body.interval_subtype_id == null);
+  // console.log(body.interval_subtype_id == undefined);
+  // console.log(body.interval_subtype_id == "");
+
   const transaction = await prisma.transaction.create({
     data: {
       transaction_name: body.transaction_name,
@@ -85,10 +90,48 @@ router.post('/transactions/input', async (req, res) => {
       category_id: body.category_id,
       type_id: body.type_id,
       interval_id: body.interval_id,
-      interval_subtype_id: body.interval_subtype_id,
+      interval_subtype_id: body.interval_subtype_id == "" ? null : body.interval_subtype_id,
       account_id: body.account_id,
     },
   });
+
+  const type = await prisma.type.findUnique({
+    where: {
+      type_id: body.type_id,
+    },
+  });
+
+  switch (type?.type_name) {
+    case 'Einnahme':
+      await prisma.account.update({
+        where: {
+          account_id: body.account_id,
+        },
+        data: {
+          account_balance: {
+            increment: body.transaction_amount,
+          },
+        },
+      });
+      break;
+    case 'Ausgabe':
+      await prisma.account.update({
+        where: {
+          account_id: body.account_id,
+        },
+        data: {
+          account_balance: {
+            decrement: body.transaction_amount,
+            //increment: body.transaction_amount,
+          },
+        },
+      });
+      break;
+    case 'Transfer':
+      //TODO: Add transfer code
+      break;
+  }
+
 
   // const token = jwt.sign({
   //     userId: user.user_id,
