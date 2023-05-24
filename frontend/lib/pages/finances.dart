@@ -5,12 +5,10 @@ import 'package:frontend/models/category.dart';
 import 'package:frontend/models/color.dart';
 import 'package:frontend/models/icon.dart';
 import 'package:frontend/services/accounts_service.dart';
-import 'package:frontend/widgets/input_fields/multiselect_dropdown.dart';
+import 'package:frontend/widgets/input_fields/dropdown_field_multi.dart';
 
 import 'package:frontend/widgets/transactions/transaction_list.dart';
 import 'package:provider/provider.dart';
-
-import '../constants/strings.dart';
 import '../constants/values.dart';
 import '../models/account.dart';
 import '../models/transaction.dart';
@@ -138,16 +136,7 @@ class _FinancesState extends State<Finances> {
               maxLength: 50,
               onFocusChanged: (value) {},
             ),
-            DatepickerField(
-              label: "Start",
-              controller: controllerStartDate,
-            ),
-            DatepickerField(
-              label: "End",
-              controller: controllerEndDate,
-            ),
-
-            MultiSelectDropdownField(
+            DropdownMultiselect(
               dropdownItems:
                   categories.map((category) => category.label).toList(),
               setValues: (value) {
@@ -155,42 +144,16 @@ class _FinancesState extends State<Finances> {
               },
               label: "Kategorie",
             ),
-            MultiSelectDropdownField(
+            DropdownMultiselect(
               dropdownItems: accounts.map((account) => account.name).toList(),
               setValues: (value) {
                 onAccountSelected(value);
               },
               label: "Konto",
             ),
-
-            // MultipleDropdown(
-            //   label: Strings.dropdownFinancesCategories,
-            //   setValue: (value) {
-            //     onCategorySelected(value);
-            //   },
-            //   dropdownItems:
-            //       categories.map((category) => category.label).toList(),
-            //   validator: (value) {
-            //     if (value == null || value.isEmpty) {
-            //       return 'Das Feld darf nicht leer sein';
-            //     }
-            //     return null;
-            //   },
-            // ),
-            // Dropdown(
-            //   label: Strings.dropdownFinancesAccount,
-            //   dropdownItems:
-            //       categories.map((category) => category.label).toList(),
-            //   needsNewCategoryButton: false,
-            //   validator: (value) {
-            //     if (value == null || value.isEmpty) {
-            //       return 'Das Feld darf nicht leer sein';
-            //     }
-            //     return null;
-            //   },
-            // ),
             (matchFound)
                 ? TransactionList(
+                    accounts: selectedAccount,
                     selectedCategory: selectedCategory,
                     transactions: filteredTransactions.isEmpty
                         ? transactions
