@@ -16,6 +16,7 @@ class Strings {
   static const String dropdownTypeCategory = "Typ";
   static const String dropdownCategory = "Kategorie";
   static const String dropdownFrequency = "Wiederholen";
+  static const String dropdownPattern = "Muster";
   static const String dropdownAccount1 = "Ausgangskonto";
   static const String dropdownAccount2 = "Zu Konto Transferieren";
   static const String dropdownFinancesAccount = "Konto";

@@ -36,6 +36,7 @@ const inputSchema = z.object({
   category_id: z.string(),
   type_id: z.string(),
   interval_id: z.string(),
+  interval_subtype_id: z.string().optional(),
   account_id: z.string(),
 });
 type InputSchema = z.infer<typeof inputSchema>;
@@ -50,6 +51,7 @@ const editSchema = z.object({
   category_id: z.string().optional(),
   type_id: z.string().optional(),
   interval_id: z.string().optional(),
+  interval_subtype_id: z.string().optional(),
   account_id: z.string().optional(),
 });
 type EditSchema = z.infer<typeof editSchema>;
@@ -83,6 +85,7 @@ router.post('/transactions/input', async (req, res) => {
       category_id: body.category_id,
       type_id: body.type_id,
       interval_id: body.interval_id,
+      interval_subtype_id: body.interval_subtype_id,
       account_id: body.account_id,
     },
   });
@@ -102,6 +105,7 @@ router.post('/transactions/input', async (req, res) => {
     category_id: transaction.category_id,
     type_id: transaction.type_id,
     interval_id: transaction.interval_id,
+    interval_subtype_id: transaction.interval_subtype_id,
     account_id: transaction.account_id,
   });
 });
@@ -142,6 +146,7 @@ router.post('/transactions/edit', async (req, res) => {
         category_id: body.category_id,
         type_id: body.type_id,
         interval_id: body.interval_id,
+        interval_subtype_id: body.interval_subtype_id,
         account_id: body.account_id,
       },
     });

@@ -134,7 +134,7 @@
 ## Datenbank statements
 INSERT INTO `Type` VALUES ("1", "Einnahme");
 INSERT INTO `Type` VALUES ("2", "Ausgabe");
-INSERT INTO `Type` VALUES ("3", "Transaktion");
+INSERT INTO `Type` VALUES ("3", "Transfer");
 
 INSERT INTO `Interval` VALUES ("1", "Nie");
 INSERT INTO `Interval` VALUES ("2", "Wöchentlich");

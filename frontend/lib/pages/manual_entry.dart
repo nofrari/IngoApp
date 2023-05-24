@@ -7,6 +7,7 @@ import 'package:frontend/constants/values.dart';
 import 'package:frontend/models/account.dart';
 import 'package:frontend/models/category.dart';
 import 'package:frontend/models/interval.dart' as transaction_interval;
+import 'package:frontend/models/interval_subtype.dart';
 import 'package:frontend/models/transaction_type.dart';
 import 'package:frontend/pages/scanner/scanner_camera.dart';
 import 'package:frontend/services/accounts_service.dart';
@@ -26,6 +27,45 @@ import 'package:dio/dio.dart';
 import 'package:frontend/widgets/popup.dart';
 import 'package:provider/provider.dart';
 import 'package:intl/intl.dart';
+
+int getWeekdayCount() {
+  DateTime now = DateTime.now();
+  DateTime firstDayOfMonth = DateTime(now.year, now.month, 1);
+  int weekday = firstDayOfMonth.weekday;
+  int currentWeekday = now.weekday;
+
+  int weeks = ((now.day - weekday) / 7).floor();
+  int extraDays = (now.day - weekday) % 7;
+
+  if (currentWeekday < weekday) {
+    return weeks + 1;
+  } else if (currentWeekday >= weekday && extraDays >= currentWeekday) {
+    return weeks + 2;
+  } else {
+    return weeks + 1;
+  }
+}
+
+String getWeekDay() {
+  switch (DateTime.now().weekday) {
+    case 0:
+      return "Montag";
+    case 1:
+      return "Dienstag";
+    case 2:
+      return "Mittwoch";
+    case 3:
+      return "Donnerstag";
+    case 4:
+      return "Freitag";
+    case 5:
+      return "Samstag";
+    case 6:
+      return "Sonntag";
+    default:
+      return "";
+  }
+}
 
 class ManualEntry extends StatefulWidget {
   const ManualEntry({super.key});
@@ -59,6 +99,7 @@ class _ManualEntryState extends State<ManualEntry> {
   String? selectedAccount;
   String? selectedCategory;
   String? selectedInterval;
+  String? selectedIntervalSubtype;
 
   Dio dio = Dio();
 
@@ -127,6 +168,20 @@ class _ManualEntryState extends State<ManualEntry> {
         context.watch<InitialService>().getInterval();
     List<String> intervalNames =
         allIntervals.map((interval) => interval.name).toList();
+
+    List<IntervalSubtypeModel> allIntervalSubtypes =
+        context.watch<InitialService>().getIntervalSubtypes();
+
+    List<String> allIntervalSubtypesNames() {
+      //montalich, quartalsweise, halbjärhlich, jährlich
+      List<String> names = [];
+      if (selectedInterval == "Monatlich") {
+        names.clear();
+        names.add("${DateTime.now().day}. des Monats");
+        names.add("${getWeekdayCount()}. ${getWeekDay()} des Monats");
+      }
+      return names;
+    }
 
     List<TransactionType> allTypes =
         context.watch<InitialService>().getTransactionType();
@@ -296,7 +351,6 @@ class _ManualEntryState extends State<ManualEntry> {
                             selectedCategory = value;
                           },
                         ),
-                        //TODO: Kontos aus DB holen
                         Dropdown(
                           label: Strings.dropdownAccount1,
                           dropdownItems: accountNames,
@@ -316,8 +370,6 @@ class _ManualEntryState extends State<ManualEntry> {
                             selectedAccount = value;
                           },
                         ),
-
-                        //TODO: String als Constante anlegen und bei Registrieren mitschicken
                         (_selectedType == 'Transfer')
                             ? Dropdown(
                                 label: Strings.dropdownAccount2,
@@ -352,9 +404,29 @@ class _ManualEntryState extends State<ManualEntry> {
                             return null;
                           },
                           setValue: (value) {
-                            selectedInterval = value;
+                            setState(() {
+                              selectedInterval = value;
+                            });
                           },
                         ),
+                        (selectedInterval == intervalNames[2])
+                            ? Dropdown(
+                                dropdownItems: allIntervalSubtypesNames(),
+                                label: Strings.dropdownPattern,
+                                needsNewCategoryButton: false,
+                                validator: (value) {
+                                  if (value == null || value.isEmpty) {
+                                    return 'Das Feld darf nicht leer sein';
+                                  }
+                                  return null;
+                                },
+                                setValue: (value) {
+                                  setState(() {
+                                    selectedIntervalSubtype = value;
+                                  });
+                                },
+                              )
+                            : Container(),
                         InputField(
                           lblText: "Beschreibung",
                           reqFormatter: letters,
@@ -402,6 +474,7 @@ class _ManualEntryState extends State<ManualEntry> {
                               late String selectedAccountID;
                               late String selectedCategoryID;
                               late String selectedIntervalID;
+                              late String selectedIntervalSubtypeID;
                               late String selectedTypeID;
 
                               for (Account account in allAccounts) {
@@ -426,6 +499,16 @@ class _ManualEntryState extends State<ManualEntry> {
                                 }
                               }
 
+                              for (IntervalSubtypeModel intervalSubtype
+                                  in allIntervalSubtypes) {
+                                if (intervalSubtype.name ==
+                                    selectedIntervalSubtype) {
+                                  selectedIntervalSubtypeID =
+                                      intervalSubtype.interval_subtype_id;
+                                  break;
+                                }
+                              }
+
                               for (TransactionType type in allTypes) {
                                 if (type.name == _selectedType) {
                                   selectedTypeID = type.type_id;
@@ -443,6 +526,7 @@ class _ManualEntryState extends State<ManualEntry> {
                                     selectedCategoryID,
                                     selectedTypeID,
                                     selectedIntervalID,
+                                    selectedIntervalSubtypeID,
                                     selectedAccountID);
                               } else {
                                 if (pdf_name != null) {
@@ -455,6 +539,7 @@ class _ManualEntryState extends State<ManualEntry> {
                                       selectedCategoryID,
                                       selectedTypeID,
                                       selectedIntervalID,
+                                      selectedIntervalSubtypeID,
                                       selectedAccountID);
 
                                   savePDFToServer(PdfFile.getPath().toString());
@@ -468,6 +553,7 @@ class _ManualEntryState extends State<ManualEntry> {
                                       selectedCategoryID,
                                       selectedTypeID,
                                       selectedIntervalID,
+                                      selectedIntervalSubtypeID,
                                       selectedAccountID);
                                 }
                               }
@@ -511,6 +597,7 @@ class _ManualEntryState extends State<ManualEntry> {
       String categoryID,
       String typeID,
       String intervalID,
+      String intervalSubtypeID,
       String accountID) async {
     Map<String, dynamic> formData = {
       "transaction_name": name,
@@ -521,6 +608,7 @@ class _ManualEntryState extends State<ManualEntry> {
       "category_id": categoryID,
       "type_id": typeID,
       "interval_id": intervalID,
+      "interval_subtype_id": intervalSubtypeID,
       "account_id": accountID
     };
 
