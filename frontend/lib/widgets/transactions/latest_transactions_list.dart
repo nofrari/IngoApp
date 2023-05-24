@@ -4,6 +4,7 @@ import 'package:frontend/models/transaction.dart';
 import 'package:flutter/material.dart';
 import 'package:frontend/pages/categories/categories.dart';
 import 'package:frontend/pages/finances.dart';
+import 'package:frontend/start.dart';
 import 'package:frontend/widgets/button.dart';
 import 'package:frontend/widgets/transactions/transaction_item.dart';
 
@@ -45,10 +46,10 @@ class _LatestTransactionListState extends State<LatestTransactionList> {
             child: Button(
               btnText: "MEHR ANZEIGEN",
               onTap: () async {
-                await Navigator.push(
+                Navigator.push(
                   context,
                   MaterialPageRoute(
-                    builder: (context) => const Finances(),
+                    builder: (context) => const Start(pageId: 3),
                   ),
                 );
               },
