@@ -33,6 +33,7 @@ class _DropdownMultiselectState extends State<DropdownMultiselect> {
   List<String> _selectedValues = [];
   String? selectedValue;
   String? nullValue;
+  GlobalKey<FormState> _formKey = GlobalKey<FormState>();
 
   @override
   void initState() {
@@ -59,110 +60,113 @@ class _DropdownMultiselectState extends State<DropdownMultiselect> {
       margin: const EdgeInsets.only(top: 10, bottom: 15),
       child: Column(
         children: [
-          DropdownButtonFormField2(
-            autovalidateMode: AutovalidateMode.onUserInteraction,
-            value: null,
-            decoration: InputDecoration(
-              label: Text(widget.label, style: Fonts.text300),
-              labelStyle: TextStyle(color: AppColor.neutral100),
-              border: DecoratedInputBorder(
-                  child: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(Values.inputRadius),
-                      borderSide: BorderSide.none),
-                  shadow: const [
-                    BoxShadow(
-                      color: Color.fromARGB(60, 0, 0, 0),
-                      blurRadius: 4,
-                      offset: Offset(0, 3),
-                    )
-                  ]),
-              focusedBorder: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(Values.inputRadius),
-                  borderSide: BorderSide(
-                      color: AppColor.blueActive, width: Values.inputBorder)),
-              errorBorder: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(Values.inputRadius),
-                  borderSide: const BorderSide(
-                      color: Colors.red, width: Values.inputBorder)),
-              filled: true,
-              fillColor: AppColor.backgroundInputField,
-              errorStyle: Fonts.errorMessage,
-              isDense: true,
-              isCollapsed: true,
-              // floatingLabelBehavior: FloatingLabelBehavior.never,
-              contentPadding:
-                  const EdgeInsets.symmetric(vertical: 10.0, horizontal: 10.0),
-            ),
-            isExpanded: true,
-            items: List.generate(
-              widget.dropdownItems.length,
-              (index) => DropdownMenuItem(
-                value: widget.dropdownItems[index].toString(),
-                child: Container(
-                  alignment: Alignment.centerLeft,
-                  child: Text(
-                    widget.dropdownItems[index].toString(),
-                    style: GoogleFonts.josefinSans(
-                      fontSize: 18,
-                      color:
-                          // color: selectedValue == widget.dropdownItems[index]
-                          //     ? AppColor.blueActive
-                          AppColor.textColor,
+          Form(
+            key: _formKey,
+            child: DropdownButtonFormField2(
+              autovalidateMode: AutovalidateMode.onUserInteraction,
+              value: null,
+              decoration: InputDecoration(
+                label: Text(widget.label, style: Fonts.text300),
+                labelStyle: TextStyle(color: AppColor.neutral100),
+                border: DecoratedInputBorder(
+                    child: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(Values.inputRadius),
+                        borderSide: BorderSide.none),
+                    shadow: const [
+                      BoxShadow(
+                        color: Color.fromARGB(60, 0, 0, 0),
+                        blurRadius: 4,
+                        offset: Offset(0, 3),
+                      )
+                    ]),
+                focusedBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(Values.inputRadius),
+                    borderSide: BorderSide(
+                        color: AppColor.blueActive, width: Values.inputBorder)),
+                errorBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(Values.inputRadius),
+                    borderSide: const BorderSide(
+                        color: Colors.red, width: Values.inputBorder)),
+                filled: true,
+                fillColor: AppColor.backgroundInputField,
+                errorStyle: Fonts.errorMessage,
+                isDense: true,
+                isCollapsed: true,
+                // floatingLabelBehavior: FloatingLabelBehavior.never,
+                contentPadding: const EdgeInsets.symmetric(
+                    vertical: 10.0, horizontal: 10.0),
+              ),
+              isExpanded: true,
+              items: List.generate(
+                widget.dropdownItems.length,
+                (index) => DropdownMenuItem(
+                  value: widget.dropdownItems[index].toString(),
+                  child: Container(
+                    alignment: Alignment.centerLeft,
+                    child: Text(
+                      widget.dropdownItems[index].toString(),
+                      style: GoogleFonts.josefinSans(
+                        fontSize: 18,
+                        color:
+                            // color: selectedValue == widget.dropdownItems[index]
+                            //     ? AppColor.blueActive
+                            AppColor.textColor,
+                      ),
                     ),
                   ),
                 ),
               ),
-            ),
-            // validator: widget.validator,
-            onChanged: (value) {
-              setState(() {
-                if (_selectedValues.contains(value)) {
-                  _selectedValues.remove(value);
-                } else {
-                  _selectedValues.add(value!);
-                }
-              });
-
-              if (widget.setValues != null) {
-                widget.setValues!(_selectedValues);
-              }
-            },
-            onSaved: (value) {},
-
-            selectedItemBuilder: _selectedValues.isNotEmpty
-                ? (BuildContext context) {
-                    return [];
+              // validator: widget.validator,
+              onChanged: (value) {
+                setState(() {
+                  if (_selectedValues.contains(value)) {
+                    _selectedValues.remove(value);
+                  } else {
+                    _selectedValues.add(value!);
                   }
-                : (BuildContext context) {
-                    return [];
-                  },
+                });
 
-            iconStyleData: IconStyleData(
-              openMenuIcon: Icon(
-                DropdownArrows.up_open_mini,
-                color: AppColor.textColor,
-              ),
-              icon: Icon(
-                DropdownArrows.down_open_mini,
-                color: AppColor.textColor,
-              ),
-              iconSize: 30,
-            ),
-            dropdownStyleData: DropdownStyleData(
-              width: MediaQuery.of(context).size.width -
-                  Values.bigCardMargin.horizontal,
-              offset: const Offset(-10, -6),
-              maxHeight: 200,
-              decoration: BoxDecoration(
-                border: Border.all(
-                  width: 2,
-                  color: AppColor.activeMenu,
+                if (widget.setValues != null) {
+                  widget.setValues!(_selectedValues);
+                }
+              },
+              onSaved: (value) {},
+
+              selectedItemBuilder: _selectedValues.isNotEmpty
+                  ? (BuildContext context) {
+                      return [];
+                    }
+                  : (BuildContext context) {
+                      return [];
+                    },
+
+              iconStyleData: IconStyleData(
+                openMenuIcon: Icon(
+                  DropdownArrows.up_open_mini,
+                  color: AppColor.textColor,
                 ),
-                borderRadius: const BorderRadius.only(
-                  bottomRight: Radius.circular(Values.inputRadius),
-                  bottomLeft: Radius.circular(Values.inputRadius),
+                icon: Icon(
+                  DropdownArrows.down_open_mini,
+                  color: AppColor.textColor,
                 ),
-                color: AppColor.backgroundGray,
+                iconSize: 30,
+              ),
+              dropdownStyleData: DropdownStyleData(
+                width: MediaQuery.of(context).size.width -
+                    Values.bigCardMargin.horizontal,
+                offset: const Offset(-10, -6),
+                maxHeight: 200,
+                decoration: BoxDecoration(
+                  border: Border.all(
+                    width: 2,
+                    color: AppColor.activeMenu,
+                  ),
+                  borderRadius: const BorderRadius.only(
+                    bottomRight: Radius.circular(Values.inputRadius),
+                    bottomLeft: Radius.circular(Values.inputRadius),
+                  ),
+                  color: AppColor.backgroundGray,
+                ),
               ),
             ),
           ),
@@ -187,8 +191,14 @@ class _DropdownMultiselectState extends State<DropdownMultiselect> {
                             widget.setValues!(_selectedValues);
                           }
                           if (_selectedValues.isEmpty) {
-                            setState(() {});
-
+                            setState(() {
+                              _selectedValues.clear();
+                            });
+                            if (widget.setValues != null) {
+                              widget.setValues!(_selectedValues);
+                            }
+                            _formKey.currentState
+                                ?.reset(); // Reset the form to hide the floating label
                             FocusScope.of(context).requestFocus(FocusNode());
                           }
                         },
