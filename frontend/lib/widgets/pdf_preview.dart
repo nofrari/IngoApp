@@ -15,6 +15,9 @@ import 'package:frontend/constants/values.dart';
 import 'package:frontend/widgets/button.dart';
 import 'package:path_provider/path_provider.dart';
 
+import 'package:pdf_render/pdf_render.dart';
+import 'package:pdf_render/pdf_render_widgets.dart';
+
 class PdfPreview extends StatefulWidget {
   String? pdfUrl;
   int? pdfHeight;
@@ -104,9 +107,17 @@ class _PdfPreviewState extends State<PdfPreview> {
 
     for (final image in _selectedImages) {
       final img = pdf.MemoryImage(image.readAsBytesSync());
-      doc.addPage(pdf.Page(
-        build: (context) => pdf.Center(child: pdf.Image(img)),
-      ));
+      doc.addPage(
+        pdf.Page(
+          build: (context) => pdf.FullPage(
+            child: pdf.FittedBox(
+              child: pdf.Image(img),
+              fit: pdf.BoxFit.cover,
+            ),
+            ignoreMargins: true,
+          ),
+        ),
+      );
     }
 
     final output = await getTemporaryDirectory();
@@ -129,13 +140,29 @@ class _PdfPreviewState extends State<PdfPreview> {
   Future<void> getPDFSize(String path) async {
     final file = File(path);
     final document = await PdfDocument.openFile(file.path);
-    //get the first page (starts with 1 not with 0) and from there the height
-    final page = await document.getPage(1);
-    double height = page.height;
-    int pageCount = document.pageCount;
+
+    double totalHeight = 0;
+    double scalingFactor = 0.805; // Adjust this value to fine-tune the height
+
+    for (int i = 0; i < document.pageCount; i++) {
+      final page = await document.getPage(i + 1);
+      double pageHeight = page.height;
+      double pageWidth = page.width;
+
+      // Adjust the container height based on the aspect ratio of the page
+      double aspectRatio = pageWidth / pageHeight;
+      double containerHeight = 450 / aspectRatio;
+
+      totalHeight += containerHeight;
+    }
+
+    // Apply scaling factor to the total height
+    totalHeight *= scalingFactor;
+
     setState(() {
-      containerHeight = (height * pageCount);
+      containerHeight = totalHeight;
     });
+
     await document.dispose();
   }
 
@@ -156,26 +183,17 @@ class _PdfPreviewState extends State<PdfPreview> {
                     borderRadius: BorderRadius.circular(Values.cardRadius - 4),
                     child: SingleChildScrollView(
                       child: Container(
+                        color: Colors.white,
                         height: (widget.pdfHeight != null)
                             ? widget.pdfHeight!.ceilToDouble()
                             : containerHeight,
                         child: InteractiveViewer(
                           clipBehavior: Clip.none,
                           constrained: true,
-                          child: PDF(
-                            enableSwipe: true,
-                            swipeHorizontal: false,
-                            autoSpacing: true,
-                            pageFling: false,
-                            fitEachPage: false,
-                            onError: (error) {
-                              print(error.toString());
-                            },
-                            onPageError: (page, error) {
-                              print('$page: ${error.toString()}');
-                            },
-                          ).fromPath(widget.pdfUrl ?? _pdfFile!.path),
-                        ), //.fromAsset(_pdfFile!.path),
+                          child: PdfViewer.openFile(
+                            widget.pdfUrl ?? _pdfFile!.path,
+                          ),
+                        ),
                       ),
                     ),
                   ),
