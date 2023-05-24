@@ -36,6 +36,8 @@ class _StartState extends State<Start> {
     currentScreen = screens[widget.pageId != null ? widget.pageId! : 0];
     //Just needed for accounts
     currentTab = widget.pageId != null && widget.pageId == 1 ? 2 : 0;
+    //for finances
+    currentTab = widget.pageId != null && widget.pageId == 3 ? 1 : 0;
     fetchDataFromDatabase();
   }
 
