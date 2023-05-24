@@ -130,3 +130,69 @@
 3. Backup der Ordnerstruktur am Server machen
 4. prisma ordner, src ordner, package-lock.json, package.json, eventuell .env, tsconfig.json auf den Server kopieren und Dateien überschreiben
 5. pm2 restart node-server ausführen
+
+## Datenbank statements
+INSERT INTO `Type` VALUES ("1", "Einnahme");
+INSERT INTO `Type` VALUES ("2", "Ausgabe");
+INSERT INTO `Type` VALUES ("3", "Transaktion");
+
+INSERT INTO `Interval` VALUES ("1", "Nie");
+INSERT INTO `Interval` VALUES ("2", "Wöchentlich");
+INSERT INTO `Interval` VALUES ("3", "Monatlich");
+INSERT INTO `Interval` VALUES ("4", "Quartalsweise");
+INSERT INTO `Interval` VALUES ("5", "Halbjährlich");
+INSERT INTO `Interval` VALUES ("6", "Jährlich");
+
+INSERT INTO `IntervalSubtype` VALUES ("1", "Tag");
+INSERT INTO `IntervalSubtype` VALUES ("2", "Wochentag");
+
+INSERT INTO `Icon` VALUES ("1", "gift");
+INSERT INTO `Icon` VALUES ("2", "dollarSign");
+INSERT INTO `Icon` VALUES ("3", "train");
+INSERT INTO `Icon` VALUES ("4", "babyCarriage");
+INSERT INTO `Icon` VALUES ("5", "shoppingBag");
+INSERT INTO `Icon` VALUES ("6", "suitcase");
+INSERT INTO `Icon` VALUES ("7", "scissors");
+INSERT INTO `Icon` VALUES ("8", "eating");
+INSERT INTO `Icon` VALUES ("9", "car");
+INSERT INTO `Icon` VALUES ("10", "baby");
+INSERT INTO `Icon` VALUES ("11", "shirt");
+INSERT INTO `Icon` VALUES ("12", "plane");
+INSERT INTO `Icon` VALUES ("13", "paw");
+INSERT INTO `Icon` VALUES ("14", "parking");
+INSERT INTO `Icon` VALUES ("15", "music");
+INSERT INTO `Icon` VALUES ("16", "dumbbell");
+INSERT INTO `Icon` VALUES ("17", "driking");
+INSERT INTO `Icon` VALUES ("18", "wine");
+INSERT INTO `Icon` VALUES ("19", "beer");
+INSERT INTO `Icon` VALUES ("20", "smoking");
+INSERT INTO `Icon` VALUES ("21", "graduation");
+INSERT INTO `Icon` VALUES ("22", "home");
+INSERT INTO `Icon` VALUES ("23", "phone");
+INSERT INTO `Icon` VALUES ("24", "people");
+INSERT INTO `Icon` VALUES ("25", "amazon");
+INSERT INTO `Icon` VALUES ("26", "spotify");
+INSERT INTO `Icon` VALUES ("27", "video");
+INSERT INTO `Icon` VALUES ("28", "book");
+INSERT INTO `Icon` VALUES ("29", "gasPump");
+INSERT INTO `Icon` VALUES ("30", "coffee");
+INSERT INTO `Icon` VALUES ("31", "wrench");
+INSERT INTO `Icon` VALUES ("32", "medical");
+INSERT INTO `Icon` VALUES ("33", "running");
+INSERT INTO `Icon` VALUES ("34", "swimming");
+INSERT INTO `Icon` VALUES ("35", "shoppingCart");
+INSERT INTO `Icon` VALUES ("36", "star");
+
+
+INSERT INTO `Color` VALUES ("1", "blueDark");
+INSERT INTO `Color` VALUES ("2", "blueLight");
+INSERT INTO `Color` VALUES ("3", "yellowDark");
+INSERT INTO `Color` VALUES ("4", "greenLight");
+INSERT INTO `Color` VALUES ("5", "greenAcid");
+INSERT INTO `Color` VALUES ("6", "redDark");
+INSERT INTO `Color` VALUES ("7", "pink");
+INSERT INTO `Color` VALUES ("8", "orange");
+INSERT INTO `Color` VALUES ("9", "violett");
+INSERT INTO `Color` VALUES ("10", "greenKadmium");
+INSERT INTO `Color` VALUES ("11", "greenNavy");
+INSERT INTO `Color` VALUES ("12", "gray");

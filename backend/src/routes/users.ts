@@ -252,4 +252,10 @@ router.get('/intervals', async (req, res) => {
     res.send(intervals);
 });
 
+router.get('/intervalsubtypes', async (req, res) => {
+
+    const intervalsubtypes = await prisma.intervalSubtype.findMany();
+    res.send(intervalsubtypes);
+});
+
 export default router;

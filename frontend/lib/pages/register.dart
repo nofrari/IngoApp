@@ -4,6 +4,7 @@ import 'package:email_validator/email_validator.dart';
 import 'package:dio/dio.dart';
 import 'package:frontend/constants/colors.dart';
 import 'package:frontend/constants/values.dart';
+import 'package:frontend/models/interval_subtype.dart';
 import 'package:frontend/services/profile_service.dart';
 import 'package:frontend/widgets/checkbox.dart';
 import 'package:provider/provider.dart';
@@ -80,6 +81,7 @@ class _RegisterState extends State<Register> {
   }
 
   void _getIntervals() async {
+    //Intervals
     try {
       Response response = await Dio().get('${Values.serverURL}/intervals');
       List<transaction_interval.IntervalModel> interval = [];
@@ -92,6 +94,23 @@ class _RegisterState extends State<Register> {
       }
 
       await context.read<InitialService>().setInterval(interval);
+    } catch (e) {
+      print(e);
+    }
+    //Subtypes
+    try {
+      Response response =
+          await Dio().get('${Values.serverURL}/intervalsubtypes');
+      List<IntervalSubtypeModel> intervalSubtypes = [];
+
+      for (var i = 0; i < response.data.length; i++) {
+        intervalSubtypes.add(IntervalSubtypeModel(
+          interval_subtype_id: response.data[i]['interval_id'].toString(),
+          name: response.data[i]['interval_subtype_name'].toString(),
+        ));
+      }
+
+      await context.read<InitialService>().setIntervalSubtype(intervalSubtypes);
     } catch (e) {
       print(e);
     }

@@ -1,6 +1,7 @@
 import 'dart:convert';
 
 import 'package:flutter/material.dart';
+import 'package:frontend/models/interval_subtype.dart';
 import 'package:frontend/models/transaction_type.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -99,6 +100,29 @@ class InitialService extends ChangeNotifier {
         .toList();
 
     return intervals;
+  }
+
+  Future<void> setIntervalSubtype(List<IntervalSubtypeModel> interval) async {
+    try {
+      List<String> intervalSubtypeStrings = interval
+          .map((intervalSubtype) => jsonEncode(intervalSubtype.toJson()))
+          .toList();
+      _prefs.setStringList('intervalSubtypes', intervalSubtypeStrings);
+    } catch (e) {
+      debugPrint(e.toString());
+    }
+  }
+
+  List<IntervalSubtypeModel> getIntervalSubtypes() {
+    List<String> intervalSubtypeStrings =
+        _prefs.getStringList('intervalSubtypes') ?? [];
+
+    List<IntervalSubtypeModel> intervalSubtypes = intervalSubtypeStrings
+        .map((intervalStrings) =>
+            IntervalSubtypeModel.fromJson(jsonDecode(intervalStrings)))
+        .toList();
+
+    return intervalSubtypes;
   }
 
   Future<void> setTransactionType(List<type.TransactionType> type) async {
