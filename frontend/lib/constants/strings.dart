@@ -74,7 +74,7 @@ class Strings {
   static const String profileSave = "Speichern";
 
   //Transactions
-  static const String transactionsReoccuringHeading =
+  static const String transactionsReccuringHeading =
       "Wiederkehrende\nTransaktionen";
   static const String transactionsAdd = "Transaktion hinzuügen";
 }

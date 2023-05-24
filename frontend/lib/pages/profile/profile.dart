@@ -7,7 +7,7 @@ import 'package:frontend/models/user.dart';
 import 'package:frontend/pages/categories/categories.dart';
 import 'package:frontend/pages/guidelines.dart';
 import 'package:frontend/pages/profile/profile_overview.dart';
-import 'package:frontend/pages/transactions/transactions_reoccuring.dart';
+import 'package:frontend/pages/transactions/transactions_reccuring.dart';
 import 'package:frontend/pages/userauth.dart';
 import 'package:frontend/services/profile_service.dart';
 import 'package:frontend/widgets/button.dart';
@@ -65,7 +65,7 @@ class _ProfileState extends State<Profile> {
             ),
             OptionBlock(
               title: Strings.profileManage,
-              pages: const [Categories(), ReoccuringTransactions()],
+              pages: const [Categories(), ReccuringTransactions()],
               children: [
                 Text(Strings.profileCategory, style: Fonts.optionTitle),
                 Text(Strings.profileTransactions, style: Fonts.optionTitle),
