@@ -19,7 +19,6 @@ import '../services/transaction_service.dart';
 import '../widgets/input_fields/datepicker_field.dart';
 import '../widgets/input_fields/dropdown_field.dart';
 import '../widgets/input_fields/input_field.dart';
-import '../widgets/input_fields/search_field.dart';
 
 import '../constants/fonts.dart';
 
