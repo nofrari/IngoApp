@@ -1,4 +1,6 @@
+import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:frontend/models/category.dart';
 import 'package:frontend/models/color.dart';
 import 'package:frontend/models/icon.dart';
@@ -9,12 +11,17 @@ import 'package:frontend/widgets/transactions/transaction_list.dart';
 import 'package:provider/provider.dart';
 
 import '../constants/strings.dart';
+import '../constants/values.dart';
 import '../models/account.dart';
 import '../models/transaction.dart';
 import '../services/initial_service.dart';
 import '../services/transaction_service.dart';
 import '../widgets/input_fields/datepicker_field.dart';
 import '../widgets/input_fields/dropdown_field.dart';
+import '../widgets/input_fields/input_field.dart';
+import '../widgets/input_fields/search_field.dart';
+
+import '../constants/fonts.dart';
 
 class Finances extends StatefulWidget {
   const Finances({super.key});
@@ -32,6 +39,13 @@ class _FinancesState extends State<Finances> {
   String? selectedCategory;
   String? selectedAccount;
   String? selectedStartDate;
+
+  TextInputFormatter letters = FilteringTextInputFormatter.allow(
+      RegExp(r"[a-zA-Z0-9#+:'()&/^\-{2}|\s\.]"));
+
+  TextInputType text = TextInputType.text;
+
+  Dio dio = Dio();
 
   void onStartDateSelected(String startDate) {
     setState(() {
@@ -53,8 +67,45 @@ class _FinancesState extends State<Finances> {
     debugPrint(selectedAccount);
   }
 
+  List<TransactionModel> filteredTransactions = [];
+  bool matchFound = true;
+
+  List<TransactionModel> filterTransactions(
+      List<TransactionModel> transactions, String filter) {
+    filteredTransactions.clear();
+
+    List<String> searchTerms = filter.toLowerCase().split(" ");
+
+    matchFound = false;
+
+    for (var transaction in transactions) {
+      bool transactionMatchFound = true;
+
+      for (var term in searchTerms) {
+        if (!transaction.transaction_name.toLowerCase().contains(term) &&
+            !transaction.transaction_amount
+                .toString()
+                .toLowerCase()
+                .contains(term)) {
+          transactionMatchFound = false;
+          break;
+        }
+      }
+
+      if (transactionMatchFound) {
+        filteredTransactions.add(transaction);
+        matchFound = true;
+      }
+    }
+
+    setState(() {});
+
+    return filteredTransactions;
+  }
+
   TextEditingController controllerStartDate = TextEditingController();
   TextEditingController controllerEndDate = TextEditingController();
+  TextEditingController controllerSearch = TextEditingController();
 
   @override
   Widget build(BuildContext context) {
@@ -69,6 +120,25 @@ class _FinancesState extends State<Finances> {
       child: SingleChildScrollView(
         child: Column(
           children: [
+            InputField(
+              lblText: "Suche",
+              reqFormatter: letters,
+              keyboardType: text,
+              controller: controllerSearch,
+              maxLines: 1,
+              validator: (value) {
+                if (value == null || value.isEmpty) {
+                  return 'Das Feld darf nicht leer sein';
+                }
+                return null;
+              },
+              onChanged: (value) {
+                //performSearch(value);
+                filterTransactions(transactions, controllerSearch.text);
+              },
+              maxLength: 50,
+              onFocusChanged: (value) {},
+            ),
             DatepickerField(
               label: "Start",
               controller: controllerStartDate,
@@ -120,10 +190,17 @@ class _FinancesState extends State<Finances> {
             //     return null;
             //   },
             // ),
-            TransactionList(
-                selectedCategory: selectedCategory,
-                transactions: transactions,
-                accounts: selectedAccount),
+            (matchFound)
+                ? TransactionList(
+                    selectedCategory: selectedCategory,
+                    transactions: filteredTransactions.isEmpty
+                        ? transactions
+                        : filteredTransactions,
+                  )
+                : Padding(
+                    padding: const EdgeInsets.only(top: 30),
+                    child: Text("Kein Ergebnis gefunden", style: Fonts.text300),
+                  ),
           ],
         ),
       ),
