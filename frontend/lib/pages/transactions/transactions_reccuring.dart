@@ -85,7 +85,7 @@ class _ReccuringTransactionsState extends State<ReccuringTransactions> {
                     await Navigator.push(
                       context,
                       MaterialPageRoute(
-                        builder: (context) => const ManualEntry(),
+                        builder: (context) => ManualEntry(),
                       ),
                     );
                   },

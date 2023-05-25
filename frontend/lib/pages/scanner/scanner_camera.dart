@@ -214,7 +214,7 @@ class _ScannerCameraState extends State<ScannerCamera>
                                   MaterialPageRoute(
                                     builder: (context) =>
                                         (position == null && images.isEmpty)
-                                            ? const ManualEntry()
+                                            ? ManualEntry()
                                             : const ScannerPreview(),
                                   ),
                                 );

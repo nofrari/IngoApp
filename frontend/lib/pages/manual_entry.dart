@@ -27,6 +27,7 @@ import 'package:frontend/widgets/input_fields/datepicker_field.dart';
 import 'package:frontend/widgets/pdf_preview.dart';
 import 'package:dio/dio.dart';
 import 'package:frontend/widgets/popup.dart';
+import 'package:frontend/widgets/round_button.dart';
 import 'package:provider/provider.dart';
 import 'package:intl/intl.dart';
 
@@ -50,19 +51,19 @@ int getWeekdayCount() {
 
 String getWeekDay() {
   switch (DateTime.now().weekday) {
-    case 0:
-      return "Montag";
     case 1:
-      return "Dienstag";
+      return "Montag";
     case 2:
-      return "Mittwoch";
+      return "Dienstag";
     case 3:
-      return "Donnerstag";
+      return "Mittwoch";
     case 4:
-      return "Freitag";
+      return "Donnerstag";
     case 5:
-      return "Samstag";
+      return "Freitag";
     case 6:
+      return "Samstag";
+    case 7:
       return "Sonntag";
     default:
       return "";
@@ -70,7 +71,8 @@ String getWeekDay() {
 }
 
 class ManualEntry extends StatefulWidget {
-  const ManualEntry({super.key});
+  ManualEntry({super.key, this.isEditMode = false});
+  bool isEditMode;
 
   @override
   State<ManualEntry> createState() => _ManualEntryState();
@@ -130,10 +132,13 @@ class _ManualEntryState extends State<ManualEntry> {
   List<TransactionType> allTypes = [];
   List<Account> allAccounts = [];
   List<transaction_interval.IntervalModel> allIntervals = [];
+  List<IntervalSubtypeModel> allIntervalSubtypes = [];
   String? _initialType;
   String? _initialCategory;
   String? _initialAccount;
   String? _initialFrequency;
+  String? _initialFrequencySubtype;
+  String? _loadedTransactionId;
 
   TransactionModel _currentTransaction = TransactionModel(
       transaction_id: "",
@@ -145,10 +150,21 @@ class _ManualEntryState extends State<ManualEntry> {
       interval_id: "",
       account_id: "");
 
+  List<String> allIntervalSubtypesNames() {
+    //montalich, quartalsweise, halbjärhlich, jährlich
+    List<String> names = [];
+    if (selectedInterval != null && selectedInterval!.name == "Monatlich") {
+      names.clear();
+      names.add("${DateTime.now().day}. des Monats");
+      names.add("${getWeekdayCount()}. ${getWeekDay()} des Monats");
+    }
+    return names;
+  }
+
   void updateCurrentTransaction() async {
     setState(() {
       _currentTransaction = TransactionModel(
-          transaction_id: "",
+          transaction_id: _loadedTransactionId ?? "",
           transaction_name: controllerTitle.text,
           transaction_amount: currencyToDouble(controllerAmount.text),
           description: controllerDescription.text,
@@ -176,10 +192,19 @@ class _ManualEntryState extends State<ManualEntry> {
     if (loadedTransaction == null) return;
     setState(() {
       _currentTransaction = loadedTransaction;
+      _loadedTransactionId = loadedTransaction.transaction_id;
       controllerTitle.text = loadedTransaction.transaction_name;
       controllerAmount.text = loadedTransaction.transaction_amount == 0
           ? ""
-          : loadedTransaction.transaction_amount.toString();
+          : NumberFormat.currency(locale: 'de', name: "EUR", symbol: '€')
+              .format(loadedTransaction.transaction_amount);
+
+      // currencyFormatter
+      //     .formatEditUpdate(
+      //         TextEditingValue.empty,
+      //         TextEditingValue(
+      //             text: loadedTransaction.transaction_amount.toString()))
+      //     .text; //loadedTransaction.transaction_amount.toString();
       controllerDescription.text = loadedTransaction.description ?? "";
       controllerDate.text = loadedTransaction.date == DateTime(2000)
           ? ""
@@ -188,29 +213,37 @@ class _ManualEntryState extends State<ManualEntry> {
       allTypes = context.read<InitialService>().getTransactionType();
       allAccounts = context.read<AccountsService>().getAccounts();
       allIntervals = context.read<InitialService>().getInterval();
+      allIntervalSubtypes =
+          context.read<InitialService>().getIntervalSubtypes();
       allCategories = context.read<InitialService>().getCategories();
 
       if (loadedTransaction.type_id != "") {
-        _initialType = allTypes
-            .firstWhere((type) => type.type_id == loadedTransaction.type_id)
-            .name;
+        selectedType = allTypes
+            .firstWhere((type) => type.type_id == loadedTransaction.type_id);
+        _initialType = selectedType!.name;
       }
       if (loadedTransaction.account_id != "") {
-        _initialAccount = allAccounts
-            .firstWhere((account) => account.id == loadedTransaction.account_id)
-            .name;
+        selectedAccount = allAccounts.firstWhere(
+            (account) => account.id == loadedTransaction.account_id);
+        _initialAccount = selectedAccount!.name;
       }
       if (loadedTransaction.interval_id != "") {
-        _initialFrequency = allIntervals
-            .firstWhere((interval) =>
-                interval.interval_id == loadedTransaction.interval_id)
-            .name;
+        selectedInterval = allIntervals.firstWhere((interval) =>
+            interval.interval_id == loadedTransaction.interval_id);
+        _initialFrequency = selectedInterval!.name;
+      }
+
+      if (loadedTransaction.interval_subtype_id != "null") {
+        int index = allIntervalSubtypes.indexWhere((subtype) =>
+            subtype.interval_subtype_id ==
+            loadedTransaction.interval_subtype_id);
+        selectedIntervalSubtype = allIntervalSubtypes[index];
+        _initialFrequencySubtype = allIntervalSubtypesNames()[index];
       }
       if (loadedTransaction.category_id != "") {
-        _initialCategory = allCategories
-            .firstWhere((category) =>
-                category.category_id == loadedTransaction.category_id)
-            .label;
+        selectedCategory = allCategories.firstWhere((category) =>
+            category.category_id == loadedTransaction.category_id);
+        _initialCategory = selectedCategory!.label;
       }
     });
   }
@@ -256,19 +289,7 @@ class _ManualEntryState extends State<ManualEntry> {
     List<String> intervalNames =
         allIntervals.map((interval) => interval.name).toList();
 
-    List<IntervalSubtypeModel> allIntervalSubtypes =
-        context.watch<InitialService>().getIntervalSubtypes();
-
-    List<String> allIntervalSubtypesNames() {
-      //montalich, quartalsweise, halbjärhlich, jährlich
-      List<String> names = [];
-      if (selectedInterval != null && selectedInterval!.name == "Monatlich") {
-        names.clear();
-        names.add("${DateTime.now().day}. des Monats");
-        names.add("${getWeekdayCount()}. ${getWeekDay()} des Monats");
-      }
-      return names;
-    }
+    allIntervalSubtypes = context.watch<InitialService>().getIntervalSubtypes();
 
     allTypes = context.watch<InitialService>().getTransactionType();
     List<String> typeNames = allTypes.map((type) => type.name).toList();
@@ -298,8 +319,9 @@ class _ManualEntryState extends State<ManualEntry> {
               showDialog(
                 context: context,
                 builder: (BuildContext context) => PopUp(
-                  content:
-                      "Wenn du diese Seite verlässt, verliest du den Fortschritt mit dieser Eingabe. Bist du sicher, dass du zurück zum Scanner möchtest?",
+                  content: widget.isEditMode == false
+                      ? "Wenn du diese Seite verlässt, verliest du den Fortschritt mit dieser Eingabe. Bist du sicher, dass du zurück zum Scanner möchtest?"
+                      : "Bist du sicher, dass du die Änderungen verwefen möchtest?",
                   actions: [
                     Container(
                       margin: Values.buttonPadding,
@@ -332,12 +354,22 @@ class _ManualEntryState extends State<ManualEntry> {
                                     ? await deletePdfFile(
                                         manualEntry['pdf_name'])
                                     : null;
-                                Navigator.push(
-                                  context,
-                                  MaterialPageRoute(
-                                    builder: (context) => const ScannerCamera(),
-                                  ),
-                                );
+                                if (widget.isEditMode) {
+                                  Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                      builder: (context) => const Start(),
+                                    ),
+                                  );
+                                } else {
+                                  Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                      builder: (context) =>
+                                          const ScannerCamera(),
+                                    ),
+                                  );
+                                }
                               },
                               theme: ButtonColorTheme.primary),
                         ],
@@ -531,6 +563,7 @@ class _ManualEntryState extends State<ManualEntry> {
                                 dropdownItems: allIntervalSubtypesNames(),
                                 label: Strings.dropdownPattern,
                                 needsNewCategoryButton: false,
+                                initialValue: _initialFrequencySubtype,
                                 validator: (value) {
                                   if (value == null || value.isEmpty) {
                                     return 'Das Feld darf nicht leer sein';
@@ -566,11 +599,8 @@ class _ManualEntryState extends State<ManualEntry> {
                           pdfHeight: manualEntry['pdf_height'],
                         ),
                         const SizedBox(
-                          height: 80,
+                          height: 100,
                         ),
-                        const SizedBox(
-                          height: 300,
-                        )
                       ],
                     ),
                   ),
@@ -581,56 +611,92 @@ class _ManualEntryState extends State<ManualEntry> {
                 ? ButtonTransparentContainer(
                     child: Container(
                       margin: Values.buttonPadding,
-                      child: Button(
-                          isTransparent: true,
-                          btnText: "SPEICHERN",
-                          onTap: () async {
-                            updateCurrentTransaction();
-                            if (_formKey.currentState!.validate()) {
-                              ScaffoldMessenger.of(context).showSnackBar(
-                                const SnackBar(
-                                    content: Text('Daten werden gespeichert')),
-                              );
-                              final date = datePicker.selectedDate;
-
-                              String? pdf_name = PdfFile.getName();
-
-                              if (_currentTransaction.isCompleted()) {
-                                //! is allowed because isCompleted() checks if thats empty
-                                _sendData(
-                                    manualEntry.isNotEmpty
-                                        ? manualEntry['pdf_name']
-                                        : pdf_name ?? " ",
-                                    _currentTransaction);
-                              } else {
-                                debugPrint(
-                                    "current Transaction Id: ${_currentTransaction.transaction_id} name: ${_currentTransaction.transaction_name} amount: ${_currentTransaction.transaction_amount} date: ${_currentTransaction.date} description: ${_currentTransaction.description} category_id: ${_currentTransaction.category_id} type_id: ${_currentTransaction.type_id} interval_id: ${_currentTransaction.interval_id} interval_subtype_id: ${_currentTransaction.interval_subtype_id} account_id: ${_currentTransaction.account_id}");
-                              }
-
-                              List<String> images =
-                                  context.read<ScannerService>().getImages();
-
-                              await CustomCacheManager.clearCache(
-                                  context, images);
-
-                              if (context.mounted) {
+                      child: Row(
+                        children: [
+                          if (widget.isEditMode)
+                            RoundButton(
+                              onTap: () async {
+                                await dio.delete(
+                                    "${Values.serverURL}/transactions/delete/${_currentTransaction.transaction_id}");
                                 await context
                                     .read<ManualEntryService>()
                                     .forgetManualEntry();
                                 await context
                                     .read<TransactionService>()
                                     .clearTransaction();
-                              }
-                              // ignore: use_build_context_synchronously
-                              await Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                  builder: (context) => const Start(),
-                                ),
-                              );
-                            }
-                          },
-                          theme: ButtonColorTheme.secondaryLight),
+                                manualEntry.isNotEmpty
+                                    ? await deletePdfFile(
+                                        manualEntry['pdf_name'])
+                                    : null;
+                                Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (context) => const Start(),
+                                  ),
+                                );
+                              },
+                              icon: Icons.delete,
+                              isTransparent: true,
+                            ),
+                          Expanded(
+                            child: Button(
+                                isTransparent: true,
+                                btnText: widget.isEditMode
+                                    ? "ÄDERUNGEN SPEICHERN"
+                                    : "SPEICHERN",
+                                onTap: () async {
+                                  updateCurrentTransaction();
+                                  if (_formKey.currentState!.validate()) {
+                                    ScaffoldMessenger.of(context).showSnackBar(
+                                      const SnackBar(
+                                          content:
+                                              Text('Daten werden gespeichert')),
+                                    );
+                                    final date = datePicker.selectedDate;
+
+                                    String? pdf_name = PdfFile.getName();
+
+                                    debugPrint(
+                                        "is complete: ${_currentTransaction.isCompleted()}");
+                                    if (_currentTransaction.isCompleted()) {
+                                      await _sendData(
+                                          manualEntry.isNotEmpty
+                                              ? manualEntry['pdf_name']
+                                              : pdf_name ?? " ",
+                                          _currentTransaction);
+                                    } else {
+                                      debugPrint(
+                                          "current Transaction Id: ${_currentTransaction.transaction_id} name: ${_currentTransaction.transaction_name} amount: ${_currentTransaction.transaction_amount} date: ${_currentTransaction.date} description: ${_currentTransaction.description} category_id: ${_currentTransaction.category_id} type_id: ${_currentTransaction.type_id} interval_id: ${_currentTransaction.interval_id} interval_subtype_id: ${_currentTransaction.interval_subtype_id} account_id: ${_currentTransaction.account_id}");
+                                    }
+
+                                    List<String> images = context
+                                        .read<ScannerService>()
+                                        .getImages();
+
+                                    await CustomCacheManager.clearCache(
+                                        context, images);
+
+                                    if (context.mounted) {
+                                      await context
+                                          .read<ManualEntryService>()
+                                          .forgetManualEntry();
+                                      await context
+                                          .read<TransactionService>()
+                                          .clearTransaction();
+                                    }
+                                    // ignore: use_build_context_synchronously
+                                    await Navigator.push(
+                                      context,
+                                      MaterialPageRoute(
+                                        builder: (context) => const Start(),
+                                      ),
+                                    );
+                                  }
+                                },
+                                theme: ButtonColorTheme.secondaryLight),
+                          ),
+                        ],
+                      ),
                     ),
                   )
                 : Container(),
@@ -642,6 +708,7 @@ class _ManualEntryState extends State<ManualEntry> {
 
   Future _sendData(String pdfName, TransactionModel transaction) async {
     Map<String, dynamic> formData = {
+      "transaction_id": transaction.transaction_id,
       "transaction_name": transaction.transaction_name,
       "transaction_amount": transaction.transaction_amount,
       "date": transaction.date.toString(),
@@ -656,7 +723,7 @@ class _ManualEntryState extends State<ManualEntry> {
 
     var response = await dio.post("${Values.serverURL}/transactions/input",
         data: formData);
-    debugPrint(response.toString());
+    debugPrint("send data response: ${response.toString()}");
   }
 
   Future savePDFToServer(String filePath) async {

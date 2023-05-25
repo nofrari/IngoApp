@@ -77,7 +77,7 @@ class _StartState extends State<Start> {
     const Profile(),
     const Scanner(),
     const ScannerCamera(),
-    const ManualEntry(),
+    ManualEntry(),
   ];
 
   final PageStorageBucket bucket = PageStorageBucket();

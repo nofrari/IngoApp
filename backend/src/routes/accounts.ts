@@ -91,10 +91,10 @@ router.delete('/accounts/:id', async (req, res) => {
     });
 
     if (!account) {
-        return res.status(404).json({ message: 'Kategorie nicht gefunden' });
+        return res.status(404).json({ message: 'Account nicht gefunden' });
     }
 
-    res.json({ message: 'Kategorie erfolgreich gelöscht' });
+    res.json({ message: 'Account erfolgreich gelöscht' });
 });
 
 router.get('/accounts/totalAmount/:user_id', async (req, res) => {

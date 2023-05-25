@@ -65,6 +65,8 @@ class _HomeOverviewCardState extends State<HomeOverviewCard> {
               type_id: (transaction['type_id']).toString(),
               description: transaction['description'].toString(),
               interval_id: transaction['interval_id'].toString(),
+              interval_subtype_id:
+                  transaction['interval_subtype_id'].toString(),
               account_id: transaction['account_id'].toString()),
         );
       }
@@ -81,6 +83,8 @@ class _HomeOverviewCardState extends State<HomeOverviewCard> {
               type_id: (latestTransaction['type_id']).toString(),
               description: latestTransaction['description'].toString(),
               interval_id: latestTransaction['interval_id'].toString(),
+              interval_subtype_id:
+                  latestTransaction['interval_subtype_id'].toString(),
               account_id: latestTransaction['account_id'].toString()),
         );
       }

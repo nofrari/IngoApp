@@ -173,7 +173,7 @@ class _CategoryAddState extends State<CategoryAdd> {
                             Navigator.push(
                               context,
                               MaterialPageRoute(
-                                builder: (context) => const ManualEntry(),
+                                builder: (context) => ManualEntry(),
                               ),
                             );
                           } else {

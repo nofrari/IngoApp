@@ -337,7 +337,7 @@ class _ScannerPreviewState extends State<ScannerPreview>
                       await Navigator.push(
                         context,
                         MaterialPageRoute(
-                          builder: (context) => const ManualEntry(),
+                          builder: (context) => ManualEntry(),
                         ),
                       );
                     },

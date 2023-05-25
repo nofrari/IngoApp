@@ -32,6 +32,8 @@ class _StartAccountState extends State<StartAccount> {
   TextInputType numeric = TextInputType.number;
   TextInputType text = TextInputType.text;
 
+  final _formKey = GlobalKey<FormState>();
+
   bool _isFocused = false;
   void onTextFieldFocusChanged(bool isFocused) {
     setState(() {
@@ -73,6 +75,7 @@ class _StartAccountState extends State<StartAccount> {
                     color: AppColor.backgroundGray,
                   ),
                   child: Form(
+                    key: _formKey,
                     child: Container(
                       margin: const EdgeInsets.all(20),
                       child: Column(
@@ -124,16 +127,18 @@ class _StartAccountState extends State<StartAccount> {
                               child: Button(
                                   btnText: "Startkonto erstellen".toUpperCase(),
                                   onTap: () async {
-                                    await _sendData(
-                                        controllerTitle.text,
-                                        currencyToDouble(
-                                            controllerAmount.text));
-                                    Navigator.push(
-                                      context,
-                                      MaterialPageRoute(
-                                        builder: (context) => const Start(),
-                                      ),
-                                    );
+                                    if (_formKey.currentState!.validate()) {
+                                      await _sendData(
+                                          controllerTitle.text,
+                                          currencyToDouble(
+                                              controllerAmount.text));
+                                      Navigator.push(
+                                        context,
+                                        MaterialPageRoute(
+                                          builder: (context) => const Start(),
+                                        ),
+                                      );
+                                    }
                                   },
                                   theme: ButtonColorTheme.secondaryLight),
                             ),

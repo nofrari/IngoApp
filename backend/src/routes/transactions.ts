@@ -1,5 +1,5 @@
 import express from 'express';
-import { PrismaClient } from '@prisma/client';
+import { PrismaClient, Transaction } from '@prisma/client';
 import { z } from 'zod';
 import multer from 'multer';
 import PDFDocument, { options } from 'pdfkit';
@@ -28,6 +28,7 @@ var storage = multer.diskStorage({
 const upload = multer({ storage: storage });
 
 const inputSchema = z.object({
+  transaction_id: z.string().optional(),
   transaction_name: z.string(),
   transaction_amount: z.number(),
   date: z.string(),
@@ -75,25 +76,62 @@ router.post('/transactions/input', async (req, res) => {
     return;
   }
 
-  // console.log(typeof (body.interval_subtype_id));
-  // console.log(body.interval_subtype_id == null);
-  // console.log(body.interval_subtype_id == undefined);
-  // console.log(body.interval_subtype_id == "");
-
-  const transaction = await prisma.transaction.create({
-    data: {
-      transaction_name: body.transaction_name,
-      transaction_amount: body.transaction_amount,
-      date: new Date(body.date),
-      description: body.description,
-      bill_url: body.bill_url,
-      category_id: body.category_id,
-      type_id: body.type_id,
-      interval_id: body.interval_id,
-      interval_subtype_id: body.interval_subtype_id == "" ? null : body.interval_subtype_id,
-      account_id: body.account_id,
+  //check if transaction is new or is updated
+  const oldTransaction = await prisma.transaction.findUnique({
+    where: {
+      transaction_id: body.transaction_id,
     },
   });
+
+  var updatedTransaction: Transaction | undefined;
+  var newTransaction: Transaction | undefined;
+
+  if (oldTransaction) {
+    updatedTransaction = await prisma.transaction.update({
+      where: {
+        transaction_id: body.transaction_id,
+      },
+      data: {
+        transaction_name: body.transaction_name,
+        transaction_amount: body.transaction_amount,
+        date: new Date(body.date),
+        description: body.description,
+        bill_url: body.bill_url,
+        category_id: body.category_id,
+        type_id: body.type_id,
+        interval_id: body.interval_id,
+        interval_subtype_id: body.interval_subtype_id == "" ? null : body.interval_subtype_id,
+        account_id: body.account_id,
+      },
+    });
+
+    if (!updatedTransaction) {
+      res.status(400).send();
+      return;
+    }
+  } else {
+
+    newTransaction = await prisma.transaction.create({
+      data: {
+        transaction_name: body.transaction_name,
+        transaction_amount: body.transaction_amount,
+        date: new Date(body.date),
+        description: body.description,
+        bill_url: body.bill_url,
+        category_id: body.category_id,
+        type_id: body.type_id,
+        interval_id: body.interval_id,
+        interval_subtype_id: body.interval_subtype_id == "" ? null : body.interval_subtype_id,
+        account_id: body.account_id,
+      },
+    });
+  }
+
+
+  if (!newTransaction && !updatedTransaction) {
+    res.status(400).send();
+    return;
+  }
 
   const type = await prisma.type.findUnique({
     where: {
@@ -109,7 +147,7 @@ router.post('/transactions/input', async (req, res) => {
         },
         data: {
           account_balance: {
-            increment: body.transaction_amount,
+            increment: oldTransaction ? body.transaction_amount - oldTransaction.transaction_amount : body.transaction_amount,
           },
         },
       });
@@ -121,8 +159,7 @@ router.post('/transactions/input', async (req, res) => {
         },
         data: {
           account_balance: {
-            decrement: body.transaction_amount,
-            //increment: body.transaction_amount,
+            decrement: oldTransaction ? body.transaction_amount - oldTransaction.transaction_amount : body.transaction_amount,
           },
         },
       });
@@ -139,17 +176,17 @@ router.post('/transactions/input', async (req, res) => {
   // }, <string>process.env.JWT_SECRET);
 
   res.send({
-    transaction_id: transaction.transaction_id,
-    transaction_name: transaction.transaction_name,
-    transaction_amount: transaction.transaction_amount,
-    date: transaction.date,
-    description: transaction.description,
-    bill_url: transaction.bill_url,
-    category_id: transaction.category_id,
-    type_id: transaction.type_id,
-    interval_id: transaction.interval_id,
-    interval_subtype_id: transaction.interval_subtype_id,
-    account_id: transaction.account_id,
+    transaction_id: (oldTransaction ? updatedTransaction! : newTransaction!).transaction_id,
+    transaction_name: (oldTransaction ? updatedTransaction! : newTransaction!).transaction_name,
+    transaction_amount: (oldTransaction ? updatedTransaction! : newTransaction!).transaction_amount,
+    date: (oldTransaction ? updatedTransaction! : newTransaction!).date,
+    description: (oldTransaction ? updatedTransaction! : newTransaction!).description,
+    bill_url: (oldTransaction ? updatedTransaction! : newTransaction!).bill_url,
+    category_id: (oldTransaction ? updatedTransaction! : newTransaction!).category_id,
+    type_id: (oldTransaction ? updatedTransaction! : newTransaction!).type_id,
+    interval_id: (oldTransaction ? updatedTransaction! : newTransaction!).interval_id,
+    interval_subtype_id: (oldTransaction ? updatedTransaction! : newTransaction!).interval_subtype_id,
+    account_id: (oldTransaction ? updatedTransaction! : newTransaction!).account_id,
   });
 });
 
@@ -227,6 +264,56 @@ router.delete('/transactions/:filename', (req, res) => {
       res.send('PDF file deleted successfully');
     }
   });
+});
+
+router.delete('/transactions/delete/:id', async (req, res) => {
+  const transaction = await prisma.transaction.delete({
+    where: {
+      transaction_id: req.params.id,
+    },
+  });
+
+  if (!transaction) {
+    return res.status(404).json({ message: 'Transaction nicht gefunden' });
+  }
+
+  const type = await prisma.type.findUnique({
+    where: {
+      type_id: transaction.type_id,
+    },
+  });
+
+  switch (type?.type_name) {
+    case 'Einnahme':
+      await prisma.account.update({
+        where: {
+          account_id: transaction.account_id,
+        },
+        data: {
+          account_balance: {
+            decrement: transaction.transaction_amount,
+          },
+        },
+      });
+      break;
+    case 'Ausgabe':
+      await prisma.account.update({
+        where: {
+          account_id: transaction.account_id,
+        },
+        data: {
+          account_balance: {
+            increment: transaction.transaction_amount,
+          },
+        },
+      });
+      break;
+    case 'Transfer':
+      //TODO: Add transfer code
+      break;
+  }
+
+  res.json({ message: 'Transaction erfolgreich gelöscht' });
 });
 
 // router.get('/transactions', async (req, res) => {
