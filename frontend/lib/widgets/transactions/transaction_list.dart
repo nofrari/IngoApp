@@ -6,6 +6,7 @@ import 'package:frontend/models/account.dart';
 import 'package:flutter/material.dart';
 import 'package:frontend/services/accounts_service.dart';
 import 'package:frontend/widgets/transactions/transaction_item.dart';
+import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 import '../../services/initial_service.dart';
 
@@ -14,9 +15,13 @@ class TransactionList extends StatefulWidget {
       {super.key,
       this.selectedCategory,
       this.accounts,
+      this.startDate,
+      this.endDate,
       required this.transactions});
   final String? selectedCategory;
   final String? accounts;
+  final String? startDate;
+  final String? endDate;
   final List<TransactionModel> transactions;
 
   @override
@@ -38,6 +43,20 @@ class _TransactionListState extends State<TransactionList> {
     List<CategoryModel> desiredCategories = [];
     List<Account> desiredAccounts = [];
 
+    String formatDate(String inputDate) {
+      if (inputDate.contains("/")) {
+        DateFormat inputFormat = DateFormat('dd / MM / yyyy');
+        DateFormat outputFormat = DateFormat('yyyy-MM-dd');
+        DateTime date = inputFormat.parse(inputDate);
+
+        String outputDate = outputFormat.format(date);
+
+        return outputDate;
+      } else {
+        return inputDate;
+      }
+    }
+
     if (widget.selectedCategory != null && widget.selectedCategory != "") {
       selectedCategories = widget.selectedCategory!
           .split(',')
@@ -56,9 +75,19 @@ class _TransactionListState extends State<TransactionList> {
           .toList();
     }
 
+    String? formateStartDate;
+    if (widget.startDate != null && widget.startDate != "") {
+      formateStartDate = formatDate(widget.startDate!);
+    }
+    String? formateEndDate;
+    if (widget.endDate != null && widget.endDate != "") {
+      formateEndDate = formatDate(widget.endDate!);
+    }
+
     filteredTransactions = filteredTransactions.where((transaction) {
       bool categoryFilter = true;
       bool accountFilter = true;
+      bool dateFilter = true;
 
       if (desiredCategories.isNotEmpty) {
         categoryFilter = desiredCategories
@@ -70,7 +99,28 @@ class _TransactionListState extends State<TransactionList> {
             .any((account) => transaction.account_id == account.id);
       }
 
-      return categoryFilter && accountFilter;
+      if (formateEndDate != null && formateEndDate != "" ||
+          formateStartDate != null && formateStartDate != "") {
+        if (formateEndDate != null &&
+            formateEndDate != "" &&
+            formateStartDate != null &&
+            formateStartDate != "") {
+          dateFilter = transaction.date
+                  .isAfter(DateTime.parse(formateStartDate)) &&
+              transaction.date.isBefore(
+                  DateTime.parse(formateEndDate).add(const Duration(days: 1)));
+        } else {
+          if (formateEndDate != null && formateEndDate != "") {
+            dateFilter = transaction.date.isBefore(
+                DateTime.parse(formateEndDate).add(const Duration(days: 1)));
+          } else {
+            dateFilter =
+                transaction.date.isAfter(DateTime.parse(formateStartDate!));
+          }
+        }
+      }
+
+      return categoryFilter && accountFilter && dateFilter;
     }).toList();
 
     //for long lists use ListView
