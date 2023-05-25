@@ -46,7 +46,6 @@ class _TransactionListState extends State<TransactionList> {
       desiredCategories = categoriesList
           .where((category) => selectedCategories.contains(category.label))
           .toList();
-      debugPrint(desiredCategories.toString());
     }
 
     if (widget.accounts != null && widget.accounts != "") {
@@ -56,7 +55,6 @@ class _TransactionListState extends State<TransactionList> {
           .where((account) => selectedAccounts.contains(account.name))
           .toList();
     }
-    debugPrint("hello ${desiredAccounts.toString()}");
 
     filteredTransactions = filteredTransactions.where((transaction) {
       bool categoryFilter = true;
@@ -78,7 +76,7 @@ class _TransactionListState extends State<TransactionList> {
     //for long lists use ListView
     return filteredTransactions.isNotEmpty
         ? Container(
-            margin: const EdgeInsets.only(top: 20),
+            margin: const EdgeInsets.only(top: 10),
             decoration: BoxDecoration(
               border: Border.all(
                 color: AppColor.neutral500,
