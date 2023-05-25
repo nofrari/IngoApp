@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:frontend/constants/colors.dart';
 import 'package:frontend/constants/fonts.dart';
+import 'package:frontend/constants/values.dart';
 import 'package:frontend/pages/categories/categories.dart';
 import 'package:frontend/widgets/button.dart';
 import 'package:frontend/widgets/button_transparent_container.dart';
@@ -186,7 +187,7 @@ class _CategoryDeleteState extends State<CategoryDelete> {
     };
 
     var response = await dio.delete(
-        "http://localhost:5432/categories/${current_category_id}",
+        "${Values.serverURL}/categories/${current_category_id}",
         data: formData);
 
     debugPrint(response.toString());

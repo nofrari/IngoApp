@@ -6,7 +6,9 @@ import 'package:frontend/constants/colors.dart';
 import 'package:frontend/constants/fonts.dart';
 import 'package:frontend/constants/icons.dart';
 import 'package:frontend/constants/values.dart';
+import 'package:frontend/models/category.dart';
 import 'package:frontend/pages/categories/categories.dart';
+import 'package:frontend/pages/manual_entry.dart';
 import 'package:frontend/services/profile_service.dart';
 import 'package:frontend/widgets/button.dart';
 import 'package:frontend/widgets/button_transparent_container.dart';
@@ -168,7 +170,12 @@ class _CategoryAddState extends State<CategoryAdd> {
                           );
 
                           if (widget.lastPage == "ManualEntry") {
-                            Navigator.pop(context);
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) => const ManualEntry(),
+                              ),
+                            );
                           } else {
                             Navigator.push(
                               context,
@@ -211,5 +218,11 @@ class _CategoryAddState extends State<CategoryAdd> {
       "${Values.serverURL}/categories/input",
       data: formData,
     );
+    await context.read<InitialService>().setCategory(CategoryModel(
+        category_id: response.data["category_id"],
+        bgColor: colorName,
+        isWhite: is_white,
+        icon: iconName,
+        label: label));
   }
 }

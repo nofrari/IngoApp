@@ -16,6 +16,7 @@ import 'package:frontend/services/custom_cache_manager.dart';
 import 'package:frontend/services/initial_service.dart';
 import 'package:frontend/services/manualentry_service.dart';
 import 'package:frontend/services/scanner_service.dart';
+import 'package:frontend/services/transaction_service.dart';
 import 'package:frontend/start.dart';
 import 'package:frontend/widgets/button.dart';
 import 'package:frontend/widgets/button_transparent_container.dart';
@@ -125,6 +126,15 @@ class _ManualEntryState extends State<ManualEntry> {
     return false;
   }
 
+  List<CategoryModel> allCategories = [];
+  List<TransactionType> allTypes = [];
+  List<Account> allAccounts = [];
+  List<transaction_interval.IntervalModel> allIntervals = [];
+  String? _initialType;
+  String? _initialCategory;
+  String? _initialAccount;
+  String? _initialFrequency;
+
   TransactionModel _currentTransaction = TransactionModel(
       transaction_id: "",
       transaction_name: "",
@@ -135,7 +145,7 @@ class _ManualEntryState extends State<ManualEntry> {
       interval_id: "",
       account_id: "");
 
-  void updateCurrentTransaction() {
+  void updateCurrentTransaction() async {
     setState(() {
       _currentTransaction = TransactionModel(
           transaction_id: "",
@@ -155,11 +165,60 @@ class _ManualEntryState extends State<ManualEntry> {
               : "",
           type_id: selectedType != null ? selectedType!.type_id : "");
     });
+    await context
+        .read<TransactionService>()
+        .setTransaction(_currentTransaction);
+  }
+
+  void loadTransaction() {
+    TransactionModel? loadedTransaction =
+        context.read<TransactionService>().getTransaction();
+    if (loadedTransaction == null) return;
+    setState(() {
+      _currentTransaction = loadedTransaction;
+      controllerTitle.text = loadedTransaction.transaction_name;
+      controllerAmount.text = loadedTransaction.transaction_amount == 0
+          ? ""
+          : loadedTransaction.transaction_amount.toString();
+      controllerDescription.text = loadedTransaction.description ?? "";
+      controllerDate.text = loadedTransaction.date == DateTime(2000)
+          ? ""
+          : DateFormat("dd / MM / yyyy").format(loadedTransaction.date);
+
+      allTypes = context.read<InitialService>().getTransactionType();
+      allAccounts = context.read<AccountsService>().getAccounts();
+      allIntervals = context.read<InitialService>().getInterval();
+      allCategories = context.read<InitialService>().getCategories();
+
+      if (loadedTransaction.type_id != "") {
+        _initialType = allTypes
+            .firstWhere((type) => type.type_id == loadedTransaction.type_id)
+            .name;
+      }
+      if (loadedTransaction.account_id != "") {
+        _initialAccount = allAccounts
+            .firstWhere((account) => account.id == loadedTransaction.account_id)
+            .name;
+      }
+      if (loadedTransaction.interval_id != "") {
+        _initialFrequency = allIntervals
+            .firstWhere((interval) =>
+                interval.interval_id == loadedTransaction.interval_id)
+            .name;
+      }
+      if (loadedTransaction.category_id != "") {
+        _initialCategory = allCategories
+            .firstWhere((category) =>
+                category.category_id == loadedTransaction.category_id)
+            .label;
+      }
+    });
   }
 
   @override
   void initState() {
     super.initState();
+    loadTransaction();
   }
 
   @override
@@ -183,17 +242,17 @@ class _ManualEntryState extends State<ManualEntry> {
         context.watch<ManualEntryService>().getManualEntry();
     List<String> images = context.watch<ScannerService>().getImages();
 
-    List<Account> allAccounts = context.watch<AccountsService>().getAccounts();
+    allAccounts = context.watch<AccountsService>().getAccounts();
     List<String> accountNames =
         allAccounts.map((account) => account.name).toList();
 
-    List<CategoryModel> allCategories =
-        context.watch<InitialService>().getCategories();
+    setState(() {
+      allCategories = context.watch<InitialService>().getCategories();
+    });
     List<String> categoryNames =
         allCategories.map((category) => category.label).toList();
 
-    List<transaction_interval.IntervalModel> allIntervals =
-        context.watch<InitialService>().getInterval();
+    allIntervals = context.watch<InitialService>().getInterval();
     List<String> intervalNames =
         allIntervals.map((interval) => interval.name).toList();
 
@@ -211,8 +270,7 @@ class _ManualEntryState extends State<ManualEntry> {
       return names;
     }
 
-    List<TransactionType> allTypes =
-        context.watch<InitialService>().getTransactionType();
+    allTypes = context.watch<InitialService>().getTransactionType();
     List<String> typeNames = allTypes.map((type) => type.name).toList();
 
     String? valueAccount1;
@@ -263,6 +321,9 @@ class _ManualEntryState extends State<ManualEntry> {
                                     await context
                                         .read<ManualEntryService>()
                                         .forgetManualEntry();
+                                    await context
+                                        .read<TransactionService>()
+                                        .clearTransaction();
                                   } catch (e) {
                                     debugPrint(e.toString());
                                   }
@@ -360,6 +421,7 @@ class _ManualEntryState extends State<ManualEntry> {
                           label: Strings.dropdownTypeCategory,
                           dropdownItems: typeNames,
                           needsNewCategoryButton: false,
+                          initialValue: _initialType,
                           setValue: (value) {
                             setState(() {
                               selectedType = allTypes
@@ -378,6 +440,7 @@ class _ManualEntryState extends State<ManualEntry> {
                           label: Strings.dropdownCategory,
                           dropdownItems: categoryNames,
                           needsNewCategoryButton: true,
+                          initialValue: _initialCategory,
                           validator: (value) {
                             if (value == null || value.isEmpty) {
                               return 'Das Feld darf nicht leer sein';
@@ -396,6 +459,7 @@ class _ManualEntryState extends State<ManualEntry> {
                           label: Strings.dropdownAccount1,
                           dropdownItems: accountNames,
                           needsNewCategoryButton: false,
+                          initialValue: _initialAccount,
                           validator: (value) {
                             valueAccount1 = value;
                             if (value == null || value.isEmpty) {
@@ -446,7 +510,7 @@ class _ManualEntryState extends State<ManualEntry> {
                           dropdownItems: intervalNames,
                           label: Strings.dropdownFrequency,
                           needsNewCategoryButton: false,
-                          initialValue: intervalNames[0],
+                          initialValue: _initialFrequency ?? intervalNames[0],
                           validator: (value) {
                             if (value == null || value.isEmpty) {
                               return 'Das Feld darf nicht leer sein';
@@ -553,6 +617,9 @@ class _ManualEntryState extends State<ManualEntry> {
                                 await context
                                     .read<ManualEntryService>()
                                     .forgetManualEntry();
+                                await context
+                                    .read<TransactionService>()
+                                    .clearTransaction();
                               }
                               // ignore: use_build_context_synchronously
                               await Navigator.push(

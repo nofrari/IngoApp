@@ -18,6 +18,17 @@ class InitialService extends ChangeNotifier {
 
   static late final SharedPreferences _prefs;
 
+  Future<void> setCategory(CategoryModel category) async {
+    try {
+      List<String> categoriesStrings = _prefs.getStringList('categories') ?? [];
+      String categoryString = jsonEncode(category.toJson());
+      categoriesStrings.add(categoryString);
+      _prefs.setStringList('categories', categoriesStrings);
+    } catch (e) {
+      debugPrint(e.toString());
+    }
+  }
+
   Future<void> setCategories(List<CategoryModel> categories) async {
     try {
       List<String> categoriesStrings =

@@ -48,7 +48,7 @@ class _CategoryEditState extends State<CategoryEdit> {
   void getData(BuildContext context) async {
     try {
       var response = await dio.get(
-          "http://localhost:5432/categories/transactions/${widget.category.category_id}");
+          "${Values.serverURL}/categories/transactions/${widget.category.category_id}");
       setState(() {
         transactionCount = response.data;
         debugPrint(transactionCount.toString());
@@ -257,7 +257,7 @@ class _CategoryEditState extends State<CategoryEdit> {
     };
 
     var response = await dio.delete(
-        "http://localhost:5432/categories/${current_category_id}",
+        "${Values.serverURL}/categories/${current_category_id}",
         data: formData);
 
     debugPrint(response.toString());
