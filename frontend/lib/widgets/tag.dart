@@ -1,8 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:frontend/widgets/text_google.dart';
 import '../constants/colors.dart';
-import '../constants/fonts.dart';
-import '../constants/values.dart';
 
 class Tag extends StatelessWidget {
   const Tag({required this.btnText, this.onTap, this.isCategory, super.key});
