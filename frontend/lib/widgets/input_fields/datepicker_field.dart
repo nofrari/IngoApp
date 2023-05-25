@@ -9,12 +9,24 @@ import 'package:control_style/control_style.dart';
 
 class DatepickerField extends StatefulWidget {
   DatepickerField(
-      {super.key, this.label, required this.controller, this.serverDate});
+      {super.key,
+      this.label,
+      required this.controller,
+      this.serverDate,
+      this.onChanged,
+      this.validator,
+      this.autovalidateMode,
+      required this.errorMsgBgColor});
 
   final TextEditingController controller;
   String? serverDate;
   DateTime _selectedDate = DateTime.now();
   String? label;
+  final ValueChanged<String>? onChanged;
+  final FormFieldValidator<String>? validator;
+  final Color errorMsgBgColor;
+
+  final AutovalidateMode? autovalidateMode;
 
   DateTime get selectedDate => _selectedDate;
   set selectedDate(DateTime value) {
@@ -37,16 +49,11 @@ class _DatepickerFieldState extends State<DatepickerField> {
     return Container(
       alignment: Alignment.center,
       margin: const EdgeInsets.only(top: 10, bottom: 15),
-      color: AppColor.neutral500,
+      color: widget.errorMsgBgColor,
       child: TextFormField(
         controller: widget.controller,
         autovalidateMode: AutovalidateMode.onUserInteraction,
-        validator: (value) {
-          if (value == null || value.isEmpty) {
-            return 'Das Feld darf nicht leer sein';
-          }
-          return null;
-        },
+        validator: widget.validator,
         style: Fonts.text300,
         cursorColor: Colors.white, //editing controller of this TextField
         decoration: InputDecoration(
@@ -57,6 +64,7 @@ class _DatepickerFieldState extends State<DatepickerField> {
           labelStyle: TextStyle(color: AppColor.neutral100),
           filled: true,
           fillColor: AppColor.neutral400,
+          errorStyle: Fonts.errorMessage,
           suffixIcon: const Align(
             widthFactor: 1.0,
             heightFactor: 1.0,
@@ -82,16 +90,13 @@ class _DatepickerFieldState extends State<DatepickerField> {
             borderSide: BorderSide(
                 color: AppColor.blueActive, width: Values.inputBorder),
           ),
-          errorBorder: DecoratedInputBorder(
-            child: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(Values.inputRadius),
-              borderSide: const BorderSide(
-                  color: Colors.red, width: Values.inputBorder),
-            ),
+          errorBorder: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(Values.inputRadius),
+            borderSide:
+                const BorderSide(color: Colors.red, width: Values.inputBorder),
           ),
         ),
-
-        readOnly: true, // when true user cannot edit text
+        readOnly: true,
         onTap: () async {
           DateTime? pickedDate = await showDatePicker(
             context: context,
@@ -143,6 +148,9 @@ class _DatepickerFieldState extends State<DatepickerField> {
               widget.controller.text = formattedDate;
               widget.selectedDate = pickedDate;
             });
+            if (widget.onChanged != null) {
+              widget.onChanged!(formattedDate);
+            }
           }
         },
       ),

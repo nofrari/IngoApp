@@ -36,10 +36,23 @@ class _StartState extends State<Start> {
   void initState() {
     super.initState();
     currentScreen = screens[widget.pageId != null ? widget.pageId! : 0];
-    //Just needed for accounts
-    currentTab = widget.pageId != null && widget.pageId == 1
-        ? 2
-        : (widget.pageId == 4 ? 4 : 0);
+    //TODO: add explanation
+    if (widget.pageId != null) {
+      switch (widget.pageId) {
+        case 1:
+          currentTab = 2;
+          break;
+        case 4:
+          currentTab = 4;
+          break;
+        case 3:
+          currentTab = 1;
+          break;
+        default:
+          currentTab = 0;
+      }
+    }
+
     fetchDataFromDatabase();
   }
 

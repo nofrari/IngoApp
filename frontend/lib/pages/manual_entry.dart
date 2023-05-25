@@ -265,6 +265,7 @@ class _ManualEntryState extends State<ManualEntry> {
 
   final DatepickerField datePicker = DatepickerField(
     controller: TextEditingController(),
+    errorMsgBgColor: AppColor.neutral500,
   );
 
   final pdfPreview = PdfPreview();
@@ -536,6 +537,13 @@ class _ManualEntryState extends State<ManualEntry> {
                         DatepickerField(
                           controller: controllerDate,
                           serverDate: manualEntry['date'],
+                          errorMsgBgColor: AppColor.neutral500,
+                          validator: (value) {
+                            if (value == null || value.isEmpty) {
+                              return 'Das Feld darf nicht leer sein';
+                            }
+                            return null;
+                          },
                           //TODO: Add callback to call updateCurrentTransaction
                         ),
                         Dropdown(
