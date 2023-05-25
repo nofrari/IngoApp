@@ -3,12 +3,9 @@ import 'package:dropdown_button2/dropdown_button2.dart';
 import 'package:frontend/constants/fonts.dart';
 import 'package:frontend/constants/values.dart';
 import 'package:frontend/customIcons/dropdown_arrows_icons.dart';
-import 'package:frontend/widgets/button.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../../constants/colors.dart';
 import 'package:control_style/control_style.dart';
-
-import '../tag.dart';
 
 class DropdownMultiselect extends StatefulWidget {
   const DropdownMultiselect({
@@ -16,14 +13,15 @@ class DropdownMultiselect extends StatefulWidget {
     required this.dropdownItems,
     required this.label,
     this.setValues,
-    this.initialValues,
+    this.selectedTags = const [],
+    this.onTagsChanged,
   });
 
   final List<String> dropdownItems;
   final String label;
-  final List<String>? initialValues;
   final ValueChanged<List<String>>? setValues;
-  // final FormFieldValidator<String>? validator;
+  final List<String> selectedTags;
+  final void Function(List<String> selectedTags)? onTagsChanged;
 
   @override
   State<DropdownMultiselect> createState() => _DropdownMultiselectState();
@@ -31,21 +29,17 @@ class DropdownMultiselect extends StatefulWidget {
 
 class _DropdownMultiselectState extends State<DropdownMultiselect> {
   List<String> _selectedValues = [];
-  String? selectedValue;
-  String? nullValue;
-  GlobalKey<FormState> _formKey = GlobalKey<FormState>();
+  List<String> _selectedTags = [];
+  final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
 
   @override
   void initState() {
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) => _selectedValues = []);
     setState(() {
-      (widget.initialValues != null)
-          ? _selectedValues = widget.initialValues!
-          : _selectedValues = [];
+      _selectedValues = [];
     });
-    nullValue = null;
-    _selectedValues = widget.initialValues ?? [];
+    _selectedTags = List.from(widget.selectedTags);
   }
 
   @override
@@ -70,8 +64,9 @@ class _DropdownMultiselectState extends State<DropdownMultiselect> {
                 labelStyle: TextStyle(color: AppColor.neutral100),
                 border: DecoratedInputBorder(
                     child: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(Values.inputRadius),
-                        borderSide: BorderSide.none),
+                      borderRadius: BorderRadius.circular(Values.inputRadius),
+                      borderSide: BorderSide.none,
+                    ),
                     shadow: const [
                       BoxShadow(
                         color: Color.fromARGB(60, 0, 0, 0),
@@ -80,13 +75,17 @@ class _DropdownMultiselectState extends State<DropdownMultiselect> {
                       )
                     ]),
                 focusedBorder: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(Values.inputRadius),
-                    borderSide: BorderSide(
-                        color: AppColor.blueActive, width: Values.inputBorder)),
+                  borderRadius: BorderRadius.circular(Values.inputRadius),
+                  borderSide: BorderSide(
+                    color: AppColor.blueActive,
+                    width: Values.inputBorder,
+                  ),
+                ),
                 errorBorder: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(Values.inputRadius),
-                    borderSide: const BorderSide(
-                        color: Colors.red, width: Values.inputBorder)),
+                  borderRadius: BorderRadius.circular(Values.inputRadius),
+                  borderSide: const BorderSide(
+                      color: Colors.red, width: Values.inputBorder),
+                ),
                 filled: true,
                 fillColor: AppColor.backgroundInputField,
                 errorStyle: Fonts.errorMessage,
@@ -94,7 +93,9 @@ class _DropdownMultiselectState extends State<DropdownMultiselect> {
                 isCollapsed: true,
                 // floatingLabelBehavior: FloatingLabelBehavior.never,
                 contentPadding: const EdgeInsets.symmetric(
-                    vertical: 10.0, horizontal: 10.0),
+                  vertical: 10.0,
+                  horizontal: 10.0,
+                ),
               ),
               isExpanded: true,
               items: List.generate(
@@ -129,9 +130,13 @@ class _DropdownMultiselectState extends State<DropdownMultiselect> {
                 if (widget.setValues != null) {
                   widget.setValues!(_selectedValues);
                 }
+                if (widget.onTagsChanged != null) {
+                  widget.onTagsChanged!(
+                    _selectedValues,
+                  ); // Call the callback function
+                }
               },
               onSaved: (value) {},
-
               selectedItemBuilder: _selectedValues.isNotEmpty
                   ? (BuildContext context) {
                       return [];
@@ -152,8 +157,10 @@ class _DropdownMultiselectState extends State<DropdownMultiselect> {
                 iconSize: 30,
               ),
               dropdownStyleData: DropdownStyleData(
-                width: MediaQuery.of(context).size.width -
-                    Values.bigCardMargin.horizontal,
+                width: (MediaQuery.of(context).size.width -
+                            Values.bigCardMargin.horizontal) /
+                        2 -
+                    5,
                 offset: const Offset(-10, -6),
                 maxHeight: 200,
                 decoration: BoxDecoration(
@@ -170,45 +177,42 @@ class _DropdownMultiselectState extends State<DropdownMultiselect> {
               ),
             ),
           ),
-          Visibility(
-            visible: _selectedValues.isNotEmpty,
-            child: Container(
-              margin: EdgeInsets.only(top: 5),
-              child: Align(
-                alignment: Alignment.topLeft,
-                child: Wrap(
-                  alignment: WrapAlignment.start,
-                  spacing: 8, // Adjust the spacing between tags as needed
-                  children: _selectedValues.map((String item) {
-                    return Container(
-                      child: Tag(
-                        btnText: item,
-                        onTap: () {
-                          setState(() {
-                            _selectedValues.remove(item);
-                          });
-                          if (widget.setValues != null) {
-                            widget.setValues!(_selectedValues);
-                          }
-                          if (_selectedValues.isEmpty) {
-                            setState(() {
-                              _selectedValues.clear();
-                            });
-                            if (widget.setValues != null) {
-                              widget.setValues!(_selectedValues);
-                            }
-                            _formKey.currentState
-                                ?.reset(); // Reset the form to hide the floating label
-                            FocusScope.of(context).requestFocus(FocusNode());
-                          }
-                        },
-                      ),
-                    );
-                  }).toList(),
-                ),
-              ),
-            ),
-          )
+          // Visibility(
+          //   visible: _selectedValues.isNotEmpty,
+          //   child: Container(
+          //     margin: const EdgeInsets.only(top: 5),
+          //     child: Align(
+          //       alignment: Alignment.topLeft,
+          //       child: Wrap(
+          //         alignment: WrapAlignment.start,
+          //         spacing: 8, // Adjust the spacing between tags as needed
+          //         children: _selectedValues.map((String item) {
+          //           return Tag(
+          //             btnText: item,
+          //             onTap: () {
+          //               setState(() {
+          //                 _selectedValues.remove(item);
+          //               });
+          //               if (widget.setValues != null) {
+          //                 widget.setValues!(_selectedValues);
+          //               }
+          //               if (_selectedValues.isEmpty) {
+          //                 setState(() {
+          //                   _selectedValues.clear();
+          //                 });
+          //                 if (widget.setValues != null) {
+          //                   widget.setValues!(_selectedValues);
+          //                 }
+          //                 _formKey.currentState
+          //                     ?.reset(); // Reset the form to hide the floating label
+          //               }
+          //             },
+          //           );
+          //         }).toList(),
+          //       ),
+          //     ),
+          //   ),
+          // )
         ],
       ),
     );
