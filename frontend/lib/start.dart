@@ -164,8 +164,9 @@ class _StartState extends State<Start> {
         },
         //Icon of Scanner
         child: Icon(
-          Icons.add,
+          Icons.document_scanner_rounded,
           color: AppColor.neutral600,
+          size: 35,
         ),
       ),
       floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
@@ -193,7 +194,7 @@ class _StartState extends State<Start> {
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
                         Icon(
-                          Icons.chat,
+                          Icons.home_rounded,
                           color: currentTab == 0
                               ? AppColor.activeMenu
                               : AppColor.neutral100,
@@ -219,7 +220,7 @@ class _StartState extends State<Start> {
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
                         Icon(
-                          Icons.chat,
+                          Icons.monetization_on_rounded,
                           color: currentTab == 1
                               ? AppColor.activeMenu
                               : AppColor.neutral100,
@@ -250,7 +251,7 @@ class _StartState extends State<Start> {
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
                         Icon(
-                          Icons.chat,
+                          Icons.account_balance_rounded,
                           color: currentTab == 2
                               ? AppColor.activeMenu
                               : AppColor.neutral100,
@@ -276,7 +277,7 @@ class _StartState extends State<Start> {
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
                         Icon(
-                          Icons.chat,
+                          Icons.account_balance_wallet_rounded,
                           color: currentTab == 3
                               ? AppColor.activeMenu
                               : AppColor.neutral100,

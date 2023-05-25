@@ -5,6 +5,7 @@ import 'package:frontend/constants/strings.dart';
 import 'package:frontend/constants/values.dart';
 import 'package:frontend/models/user.dart';
 import 'package:frontend/pages/categories/categories.dart';
+import 'package:frontend/pages/data_protection.dart';
 import 'package:frontend/pages/guidelines.dart';
 import 'package:frontend/pages/profile/profile_overview.dart';
 import 'package:frontend/pages/transactions/transactions_reccuring.dart';
@@ -73,11 +74,7 @@ class _ProfileState extends State<Profile> {
             ),
             OptionBlock(
               title: Strings.profileMore,
-              pages: const [
-                Guidelines(),
-                //TODO replace with data protection page
-                Guidelines()
-              ],
+              pages: const [Guidelines(), DataProtection()],
               children: [
                 Text(Strings.profileGuidelines, style: Fonts.optionTitle),
                 Text(Strings.profileDataprotection, style: Fonts.optionTitle),

@@ -655,11 +655,11 @@ class _ManualEntryState extends State<ManualEntry> {
                                 onTap: () async {
                                   updateCurrentTransaction();
                                   if (_formKey.currentState!.validate()) {
-                                    ScaffoldMessenger.of(context).showSnackBar(
-                                      const SnackBar(
-                                          content:
-                                              Text('Daten werden gespeichert')),
-                                    );
+                                    // ScaffoldMessenger.of(context).showSnackBar(
+                                    //   const SnackBar(
+                                    //       content:
+                                    //           Text('Daten werden gespeichert')),
+                                    // );
                                     final date = datePicker.selectedDate;
 
                                     String? pdf_name = PdfFile.getName();

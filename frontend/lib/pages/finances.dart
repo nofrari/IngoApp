@@ -175,6 +175,7 @@ class _FinancesState extends State<Finances> {
         child: Column(
           children: [
             InputField(
+              hidePassword: false,
               lblText: "Suche",
               reqFormatter: letters,
               keyboardType: text,

@@ -288,7 +288,6 @@ class _RegisterState extends State<Register> {
                 return null;
               },
             ),
-            //TODO: Datenschutzerklärung verlinken
             CheckboxDataProtection(
               linkText: 'Ich stimme der Datenschutzbestimmung zu',
               linkTo: () => Navigator.push(
