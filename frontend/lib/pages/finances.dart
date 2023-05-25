@@ -1,6 +1,7 @@
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:frontend/constants/colors.dart';
 import 'package:frontend/models/category.dart';
 import 'package:frontend/models/color.dart';
 import 'package:frontend/models/icon.dart';
@@ -8,6 +9,7 @@ import 'package:frontend/services/accounts_service.dart';
 import 'package:frontend/widgets/input_fields/dropdown_field_multi.dart';
 
 import 'package:frontend/widgets/transactions/transaction_list.dart';
+import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 import '../constants/values.dart';
 import '../models/account.dart';
@@ -36,6 +38,8 @@ class _FinancesState extends State<Finances> {
   String? selectedCategory;
   String? selectedAccount;
   String? selectedStartDate;
+
+  String? validatorDate;
 
   TextInputFormatter letters = FilteringTextInputFormatter.allow(
       RegExp(r"[a-zA-Z0-9#+:'()&/^\-{2}|\s\.]"));
@@ -67,25 +71,28 @@ class _FinancesState extends State<Finances> {
   List<TransactionModel> filteredTransactions = [];
   bool matchFound = true;
 
-  List<TransactionModel> filterTransactions(
-      List<TransactionModel> transactions, String filter) {
+  List<TransactionModel> filterTransactionsByDateRange(
+      List<TransactionModel> transactions, String startDate, String endDate) {
     filteredTransactions.clear();
-
-    List<String> searchTerms = filter.toLowerCase().split(" ");
-
     matchFound = false;
 
     for (var transaction in transactions) {
       bool transactionMatchFound = true;
 
-      for (var term in searchTerms) {
-        if (!transaction.transaction_name.toLowerCase().contains(term) &&
-            !transaction.transaction_amount
-                .toString()
-                .toLowerCase()
-                .contains(term)) {
+      if (endDate.isEmpty) {
+        if (transaction.date.isBefore(DateTime.parse(startDate))) {
           transactionMatchFound = false;
-          break;
+        }
+      } else if (startDate.isEmpty) {
+        if (transaction.date
+            .isAfter(DateTime.parse(endDate).add(const Duration(days: 1)))) {
+          transactionMatchFound = false;
+        }
+      } else {
+        if (transaction.date.isBefore(DateTime.parse(startDate)) ||
+            transaction.date.isAfter(
+                DateTime.parse(endDate).add(const Duration(days: 1)))) {
+          transactionMatchFound = false;
         }
       }
 
@@ -130,11 +137,90 @@ class _FinancesState extends State<Finances> {
                 return null;
               },
               onChanged: (value) {
-                //performSearch(value);
-                filterTransactions(transactions, controllerSearch.text);
+                // filterTransactions(transactions, controllerSearch.text);
               },
               maxLength: 50,
               onFocusChanged: (value) {},
+            ),
+            DatepickerField(
+              label: "Start",
+              controller: controllerStartDate,
+              errorMsgBgColor: AppColor.backgroundFullScreen,
+              onChanged: (value) {
+                if (controllerEndDate.text.isNotEmpty) {
+                  if (isStartDateBeforeEndDate(value, controllerEndDate.text)) {
+                    filterTransactionsByDateRange(
+                        transactions,
+                        formatDate(value),
+                        (controllerEndDate.text == "")
+                            ? controllerEndDate.text
+                            : formatDate(controllerEndDate.text));
+                    setState(() {
+                      validatorDate = null;
+                    });
+                  } else {
+                    setState(() {
+                      validatorDate =
+                          'Das Startdatum muss vor dem Enddatum liegen';
+                    });
+                  }
+                } else {
+                  filterTransactionsByDateRange(
+                      transactions,
+                      DateFormat('yyyy-MM-dd')
+                          .format(DateFormat('dd / MM / yyyy').parse(value)),
+                      (controllerEndDate.text == "")
+                          ? controllerEndDate.text
+                          : formatDate(controllerEndDate.text));
+                  setState(() {
+                    validatorDate = null;
+                  });
+                }
+              },
+              validator: (value) {
+                return validatorDate;
+              },
+            ),
+            DatepickerField(
+              label: "End",
+              controller: controllerEndDate,
+              errorMsgBgColor: AppColor.backgroundFullScreen,
+              onChanged: (value) {
+                if (controllerStartDate.text.isNotEmpty) {
+                  if (isStartDateBeforeEndDate(
+                      controllerStartDate.text, value)) {
+                    filterTransactionsByDateRange(
+                      transactions,
+                      (controllerStartDate.text.isEmpty)
+                          ? controllerStartDate.text
+                          : formatDate(controllerStartDate.text),
+                      formatDate(value),
+                    );
+                    setState(() {
+                      validatorDate = null;
+                    });
+                  } else {
+                    setState(() {
+                      validatorDate =
+                          'Das Startdatum muss vor dem Enddatum liegen';
+                    });
+                  }
+                } else {
+                  filterTransactionsByDateRange(
+                    transactions,
+                    (controllerStartDate.text.isEmpty)
+                        ? controllerStartDate.text
+                        : formatDate(controllerStartDate.text),
+                    formatDate(value),
+                  );
+                  setState(() {
+                    validatorDate = null;
+                  });
+                }
+              },
+              validator: (value) {
+                return validatorDate;
+              },
             ),
             DropdownMultiselect(
               dropdownItems:
@@ -167,5 +253,22 @@ class _FinancesState extends State<Finances> {
         ),
       ),
     );
+  }
+
+  String formatDate(String inputDate) {
+    DateFormat inputFormat = DateFormat('dd / MM / yyyy');
+    DateFormat outputFormat = DateFormat('yyyy-MM-dd');
+    DateTime date = inputFormat.parse(inputDate);
+
+    String outputDate = outputFormat.format(date);
+
+    return outputDate;
+  }
+
+  bool isStartDateBeforeEndDate(String startDate, String endDate) {
+    DateTime start = DateTime.parse(formatDate(startDate));
+    DateTime end = DateTime.parse(formatDate(endDate));
+
+    return start.isBefore(end);
   }
 }
