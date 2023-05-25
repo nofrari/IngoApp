@@ -42,11 +42,11 @@ const inputSchema = z.object({
 type InputSchema = z.infer<typeof inputSchema>;
 
 const editSchema = z.object({
-    transaction_id: z.string(),
+    transaction_id: z.string().optional(),
     transaction_name: z.string().optional(),
     transaction_amount: z.number().optional(),
     date: z.string().optional(),
-    description: z.string().optional().optional(),
+    description: z.string().optional(),
     bill_url: z.string().optional(),
     category_id: z.string().optional(),
     type_id: z.string().optional(),
@@ -55,11 +55,15 @@ const editSchema = z.object({
 });
 type EditSchema = z.infer<typeof editSchema>;
 
-// router.post('/transactions', (req, res) => {
-//     res.status(201).send('Hello world2');
-// });
+const changeAccountSchema = z.object({
+    old_account_id: z.string(),
+    new_account_id: z.string(),
+});
+type changeAccountSchema = z.infer<typeof changeAccountSchema>;
 
-
+router.post('/transactions', (req, res) => {
+    res.status(201).send('Hello world2');
+});
 
 
 router.post('/transactions/input', async (req, res) => {
@@ -114,130 +118,49 @@ router.post('/transactions/edit', async (req, res) => {
         return;
     }
 
-    const user = await prisma.transaction.findUnique({
+    const transaction = await prisma.transaction.findUnique({
         where: {
             transaction_id: body.transaction_id
         }
     });
 
-    if (!user) {
+    if (!transaction) {
         res.status(404).send();
         return;
     }
 
-    if (body.transaction_name) {
+    const parsedDate = new Date(body.date!);
+
+    try {
         await prisma.transaction.update({
             where: {
                 transaction_id: body.transaction_id
             },
             data: {
-                transaction_name: body.transaction_name
+                transaction_name: body.transaction_name,
+                transaction_amount: body.transaction_amount,
+                date: parsedDate,
+                description: body.description,
+                bill_url: body.bill_url,
+                category_id: body.category_id,
+                type_id: body.type_id,
+                interval_id: body.interval_id,
+                account_id: body.account_id,
             }
         });
 
-        res.status(200).send();
-
-    } else if (body.transaction_amount) {
-        await prisma.transaction.update({
-            where: {
-                transaction_id: body.transaction_id
-            },
-            data: {
-                transaction_amount: body.transaction_amount
-            }
-        });
 
         res.status(200).send();
 
-    } else if (body.date) {
-        await prisma.transaction.update({
-            where: {
-                transaction_id: body.transaction_id
-            },
-            data: {
-                date: body.date
-            }
-        });
-
-        res.status(200).send();
-
-    } else if (body.description) {
-        await prisma.transaction.update({
-            where: {
-                transaction_id: body.transaction_id
-            },
-            data: {
-                description: body.description
-            }
-        });
-
-        res.status(200).send();
-
-    } else if (body.bill_url) {
-        await prisma.transaction.update({
-            where: {
-                transaction_id: body.transaction_id
-            },
-            data: {
-                bill_url: body.bill_url
-            }
-        });
-
-        res.status(200).send();
-
-    } else if (body.category_id) {
-        await prisma.transaction.update({
-            where: {
-                transaction_id: body.transaction_id
-            },
-            data: {
-                category_id: body.category_id
-            }
-        });
-
-        res.status(200).send();
-
-    } else if (body.type_id) {
-        await prisma.transaction.update({
-            where: {
-                transaction_id: body.transaction_id
-            },
-            data: {
-                type_id: body.type_id
-            }
-        });
-
-        res.status(200).send();
-
-    } else if (body.interval_id) {
-        await prisma.transaction.update({
-            where: {
-                transaction_id: body.transaction_id
-            },
-            data: {
-                interval_id: body.interval_id
-            }
-        });
-
-        res.status(200).send();
-
-    } else if (body.account_id) {
-        await prisma.transaction.update({
-            where: {
-                transaction_id: body.transaction_id
-            },
-            data: {
-                account_id: body.account_id
-            }
-        });
-
-        res.status(200).send();
-
-    } else {
-        res.status(406).send();
+    } catch (e) {
+        console.log(e);
+        res.status(404).send(e);
         return;
     }
-});
+})
+
+
+
 
 router.post("/transactions/pdfUpload", upload.single("pdf"), async (req, res) => {
     if (!req.file) {
@@ -260,6 +183,110 @@ router.delete('/transactions/:filename', (req, res) => {
             res.send('PDF file deleted successfully');
         }
     });
+});
+
+// router.get('/transactions', async (req, res) => {
+//     const transactions = await prisma.transaction.findMany();
+//     res.send(transactions);
+// });
+
+router.get('/transactions/:id', async (req, res) => {
+    const id = req.params.id;
+
+    const transaction = await prisma.transaction.findUnique({ where: { transaction_id: id } });
+    res.send(transaction);
+});
+
+router.get('/transactions/list/:user_id', async (req, res) => {
+    const user_id = req.params.user_id;
+
+    const transactions = await prisma.transaction.findMany({
+        where: {
+            category: {
+                user: {
+                    user_id: user_id,
+                },
+            },
+        },
+    });
+
+    res.send(transactions);
+});
+
+router.get('/transactions/account/:id', async (req, res) => {
+    console.log("called");
+    const id = req.params.id;
+
+    const transaction = await prisma.transaction.findMany({
+        where: {
+            account_id: id,
+        },
+    });
+    res.send(transaction);
+});
+
+router.post('/transactions/change', async (req, res) => {
+    const body = <changeAccountSchema>req.body;
+    const validationResult: any = changeAccountSchema.safeParse(body);
+
+    if (!validationResult.success) {
+        res.status(400).send();
+        return;
+    }
+
+    //First get sum of old account
+    const oldAccount = await prisma.account.findUnique({
+        where: {
+            account_id: body.old_account_id,
+        },
+    });
+
+    //First get sum of old account
+    const newAccount = await prisma.account.findUnique({
+        where: {
+            account_id: body.new_account_id,
+        },
+    });
+
+    const newAmount: number = (oldAccount ? oldAccount.account_balance : 0) + (newAccount ? newAccount.account_balance : 0);
+
+    //update amount
+    try {
+        await prisma.account.update({
+            where: {
+                account_id: body.new_account_id,
+            },
+            data: {
+                account_balance: newAmount,
+            }
+        });
+        res.status(200).send();
+
+    } catch (e) {
+        console.log(e);
+        res.status(404).send(e);
+        return;
+    }
+
+    //update transactions
+    try {
+        await prisma.transaction.updateMany({
+            where: {
+                account_id: body.old_account_id,
+            },
+            data: {
+                account_id: body.new_account_id,
+            }
+        });
+
+
+        res.status(200).send();
+
+    } catch (e) {
+        console.log(e);
+        res.status(404).send(e);
+        return;
+    }
 });
 
 export default router;

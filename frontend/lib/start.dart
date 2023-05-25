@@ -1,4 +1,9 @@
+import 'dart:ffi';
+
 import 'package:flutter/material.dart';
+import 'package:dio/dio.dart';
+import 'package:frontend/services/profile_service.dart';
+import 'package:provider/provider.dart';
 
 //import constants
 import 'constants/colors.dart';
@@ -8,10 +13,10 @@ import 'constants/fonts.dart';
 
 //menu-pages import
 import 'pages/home.dart';
-import 'pages/accounts.dart';
+import 'pages/accounts/accounts.dart';
 import 'pages/budget.dart';
 import 'pages/finances.dart';
-import 'pages/profile.dart';
+import 'pages/profile/profile.dart';
 import 'pages/scanner.dart';
 import 'pages/scanner/scanner_camera.dart';
 import 'pages/manual_entry.dart';
@@ -19,18 +24,46 @@ import 'pages/manual_entry.dart';
 import 'package:frontend/models/user.dart';
 
 class Start extends StatefulWidget {
-  const Start({super.key});
+  const Start({this.pageId, super.key});
+  final int? pageId;
 
   @override
   State<Start> createState() => _StartState();
 }
 
 class _StartState extends State<Start> {
-  final User user = User(
-      id: 1,
-      firstName: "Klaus",
-      lastName: "Temper",
-      email: "klaustemper@gmail.com");
+  @override
+  void initState() {
+    super.initState();
+    currentScreen = screens[widget.pageId != null ? widget.pageId! : 0];
+    //Just needed for accounts
+    currentTab = widget.pageId != null && widget.pageId == 1
+        ? 2
+        : (widget.pageId == 4 ? 4 : 0);
+    fetchDataFromDatabase();
+  }
+
+  User user = User(id: "", firstName: " ", lastName: " ", email: " ");
+
+//TODO: löschen falls nicht mehr gebraucht
+  void fetchDataFromDatabase() async {
+    try {
+      Response response = await Dio().get('${Values.serverURL}/users/1');
+
+      setState(() {
+        user = User(
+          id: response.data['user_id'],
+          firstName: response.data['user_name'].toString(),
+          lastName: response.data['user_sirname'].toString(),
+          email: response.data['email'].toString(),
+        );
+      });
+    } catch (error, stackTrace) {
+      print('Error: $error');
+      print('Stacktrace: $stackTrace');
+    }
+  }
+
   //variable for current Tab
   int currentTab = 0;
 
@@ -51,6 +84,9 @@ class _StartState extends State<Start> {
 
   @override
   Widget build(BuildContext context) {
+    setState(() {
+      user = context.read<ProfileService>().getUser();
+    });
     return Scaffold(
       appBar: AppBar(
         elevation: 0,
@@ -86,6 +122,7 @@ class _StartState extends State<Start> {
                   backgroundColor: AppColor.blueActive),
               child: Text(
                 user.abreviationName,
+                // "Test",
                 style: Fonts.textNormalBlack18,
               ),
             ),

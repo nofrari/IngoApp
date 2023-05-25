@@ -4,8 +4,14 @@ import 'package:frontend/constants/colors.dart';
 import 'package:frontend/constants/fonts.dart';
 import 'package:frontend/constants/strings.dart';
 import 'package:frontend/constants/values.dart';
+import 'package:frontend/models/account.dart';
+import 'package:frontend/models/category.dart';
+import 'package:frontend/models/interval.dart' as transaction_interval;
+import 'package:frontend/models/transaction_type.dart';
 import 'package:frontend/pages/scanner/scanner_camera.dart';
+import 'package:frontend/services/accounts_service.dart';
 import 'package:frontend/services/custom_cache_manager.dart';
+import 'package:frontend/services/initial_service.dart';
 import 'package:frontend/services/manualentry_service.dart';
 import 'package:frontend/services/scanner_service.dart';
 import 'package:frontend/start.dart';
@@ -29,23 +35,6 @@ class ManualEntry extends StatefulWidget {
 }
 
 class _ManualEntryState extends State<ManualEntry> {
-  TextInputFormatter currency =
-      TextInputFormatter.withFunction((oldValue, newValue) {
-    String cleanText = newValue.text.replaceAll(RegExp(r'[^\d]'), '');
-    int value = int.tryParse(cleanText) ?? 0;
-    final formatter =
-        NumberFormat.currency(locale: 'de', name: "EUR", symbol: '€');
-    String newText = formatter.format(value / 100);
-    int cursorPos = newText.length;
-    if (newValue.selection.baseOffset == newValue.selection.extentOffset) {
-      cursorPos = formatter.format(value / 100).length - 2;
-    }
-    return TextEditingValue(
-      text: newText,
-      selection: TextSelection.collapsed(offset: cursorPos),
-    );
-  });
-
   TextInputFormatter digits = FilteringTextInputFormatter.digitsOnly;
   TextInputFormatter letters = FilteringTextInputFormatter.allow(
       RegExp(r"[a-zA-Z0-9#+:'()&/^\-{2}|\s]"));
@@ -67,6 +56,10 @@ class _ManualEntryState extends State<ManualEntry> {
 
   final _formKey = GlobalKey<FormState>();
 
+  String? selectedAccount;
+  String? selectedCategory;
+  String? selectedInterval;
+
   Dio dio = Dio();
 
   bool _isFocused = false;
@@ -74,6 +67,17 @@ class _ManualEntryState extends State<ManualEntry> {
     setState(() {
       _isFocused = isFocused;
     });
+  }
+
+  bool _enableDropdown(List<String> images) {
+    if (images.isNotEmpty ||
+        controllerTitle.text.isNotEmpty ||
+        controllerAmount.text.isNotEmpty ||
+        controllerDescription.text.isNotEmpty ||
+        controllerDate.text.isNotEmpty) {
+      return true;
+    }
+    return false;
   }
 
   String _selectedType = "";
@@ -110,6 +114,27 @@ class _ManualEntryState extends State<ManualEntry> {
         context.watch<ManualEntryService>().getManualEntry();
     List<String> images = context.watch<ScannerService>().getImages();
 
+    List<Account> allAccounts = context.watch<AccountsService>().getAccounts();
+    List<String> accountNames =
+        allAccounts.map((account) => account.name).toList();
+
+    List<CategoryModel> allCategories =
+        context.watch<InitialService>().getCategories();
+    List<String> categoryNames =
+        allCategories.map((category) => category.label).toList();
+
+    List<transaction_interval.Interval> allIntervals =
+        context.watch<InitialService>().getInterval();
+    List<String> intervalNames =
+        allIntervals.map((interval) => interval.name).toList();
+
+    List<TransactionType> allTypes =
+        context.watch<InitialService>().getTransactionType();
+    List<String> typeNames = allTypes.map((type) => type.name).toList();
+
+    String? valueAccount1;
+    String? valueAccount2;
+
     if (manualEntry.isNotEmpty) {
       controllerTitle.text = manualEntry['supplier_name'];
       controllerAmount.text = manualEntry['amount'].toString();
@@ -127,7 +152,7 @@ class _ManualEntryState extends State<ManualEntry> {
       child: Scaffold(
         appBar: Header(
           onTap: () async {
-            if (images.isNotEmpty) {
+            if (_enableDropdown(images)) {
               // warning dialog
               showDialog(
                 context: context,
@@ -144,7 +169,7 @@ class _ManualEntryState extends State<ManualEntry> {
                               onTap: () {
                                 Navigator.pop(context);
                               },
-                              theme: ButtonColorTheme.secondary),
+                              theme: ButtonColorTheme.secondaryLight),
                           Button(
                               btnText: "FORTFAHREN",
                               onTap: () async {
@@ -229,7 +254,7 @@ class _ManualEntryState extends State<ManualEntry> {
                         ),
                         InputField(
                           lblText: "Betrag in €",
-                          reqFormatter: currency,
+                          reqFormatter: currencyFormatter,
                           keyboardType: numeric,
                           controller: controllerAmount,
                           maxLines: 1,
@@ -245,66 +270,88 @@ class _ManualEntryState extends State<ManualEntry> {
                         ),
                         Dropdown(
                           label: Strings.dropdownTypeCategory,
-                          dropdownItems: const [
-                            'Einnahme',
-                            'Ausgabe',
-                            'Transfer',
-                          ],
+                          dropdownItems: typeNames,
                           needsNewCategoryButton: false,
                           setValue: setSelectedType,
+                          validator: (value) {
+                            if (value == null || value.isEmpty) {
+                              return 'Das Feld darf nicht leer sein';
+                            }
+                            return null;
+                          },
                         ),
-                        const Dropdown(
+                        Dropdown(
                           label: Strings.dropdownCategory,
-                          dropdownItems: [
-                            'Essen',
-                            'Freizeit',
-                            'Lebensmittel',
-                            'Shopping',
-                            'awef',
-                            'asdfasdfasdf',
-                            'ölkdjföjrö',
-                            'jkrgh alhfiu',
-                          ],
+                          dropdownItems: categoryNames,
                           needsNewCategoryButton: true,
+                          validator: (value) {
+                            if (value == null || value.isEmpty) {
+                              return 'Das Feld darf nicht leer sein';
+                            }
+                            return null;
+                          },
+                          setValue: (value) {
+                            selectedCategory = value;
+                          },
                         ),
                         //TODO: Kontos aus DB holen
-                        const Dropdown(
+                        Dropdown(
                           label: Strings.dropdownAccount1,
-                          dropdownItems: [
-                            'Gelbörse',
-                            'Bank',
-                            'Kreditkarte',
-                          ],
+                          dropdownItems: accountNames,
                           needsNewCategoryButton: false,
+                          validator: (value) {
+                            valueAccount1 = value;
+                            if (value == null || value.isEmpty) {
+                              return 'Das Feld darf nicht leer sein';
+                            }
+
+                            if (valueAccount1 == valueAccount2) {
+                              return 'Zeimal dasselbe Konto ausgewählt';
+                            }
+                            return null;
+                          },
+                          setValue: (value) {
+                            selectedAccount = value;
+                          },
                         ),
+
                         //TODO: String als Constante anlegen und bei Registrieren mitschicken
                         (_selectedType == 'Transfer')
-                            ? const Dropdown(
+                            ? Dropdown(
                                 label: Strings.dropdownAccount2,
-                                dropdownItems: [
-                                  'Gelbörse',
-                                  'Bank',
-                                  'Kreditkarte',
-                                ],
+                                dropdownItems: accountNames,
                                 needsNewCategoryButton: false,
+                                validator: (value) {
+                                  valueAccount2 = value;
+                                  if (value == null || value.isEmpty) {
+                                    return 'Das Feld darf nicht leer sein';
+                                  }
+
+                                  if (valueAccount1 == valueAccount2) {
+                                    return 'Zeimal dasselbe Konto ausgewählt';
+                                  }
+                                  return null;
+                                },
                               )
                             : Container(),
                         DatepickerField(
                           controller: controllerDate,
                           serverDate: manualEntry['date'],
                         ),
-                        const Dropdown(
-                          dropdownItems: [
-                            'Nie',
-                            'Wöchentlich',
-                            'Alle zwei Wochen',
-                            'Monatlich',
-                            'Quartalsweise',
-                            'Jährlich',
-                          ],
+                        Dropdown(
+                          dropdownItems: intervalNames,
                           label: Strings.dropdownFrequency,
                           needsNewCategoryButton: false,
-                          initialValue: 'Nie',
+                          initialValue: intervalNames[0],
+                          validator: (value) {
+                            if (value == null || value.isEmpty) {
+                              return 'Das Feld darf nicht leer sein';
+                            }
+                            return null;
+                          },
+                          setValue: (value) {
+                            selectedInterval = value;
+                          },
                         ),
                         InputField(
                           lblText: "Beschreibung",
@@ -346,37 +393,82 @@ class _ManualEntryState extends State<ManualEntry> {
                                 const SnackBar(
                                     content: Text('Daten werden gespeichert')),
                               );
-
-                              final refactoredAmount = controllerAmount.text
-                                  .replaceAll("€", "")
-                                  .replaceAll(" ", "")
-                                  .replaceAll(",", ".");
-
-                              final amount = double.tryParse(refactoredAmount);
                               final date = datePicker.selectedDate;
 
                               String? pdf_name = PdfFile.getName();
 
+                              late String selectedAccountID;
+                              late String selectedCategoryID;
+                              late String selectedIntervalID;
+                              late String selectedTypeID;
+
+                              for (Account account in allAccounts) {
+                                if (account.name == selectedAccount) {
+                                  selectedAccountID = account.id;
+                                  break;
+                                }
+                              }
+
+                              for (CategoryModel category in allCategories) {
+                                if (category.label == selectedCategory) {
+                                  selectedCategoryID = category.category_id;
+                                  break;
+                                }
+                              }
+
+                              for (transaction_interval.Interval interval
+                                  in allIntervals) {
+                                if (interval.name == selectedInterval) {
+                                  selectedIntervalID = interval.interval_id;
+                                  break;
+                                }
+                              }
+
+                              for (TransactionType type in allTypes) {
+                                if (type.name == _selectedType) {
+                                  selectedTypeID = type.type_id;
+                                  break;
+                                }
+                              }
+
                               if (manualEntry.isNotEmpty) {
                                 _sendData(
                                     controllerTitle.text,
-                                    amount!,
+                                    currencyToDouble(controllerAmount.text),
                                     date,
                                     controllerDescription.text,
-                                    manualEntry['pdf_name']);
+                                    manualEntry['pdf_name'],
+                                    selectedCategoryID,
+                                    selectedTypeID,
+                                    selectedIntervalID,
+                                    selectedAccountID);
                               } else {
-                                _sendData(controllerTitle.text, amount!, date,
-                                    controllerDescription.text, pdf_name!);
-                                savePDFToServer(PdfFile.getPath().toString());
-                              }
+                                if (pdf_name != null) {
+                                  _sendData(
+                                      controllerTitle.text,
+                                      currencyToDouble(controllerAmount.text),
+                                      date,
+                                      controllerDescription.text,
+                                      pdf_name,
+                                      selectedCategoryID,
+                                      selectedTypeID,
+                                      selectedIntervalID,
+                                      selectedAccountID);
 
-                              // print("Name from Gallery: ${PdfFile.getName()}");
-                              // print("Path from Camera: " +
-                              //     manualEntry['pdf_name'].toString());
-                              // print(
-                              //     "Name from Gallery: ${PdfFile.getPath().toString()}");
-                              // print("Path from Camera: " +
-                              //     manualEntry['pdf_path'].toString());
+                                  savePDFToServer(PdfFile.getPath().toString());
+                                } else {
+                                  _sendData(
+                                      controllerTitle.text,
+                                      currencyToDouble(controllerAmount.text),
+                                      date,
+                                      controllerDescription.text,
+                                      " ",
+                                      selectedCategoryID,
+                                      selectedTypeID,
+                                      selectedIntervalID,
+                                      selectedAccountID);
+                                }
+                              }
 
                               List<String> images =
                                   context.read<ScannerService>().getImages();
@@ -398,7 +490,7 @@ class _ManualEntryState extends State<ManualEntry> {
                               );
                             }
                           },
-                          theme: ButtonColorTheme.secondary),
+                          theme: ButtonColorTheme.secondaryLight),
                     ),
                   )
                 : Container(),
@@ -408,21 +500,29 @@ class _ManualEntryState extends State<ManualEntry> {
     );
   }
 
-  Future _sendData(String name, double amount, DateTime date,
-      String description, String pdfName) async {
+  Future _sendData(
+      String name,
+      double amount,
+      DateTime date,
+      String description,
+      String pdfName,
+      String categoryID,
+      String typeID,
+      String intervalID,
+      String accountID) async {
     Map<String, dynamic> formData = {
       "transaction_name": name,
       "transaction_amount": amount,
       "date": date.toString(),
       "description": description,
       "bill_url": pdfName,
-      "category_id": "1234",
-      "type_id": "1234",
-      "interval_id": "1234",
-      "account_id": "1234"
+      "category_id": categoryID,
+      "type_id": typeID,
+      "interval_id": intervalID,
+      "account_id": accountID
     };
 
-    var response = await dio.post("http://10.0.2.2:5432/transactions/input",
+    var response = await dio.post("${Values.serverURL}/transactions/input",
         data: formData);
     debugPrint(response.toString());
   }
@@ -432,10 +532,8 @@ class _ManualEntryState extends State<ManualEntry> {
       'pdf': await MultipartFile.fromFile(filePath),
     });
 
-    var response = await dio.post(
-        "http://localhost:5432/transactions/pdfUpload",
-        data: formData,
-        options: Options(responseType: ResponseType.json));
+    var response = await dio.post("${Values.serverURL}/transactions/pdfUpload",
+        data: formData, options: Options(responseType: ResponseType.json));
 
     debugPrint(response.toString());
   }
@@ -443,7 +541,7 @@ class _ManualEntryState extends State<ManualEntry> {
   Future deletePdfFile(String pdfName) async {
     try {
       await dio.delete(
-        "http://10.0.2.2:5432/transactions/$pdfName",
+        "${Values.serverURL}/transactions/$pdfName",
       );
       print('PDF file deleted successfully!');
     } catch (e) {

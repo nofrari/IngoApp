@@ -2,7 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:email_validator/email_validator.dart';
 import 'package:dio/dio.dart';
+import 'package:frontend/constants/values.dart';
 import 'package:frontend/pages/password_reset.dart';
+import 'package:frontend/services/profile_service.dart';
+import 'package:provider/provider.dart';
 import 'package:frontend/widgets/linkIntern.dart';
 
 import '../constants/fonts.dart';
@@ -44,7 +47,7 @@ class _LoginState extends State<Login> {
 
   final _formKey = GlobalKey<FormState>();
   final PageStorageBucket bucket = PageStorageBucket();
-  late bool userExists;
+  late bool userExists = false;
   late bool credentialsMatch;
 
   Dio dio = Dio();
@@ -52,8 +55,8 @@ class _LoginState extends State<Login> {
   @override
   void initState() {
     super.initState();
-    controllerMail.text = "lehner.selina9@gmail.com";
-    controllerPassword.text = "123selina";
+    // controllerMail.text = "lehner.selina9@gmail.com";
+    // controllerPassword.text = "123selina";
   }
 
   @override
@@ -138,7 +141,7 @@ class _LoginState extends State<Login> {
                         }
                       }
                     },
-                    theme: ButtonColorTheme.secondary),
+                    theme: ButtonColorTheme.secondaryLight),
               ),
             ),
           ],
@@ -154,8 +157,14 @@ class _LoginState extends State<Login> {
     };
 
     try {
-      await dio.post("http://localhost:5432/users/login", data: formData);
-      debugPrint('user hat sich eingeloggt');
+      dynamic response =
+          await dio.post("${Values.serverURL}/users/login", data: formData);
+      debugPrint('user hat sich eingeloggt: ${response.data}');
+      await context.read<ProfileService>().setUser(
+          id: response.data['user_id'],
+          firstname: response.data['user_name'].toString(),
+          lastname: response.data['user_sirname'],
+          email: response.data['email']);
       setState(() {
         userExists = true;
       });

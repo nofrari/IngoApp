@@ -6,6 +6,10 @@ class Strings {
   static const String menuFinance = "Finanzen";
   static const String menuAccounts = "Accounts";
 
+//General
+  static const String abort = "ABBRECHEN";
+  static const String confirm = "FORTFAHREN";
+
   //Dropdown
   static const String dropdownBudget = "Budget für";
   static const String dropdownFurtherCategory = "Weitere Kategorie auswählen";
@@ -41,4 +45,28 @@ class Strings {
   static const String btnLogin = "Anmelden";
   static const String btnPasswordReset = "Passwort zurücksetzen";
   static const String btnBackToLogin = "Zurück zur Anmeldung";
+
+  //Accounts
+  static const String accountsHeading = "KONTENÜBERSICHT";
+  static const String accountsButton = "KONTO HINZUFÜGEN";
+  static const String accountsDelete = "KONTO LÖSCHEN";
+
+  //Profile
+  static const String profileAccount = "KONTO";
+  static const String profileName = "NAME";
+  static const String profileMail = "E-MAIL";
+  static const String profileManage = "VERWALTUNG";
+  static const String profileMore = "MEHR";
+  static const String profileCategory = "Kategorien";
+  static const String profileTransactions = "Wiederkehrende Transaktionen";
+  static const String profileGuidelines = "Richtlinien";
+  static const String profileDataprotection = "Datenschutzerklärung";
+  static const String profileLogout = "ABMELDEN";
+  static const String profileEdit = "PROFIL BEARBEITEN";
+  static const String profileDelete = "KONTO LÖSCHEN";
+  static const String profileEditPassword = "PASSWORT ÄNDERN";
+  static const String profileOldPassword = "Altes Passwort";
+  static const String profileNewPassword = "Neues Passwort";
+  static const String profileNewPassword2 = "Neues Passwort wiederholen";
+  static const String profileSave = "Speichern";
 }

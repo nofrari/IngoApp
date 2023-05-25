@@ -1,6 +1,3 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
-
 generator client {
   provider = "prisma-client-js"
 }
@@ -18,8 +15,8 @@ model User {
   password     String
   pin          Int?
   accounts     Account[]
-  categories   Category[]
   budgets      Budget[]
+  categories   Category[]
 }
 
 model Account {
@@ -29,18 +26,26 @@ model Account {
   user_id         String
   user            User          @relation(fields: [user_id], references: [user_id], onDelete: Cascade)
   transactions    Transaction[]
+
+  @@index([user_id], map: "Account_user_id_fkey")
 }
 
 model Category {
   category_id   String        @id @unique @default(cuid())
   category_name String
-  color         String
-  transactions  Transaction[]
+  is_white      Boolean
   user_id       String
-  user          User          @relation(fields: [user_id], references: [user_id], onDelete: Cascade)
-  budgets       Budget[]
   icon_id       String
+  color_id      String
+  color         Color         @relation(fields: [color_id], references: [color_id], onDelete: Cascade)
   icon          Icon          @relation(fields: [icon_id], references: [icon_id], onDelete: Cascade)
+  user          User          @relation(fields: [user_id], references: [user_id], onDelete: Cascade)
+  transactions  Transaction[]
+  budgets       Budget[]      @relation("BudgetToCategory")
+
+  @@index([color_id], map: "Category_color_id_fkey")
+  @@index([icon_id], map: "Category_icon_id_fkey")
+  @@index([user_id], map: "Category_user_id_fkey")
 }
 
 model Type {
@@ -52,8 +57,8 @@ model Type {
 model Interval {
   interval_id   String        @id @unique @default(cuid())
   interval_name String
-  transactions  Transaction[]
   budgets       Budget[]
+  transactions  Transaction[]
 }
 
 model Transaction {
@@ -64,13 +69,18 @@ model Transaction {
   description        String?
   bill_url           String?
   category_id        String
-  category           Category @relation(fields: [category_id], references: [category_id], onDelete: Cascade)
   type_id            String
-  type               Type     @relation(fields: [type_id], references: [type_id], onDelete: Cascade)
   interval_id        String
-  interval           Interval @relation(fields: [interval_id], references: [interval_id], onDelete: Cascade)
   account_id         String
   account            Account  @relation(fields: [account_id], references: [account_id], onDelete: Cascade)
+  category           Category @relation(fields: [category_id], references: [category_id], onDelete: Cascade)
+  interval           Interval @relation(fields: [interval_id], references: [interval_id], onDelete: Cascade)
+  type               Type     @relation(fields: [type_id], references: [type_id], onDelete: Cascade)
+
+  @@index([account_id], map: "Transaction_account_id_fkey")
+  @@index([category_id], map: "Transaction_category_id_fkey")
+  @@index([interval_id], map: "Transaction_interval_id_fkey")
+  @@index([type_id], map: "Transaction_type_id_fkey")
 }
 
 model Budget {
@@ -80,14 +90,23 @@ model Budget {
   startdate     DateTime
   enddate       DateTime
   user_id       String
-  user          User       @relation(fields: [user_id], references: [user_id], onDelete: Cascade)
   interval_id   String
   interval      Interval   @relation(fields: [interval_id], references: [interval_id], onDelete: Cascade)
-  categories    Category[]
+  user          User       @relation(fields: [user_id], references: [user_id], onDelete: Cascade)
+  categories    Category[] @relation("BudgetToCategory")
+
+  @@index([interval_id], map: "Budget_interval_id_fkey")
+  @@index([user_id], map: "Budget_user_id_fkey")
 }
 
 model Icon {
   icon_id   String     @id @unique @default(cuid())
   icon_name String
   category  Category[]
+}
+
+model Color {
+  color_id   String     @id @unique @default(cuid())
+  color_name String
+  category   Category[]
 }

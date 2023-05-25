@@ -2,25 +2,43 @@ import 'package:flutter/material.dart';
 import 'package:frontend/constants/colors.dart';
 
 class RoundButton extends StatelessWidget {
-  const RoundButton({required this.onTap, required this.icon, super.key});
+  RoundButton(
+      {this.isTransparent,
+      required this.onTap,
+      required this.icon,
+      this.padding,
+      this.color,
+      this.iconSize,
+      this.borderWidth,
+      super.key});
 
   final IconData icon;
   final void Function() onTap;
+  final double? padding;
+  final Color? color;
+  final double? iconSize;
+  final double? borderWidth;
+  bool? isTransparent;
 
   @override
   Widget build(BuildContext context) {
     return ElevatedButton(
       onPressed: onTap,
       style: ElevatedButton.styleFrom(
-        backgroundColor: AppColor.neutral800,
-        padding: const EdgeInsets.all(8),
+        tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+        backgroundColor: isTransparent != null && isTransparent == true
+            ? Colors.transparent
+            : AppColor.neutral800,
+        padding: EdgeInsets.all((padding != null) ? padding! : 8),
         shape: const CircleBorder(),
-        side: BorderSide(width: 2, color: AppColor.blueActive),
+        side: BorderSide(
+            width: (borderWidth != null) ? borderWidth! : 2,
+            color: (color != null) ? color! : AppColor.blueActive),
       ),
       child: Icon(
         icon,
-        color: AppColor.blueActive,
-        size: 25,
+        color: (color != null) ? color! : AppColor.blueActive,
+        size: (iconSize != null) ? iconSize! : 25,
       ),
     );
   }

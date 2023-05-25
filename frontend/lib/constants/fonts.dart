@@ -50,6 +50,11 @@ class Fonts {
     fontSize: 16,
     fontWeight: FontWeight.bold,
   );
+  static TextStyle disabledButton = GoogleFonts.josefinSans(
+    color: AppColor.neutral300,
+    fontSize: 16,
+    fontWeight: FontWeight.bold,
+  );
 
   static TextStyle popupText = GoogleFonts.josefinSans(
       color: AppColor.neutral100, fontSize: 15, fontWeight: FontWeight.normal);
@@ -72,4 +77,33 @@ class Fonts {
       fontSize: 12,
       fontWeight: FontWeight.bold,
       decoration: TextDecoration.underline);
+
+//ACCOUNTS
+  static TextStyle accountsHeading = GoogleFonts.josefinSans(
+    color: AppColor.blueActive,
+    fontSize: 16,
+    fontWeight: FontWeight.normal,
+  );
+
+  static TextStyle accountBalance = GoogleFonts.josefinSans(
+    color: AppColor.neutral100,
+    fontSize: 25,
+    fontWeight: FontWeight.bold,
+  );
+
+  static TextStyle accountDeleteInfo = GoogleFonts.josefinSans(
+      color: AppColor.neutral100, fontSize: 18, fontWeight: FontWeight.normal);
+
+  //PROFILE
+  static TextStyle optionTitle = GoogleFonts.josefinSans(
+      color: AppColor.neutral100, fontSize: 16, fontWeight: FontWeight.normal);
+
+  static TextStyle guidelines = GoogleFonts.josefinSans(
+      color: AppColor.neutral100,
+      fontSize: 14,
+      fontWeight: FontWeight.normal,
+      height: 2);
+
+  static TextStyle userIconBig = GoogleFonts.josefinSans(
+      color: AppColor.neutral600, fontSize: 40, fontWeight: FontWeight.normal);
 }

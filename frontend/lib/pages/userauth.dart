@@ -51,11 +51,13 @@ class _AuthState extends State<Auth> {
                   child: Column(children: [
                     Toggle(toggleView: toggleView),
                     Expanded(
-                        child: Align(
-                            alignment: Alignment.bottomCenter,
-                            child: Container(
-                                margin: EdgeInsets.all(20),
-                                child: showSignIn ? Register() : Login())))
+                      child: Align(
+                        alignment: Alignment.bottomCenter,
+                        child: Container(
+                            margin: EdgeInsets.all(20),
+                            child: showSignIn ? Register() : Login()),
+                      ),
+                    ),
                   ]),
                 ),
               ],

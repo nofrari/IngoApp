@@ -3,12 +3,19 @@ import 'package:flutter/services.dart';
 import 'package:email_validator/email_validator.dart';
 import 'package:dio/dio.dart';
 import 'package:frontend/constants/colors.dart';
+import 'package:frontend/constants/values.dart';
+import 'package:frontend/services/profile_service.dart';
 import 'package:frontend/widgets/checkbox.dart';
+import 'package:provider/provider.dart';
 
 import '../constants/fonts.dart';
+import '../models/category.dart';
+import '../services/initial_service.dart';
 import '../widgets/input_fields/checkbox_field.dart';
 import '../widgets/input_fields/input_field.dart';
 import '../widgets/button.dart';
+import '../models/interval.dart' as transaction_interval;
+import '../models/transaction_type.dart';
 
 import '../constants/strings.dart';
 import '../start.dart';
@@ -41,6 +48,73 @@ class _RegisterState extends State<Register> {
   TextEditingController controllerPassword = TextEditingController();
   TextEditingController controllerPasswordRepeat = TextEditingController();
 
+  void _getCategories() async {
+    try {
+      Response response = await Dio().get('${Values.serverURL}/categories/1');
+      List<CategoryModel> categories = [];
+
+      for (var i = 0; i < response.data["categories"].length; i++) {
+        var iconId = response.data["categories"][i]['icon_id'].toString();
+        var colorId = response.data["categories"][i]['color_id'].toString();
+
+        var icon = response.data["icons"]
+            .firstWhere((icon) => icon['icon_id'] == iconId);
+        var iconName = icon['icon_name'].toString();
+
+        var color = response.data["colors"]
+            .firstWhere((color) => color['color_id'] == colorId);
+        var colorName = color['color_name'].toString();
+
+        categories.add(CategoryModel(
+            category_id:
+                response.data["categories"][i]['category_id'].toString(),
+            bgColor: colorName,
+            isWhite: response.data["categories"][i]['is_white'],
+            icon: iconName,
+            label: response.data["categories"][i]['category_name'].toString()));
+      }
+      await context.read<InitialService>().setCategories(categories);
+    } catch (e) {
+      print(e);
+    }
+  }
+
+  void _getIntervals() async {
+    try {
+      Response response = await Dio().get('${Values.serverURL}/intervals');
+      List<transaction_interval.Interval> interval = [];
+
+      for (var i = 0; i < response.data.length; i++) {
+        interval.add(transaction_interval.Interval(
+          interval_id: response.data[i]['interval_id'].toString(),
+          name: response.data[i]['interval_name'].toString(),
+        ));
+      }
+
+      await context.read<InitialService>().setInterval(interval);
+    } catch (e) {
+      print(e);
+    }
+  }
+
+  void _getTypes() async {
+    try {
+      Response response = await Dio().get('${Values.serverURL}/types');
+      List<TransactionType> type = [];
+
+      for (var i = 0; i < response.data.length; i++) {
+        type.add(TransactionType(
+          type_id: response.data[i]['type_id'].toString(),
+          name: response.data[i]['type_name'].toString(),
+        ));
+      }
+
+      await context.read<InitialService>().setTransactionType(type);
+    } catch (e) {
+      print(e);
+    }
+  }
+
   String? Function(String?) required = (value) {
     if (value == null) {
       return Strings.alertInputfieldEmpty;
@@ -64,11 +138,15 @@ class _RegisterState extends State<Register> {
   @override
   void initState() {
     super.initState();
-    controllerLastName.text = "selina";
-    controllerName.text = "lehner";
-    controllerMail.text = "lehner.selina9@gmail.com";
-    controllerPassword.text = "123selina";
-    controllerPasswordRepeat.text = "123selina";
+    // controllerLastName.text = "selina";
+    // controllerName.text = "lehner";
+    // controllerMail.text = "lehner.selina9@gmail.com";
+    // controllerPassword.text = "123selina";
+    // controllerPasswordRepeat.text = "123selina";
+
+    _getCategories();
+    _getIntervals();
+    _getTypes();
   }
 
   @override
@@ -241,7 +319,7 @@ class _RegisterState extends State<Register> {
                         }
                       }
                     },
-                    theme: ButtonColorTheme.secondary),
+                    theme: ButtonColorTheme.secondaryLight),
               ),
             ),
           ],
@@ -260,7 +338,14 @@ class _RegisterState extends State<Register> {
     };
 
     try {
-      await dio.post("http://localhost:5432/users/register", data: formData);
+      dynamic response =
+          await dio.post("${Values.serverURL}/users/register", data: formData);
+      await context.read<ProfileService>().setUser(
+          id: response.data['user_id'],
+          firstname: response.data['user_name'],
+          lastname: response.data['user_sirname'],
+          email: response.data['email']);
+
       setState(() {
         mailExists = false;
       });

@@ -7,8 +7,9 @@ import 'package:frontend/widgets/button.dart';
 import 'package:frontend/widgets/transactions/transaction_item.dart';
 
 class AccountItem extends StatefulWidget {
-  const AccountItem({required this.account, super.key});
+  const AccountItem({required this.account, this.isSelected, super.key});
   final Account account;
+  final bool? isSelected;
   @override
   State<AccountItem> createState() => _AccountItemState();
 }
@@ -19,7 +20,11 @@ class _AccountItemState extends State<AccountItem> {
     return Container(
       margin: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
       decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(8), color: AppColor.neutral700),
+          border: (widget.isSelected != null && widget.isSelected!)
+              ? Border.all(color: AppColor.blueActive)
+              : const Border.fromBorderSide(BorderSide.none),
+          borderRadius: BorderRadius.circular(8),
+          color: AppColor.neutral700),
       child: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 10),
         child: Row(

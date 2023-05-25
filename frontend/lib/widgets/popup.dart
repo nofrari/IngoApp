@@ -4,7 +4,7 @@ import 'package:frontend/constants/colors.dart';
 import 'package:frontend/constants/values.dart';
 
 class PopUp extends StatelessWidget {
-  const PopUp({super.key, this.actions, this.title, required this.content});
+  const PopUp({super.key, this.actions, this.title, this.content});
 
   final String? title;
   final String? content;

@@ -70,36 +70,14 @@ router.post('/users/edit', async (req, res) => {
     }
 
     //if blocks to check which parameter is sent in the request body and then update the database
-    if (body.user_name) {
+    if (body.user_name && body.user_sirname && body.email) {
         await prisma.user.update({
             where: {
                 user_id: body.user_id
             },
             data: {
-                user_name: body.user_name
-            }
-        });
-
-        res.status(200).send();
-
-    } else if (body.user_sirname) {
-        await prisma.user.update({
-            where: {
-                user_id: body.user_id
-            },
-            data: {
-                user_sirname: body.user_sirname
-            }
-        });
-
-        res.status(200).send();
-
-    } else if (body.email) {
-        await prisma.user.update({
-            where: {
-                user_id: body.user_id
-            },
-            data: {
+                user_name: body.user_name,
+                user_sirname: body.user_sirname,
                 email: body.email
             }
         });
@@ -165,13 +143,13 @@ router.post('/users/register', async (req, res) => {
         }
     });
 
-    const token = jwt.sign({
-        userId: user.user_id,
-        exp: Math.floor(Date.now() / 1000) + (60 * 60)
-    }, <string>process.env.JWT_SECRET);
+    // const token = jwt.sign({
+    //     userId: user.user_id,
+    //     exp: Math.floor(Date.now() / 1000) + (60 * 60)
+    // }, <string>process.env.JWT_SECRET);
 
     res.send({
-        accessToken: token,
+        //accessToken: token,
         user_id: user.user_id,
         username: user.user_name,
         user_sirname: user.user_sirname,
@@ -187,12 +165,18 @@ router.post('/users/register', async (req, res) => {
 
 //get one user by id
 //for testing: copy token from login or register and paste it in the authorization header under Bearer token
-router.get('/users/:id', verifyToken, async (req, res) => {
-    if (res.locals.user.userId !== req.params.id) {
-        res.status(403).send();
-    }
+router.get('/users/:id', async (req, res) => {
     const user = await prisma.user.findUnique({ where: { user_id: req.params.id } });
     res.send(user);
+});
+
+router.get('/users/delete/:id', async (req, res) => {
+    try {
+        await prisma.user.delete({ where: { user_id: req.params.id } });
+        res.send(200);
+    } catch (error) {
+        res.send(error);
+    }
 });
 
 //user login
@@ -223,15 +207,15 @@ router.post('/users/login', async (req, res) => {
         return;
     }
 
-    const token = jwt.sign({
-        userId: user.user_id,
-        exp: Math.floor(Date.now() / 1000) + (60 * 60 * 24 * 30)
-    }, <string>process.env.JWT_SECRET);
+    // const token = jwt.sign({
+    //     userId: user.user_id,
+    //     exp: Math.floor(Date.now() / 1000) + (60 * 60 * 24 * 30)
+    // }, <string>process.env.JWT_SECRET);
 
     res.status(200).send({
-        accessToken: token,
+        //accessToken: token,
         user_id: user.user_id,
-        username: user.user_name,
+        user_name: user.user_name,
         user_sirname: user.user_sirname,
         email: user.email,
         pin: user.pin
@@ -310,4 +294,49 @@ router.post('/users/reset-password', async (req, res) => {
     });
   }
   
-  export default router;
+router.post('/users/init', async (req, res) => {
+    try {
+        // Hier kannst du deine vordefinierten Werte angeben
+        const predefinedInterval = [
+            { interval_name: 'Nie' },
+            { interval_name: 'Wöchentlich' },
+            { interval_name: 'Monatlich' },
+            { interval_name: 'Vierteljährlich' },
+            { interval_name: 'Halbjährlich' },
+            { interval_name: 'Jährlich' },
+        ];
+
+        const predefinedTypes = [
+            { type_name: 'Einnahmen' },
+            { type_name: 'Ausgaben' },
+            { type_name: 'Transaktion' },
+        ];
+
+        // Hier kannst du den Code zum Speichern der Werte in die Datenbank einfügen
+        await prisma.interval.createMany({
+            data: predefinedInterval,
+        });
+
+        await prisma.type.createMany({
+            data: predefinedTypes,
+        });
+
+        res.status(200).json({ message: 'Vordefinierte Werte erfolgreich in die Datenbank geschrieben.' });
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ message: 'Interner Serverfehler.' });
+    }
+});
+
+router.get('/types', async (req, res) => {
+    const types = await prisma.type.findMany();
+    res.send(types);
+});
+
+router.get('/intervals', async (req, res) => {
+
+    const intervals = await prisma.interval.findMany();
+    res.send(intervals);
+});
+
+export default router;
