@@ -251,7 +251,7 @@ class _ManualEntryState extends State<ManualEntry> {
   @override
   void initState() {
     super.initState();
-    loadTransaction();
+    widget.isEditMode == true ? loadTransaction() : null;
   }
 
   @override

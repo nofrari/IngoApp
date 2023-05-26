@@ -2,6 +2,8 @@ import 'package:frontend/constants/colors.dart';
 import 'package:frontend/constants/fonts.dart';
 import 'package:frontend/models/account.dart';
 import 'package:flutter/material.dart';
+import 'package:frontend/pages/accounts/accounts.dart';
+import 'package:frontend/start.dart';
 import 'package:frontend/widgets/accounts/account_item.dart';
 import 'package:frontend/widgets/button.dart';
 import 'package:frontend/widgets/transactions/transaction_item.dart';
@@ -42,7 +44,16 @@ class _AccountsOverviewState extends State<AccountsOverview> {
             ),
             child: Button(
               btnText: "ZUR KONTOÜBERSICHT",
-              onTap: () {},
+              onTap: () async {
+                await Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => const Start(
+                      pageId: 1,
+                    ),
+                  ),
+                );
+              },
               theme: ButtonColorTheme.secondaryLight,
             ),
           )
