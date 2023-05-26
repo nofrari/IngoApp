@@ -31,9 +31,8 @@ class _CategoryToggleBlackState extends State<CategoryToggleBlack> {
         mainAxisAlignment: MainAxisAlignment.start,
         crossAxisAlignment: CrossAxisAlignment.center,
         children: [
-          TextGoogle(
-            align: TextAlign.start,
-            text: "Iconfarbe:",
+          Text(
+            "Iconfarbe:",
             style: Fonts.text300,
           ),
           Switch(
@@ -45,6 +44,13 @@ class _CategoryToggleBlackState extends State<CategoryToggleBlack> {
             value: widget.isWhite ?? isWhite,
             onChanged: (value) => changeIsBlack(value),
           ),
+          Text(
+            (widget.isWhite != null && widget.isWhite == true) ||
+                    isWhite == true
+                ? "weiß"
+                : "schwarz",
+            style: Fonts.text300,
+          )
         ],
       ),
     );
