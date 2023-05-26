@@ -53,6 +53,7 @@ class _ColorSelectorState extends State<ColorSelector> {
               pickerColor: AppColor.getColorFromString(_currentColor),
               layoutBuilder: (context, colors, child) {
                 return GridView.builder(
+                  physics: NeverScrollableScrollPhysics(),
                   itemCount: colorList.length,
                   gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
                     crossAxisCount: 6,

@@ -50,6 +50,7 @@ class _CategoryIconSelectState extends State<CategoryIconSelect> {
             height: 400,
             width: double.infinity,
             child: GridView.builder(
+              physics: NeverScrollableScrollPhysics(),
               itemCount: icons.length,
               gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
                 crossAxisCount: 6,
