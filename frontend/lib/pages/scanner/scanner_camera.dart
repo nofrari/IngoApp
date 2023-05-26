@@ -260,6 +260,7 @@ class _ScannerCameraState extends State<ScannerCamera>
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
+          behavior: SnackBarBehavior.floating,
           content: Text('An error occurred when scanning text'),
         ),
       );

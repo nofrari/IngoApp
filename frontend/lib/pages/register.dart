@@ -335,6 +335,7 @@ class _RegisterState extends State<Register> {
                         } else {
                           ScaffoldMessenger.of(context).showSnackBar(
                             const SnackBar(
+                                behavior: SnackBarBehavior.floating,
                                 content: Text('Mailadresse existiert bereits')),
                           );
                         }
