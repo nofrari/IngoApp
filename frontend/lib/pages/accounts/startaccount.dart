@@ -24,7 +24,7 @@ class StartAccount extends StatefulWidget {
 
 class _StartAccountState extends State<StartAccount> {
   TextInputFormatter letters = FilteringTextInputFormatter.allow(
-      RegExp(r"[a-zA-Z0-9#+:'()&/^\-{2}|\s]"));
+      RegExp(r"[a-zA-Z0-9ÄÖÜäöüß#+:'()&/^\-{2}|\s\.]"));
 
   TextEditingController controllerTitle = TextEditingController();
   TextEditingController controllerAmount = TextEditingController();
