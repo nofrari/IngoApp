@@ -25,7 +25,7 @@ class ProfileOverview extends StatefulWidget {
 class _ProfileOverviewState extends State<ProfileOverview> {
   User user = User(id: "", firstName: " ", lastName: " ", email: " ");
   TextInputFormatter letters = FilteringTextInputFormatter.allow(
-      RegExp(r"[a-zA-Z0-9#+:'()&/^\-{2}|\s]"));
+      RegExp(r"[a-zA-Z0-9#+:'@()&/^\-{2}|\s\.]"));
 
   TextEditingController controllerFirstName = TextEditingController();
   TextEditingController controllerLastName = TextEditingController();
@@ -158,6 +158,7 @@ class _ProfileOverviewState extends State<ProfileOverview> {
                                       ScaffoldMessenger.of(context)
                                           .showSnackBar(
                                         const SnackBar(
+                                            behavior: SnackBarBehavior.floating,
                                             content: Text(
                                                 'Ein Fehler ist aufgetreten.')),
                                       );
@@ -335,6 +336,9 @@ class _ProfileOverviewState extends State<ProfileOverview> {
                                                               context)
                                                           .showSnackBar(
                                                         const SnackBar(
+                                                            behavior:
+                                                                SnackBarBehavior
+                                                                    .floating,
                                                             content: Text(
                                                                 'Daten gespeichert.')),
                                                       );
@@ -361,19 +365,20 @@ class _ProfileOverviewState extends State<ProfileOverview> {
                                         controllerEmail.text);
                                     ScaffoldMessenger.of(context).showSnackBar(
                                       const SnackBar(
+                                          behavior: SnackBarBehavior.floating,
                                           content: Text('Daten gespeichert.')),
                                     );
                                     Navigator.push(
                                       context,
                                       MaterialPageRoute(
-                                        builder: (context) =>
-                                            const Start(pageId: 4),
+                                        builder: (context) => Start(pageId: 4),
                                       ),
                                     );
                                   } catch (e) {
                                     debugPrint(e.toString());
                                     ScaffoldMessenger.of(context).showSnackBar(
                                       const SnackBar(
+                                          behavior: SnackBarBehavior.floating,
                                           content: Text(
                                               'Ein Fehler ist aufgetreten.')),
                                     );
@@ -425,8 +430,12 @@ class _ProfileOverviewState extends State<ProfileOverview> {
         switch (dioError.response!.statusCode) {
           case 401:
             debugPrint('error: 401 - Password doesnt match');
-            ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
-                content: Text('Passwörter stimmen nicht überein.')));
+            ScaffoldMessenger.of(context).showSnackBar(
+              const SnackBar(
+                behavior: SnackBarBehavior.floating,
+                content: Text('Passwörter stimmen nicht überein.'),
+              ),
+            );
             break;
           default:
             debugPrint(
@@ -436,7 +445,9 @@ class _ProfileOverviewState extends State<ProfileOverview> {
       }
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Ein fehler ist aufgetreten.')),
+        const SnackBar(
+            behavior: SnackBarBehavior.floating,
+            content: Text('Ein fehler ist aufgetreten.')),
       );
       debugPrint('error: Something went wrong : $e');
     }

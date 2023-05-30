@@ -2,6 +2,7 @@ import 'dart:ffi';
 
 import 'package:flutter/material.dart';
 import 'package:dio/dio.dart';
+import 'package:frontend/pages/categories/categories.dart';
 import 'package:frontend/services/profile_service.dart';
 import 'package:provider/provider.dart';
 
@@ -24,8 +25,9 @@ import 'pages/manual_entry.dart';
 import 'package:frontend/models/user.dart';
 
 class Start extends StatefulWidget {
-  const Start({this.pageId, super.key});
+  Start({this.pageId, this.accountId, super.key});
   final int? pageId;
+  String? accountId;
 
   @override
   State<Start> createState() => _StartState();
@@ -47,6 +49,9 @@ class _StartState extends State<Start> {
           break;
         case 3:
           currentTab = 1;
+          currentScreen = Finances(
+            accountId: widget.accountId,
+          );
           break;
         default:
           currentTab = 0;
@@ -85,8 +90,8 @@ class _StartState extends State<Start> {
   final List<Widget> screens = [
     const Home(),
     const Accounts(),
-    const Budget(),
-    const Finances(),
+    const Categories(),
+    Finances(),
     const Profile(),
     const Scanner(),
     const ScannerCamera(),
@@ -213,7 +218,7 @@ class _StartState extends State<Start> {
                     onPressed: () {
                       setState(() {
                         currentTab = 1;
-                        currentScreen = const Finances();
+                        currentScreen = Finances();
                       });
                     },
                     child: Column(
@@ -270,7 +275,7 @@ class _StartState extends State<Start> {
                     onPressed: () {
                       setState(() {
                         currentTab = 3;
-                        currentScreen = const Budget();
+                        currentScreen = const Categories();
                       });
                     },
                     child: Column(
@@ -283,7 +288,7 @@ class _StartState extends State<Start> {
                               : AppColor.neutral100,
                         ),
                         Text(
-                          Strings.menuBudget,
+                          Strings.menuCategories,
                           style: TextStyle(
                             color: AppColor.neutral100,
                           ),

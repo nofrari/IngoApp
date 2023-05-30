@@ -251,7 +251,7 @@ class _ManualEntryState extends State<ManualEntry> {
   @override
   void initState() {
     super.initState();
-    loadTransaction();
+    widget.isEditMode == true ? loadTransaction() : null;
   }
 
   @override
@@ -359,7 +359,7 @@ class _ManualEntryState extends State<ManualEntry> {
                                   Navigator.push(
                                     context,
                                     MaterialPageRoute(
-                                      builder: (context) => const Start(),
+                                      builder: (context) => Start(),
                                     ),
                                   );
                                 } else {
@@ -639,7 +639,7 @@ class _ManualEntryState extends State<ManualEntry> {
                                 Navigator.push(
                                   context,
                                   MaterialPageRoute(
-                                    builder: (context) => const Start(),
+                                    builder: (context) => Start(),
                                   ),
                                 );
                               },
@@ -696,7 +696,7 @@ class _ManualEntryState extends State<ManualEntry> {
                                     await Navigator.push(
                                       context,
                                       MaterialPageRoute(
-                                        builder: (context) => const Start(),
+                                        builder: (context) => Start(),
                                       ),
                                     );
                                   }

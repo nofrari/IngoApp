@@ -22,8 +22,8 @@ import '../constants/fonts.dart';
 import '../widgets/tag.dart';
 
 class Finances extends StatefulWidget {
-  const Finances({super.key});
-
+  Finances({this.accountId, super.key});
+  String? accountId;
   @override
   State<Finances> createState() => _FinancesState();
 }
@@ -40,6 +40,8 @@ class _FinancesState extends State<Finances> {
   List<String> selectedCategoryTags = [];
   List<String> selectedAccountTags = [];
   String? selectedEndDate;
+  Account? accountSelectedFromHome;
+  bool? previouslySelected = true;
 
   String? validatorDate;
 
@@ -68,9 +70,7 @@ class _FinancesState extends State<Finances> {
   }
 
   void onAccountSelected(List<String> values) {
-    setState(() {
-      selectedAccount = values.join(", ");
-    });
+    selectedAccount = values.join(", ");
   }
 
   void handleCategoryTagsChanged(List<String> tags) {
@@ -151,7 +151,7 @@ class _FinancesState extends State<Finances> {
         },
       );
     }));
-    debugPrint(tags.toList().toString());
+
     return tags;
   }
 
@@ -162,6 +162,24 @@ class _FinancesState extends State<Finances> {
     colors = context.watch<InitialService>().getColors();
     icons = context.watch<InitialService>().getIcons();
     accounts = context.watch<AccountsService>().getAccounts();
+    // if (widget.accountId != null && widget.accountId != "") {
+    //   accountSelectedFromHome =
+    //       context.watch<AccountsService>().getAccount(widget.accountId ?? "");
+    //   debugPrint(
+    //       "account selected name: ${accountSelectedFromHome!.name.toString()}");
+
+    //   setState(() {
+    //     selectedAccountTags.insert(0, accountSelectedFromHome!.name);
+    //   });
+
+    //   onAccountSelected(selectedAccountTags);
+
+    //   setState(() {
+    //     widget.accountId = null;
+    //     previouslySelected = true;
+    //   });
+    // }
+
     List<Widget> tags = generateTags();
 
     String test = DateFormat('yyyy-MM-dd')
@@ -224,7 +242,7 @@ class _FinancesState extends State<Finances> {
                           DateTime endDate = DateTime.parse(endDateString);
 
                           if (endDate.isBefore(startDate)) {
-                            return "Startdatum darf nicht nach dem Enddatum liegen";
+                            return "Startdatum < Enddatum";
                           } else {
                             return null;
                           }

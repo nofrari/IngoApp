@@ -135,7 +135,7 @@ class _StartAccountState extends State<StartAccount> {
                                       Navigator.push(
                                         context,
                                         MaterialPageRoute(
-                                          builder: (context) => const Start(),
+                                          builder: (context) => Start(),
                                         ),
                                       );
                                     }

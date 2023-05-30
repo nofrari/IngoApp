@@ -144,6 +144,7 @@ class _LoginState extends State<Login> {
                           debugPrint('da passt was nicht');
                           ScaffoldMessenger.of(context).showSnackBar(
                             const SnackBar(
+                                behavior: SnackBarBehavior.floating,
                                 content: Text(
                                     'Keinen User gefunden, bitte überprüfe deine Eingaben.')),
                           );

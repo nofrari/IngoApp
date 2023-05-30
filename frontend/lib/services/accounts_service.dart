@@ -11,56 +11,6 @@ class AccountsService extends ChangeNotifier {
 
   static late final SharedPreferences _prefs;
 
-  Future<void> setManualEntry(String pdfName, String pdfPath, int pdfHeight,
-      String supplierName, int amount, String date, String category) async {
-    try {
-      Map<String, dynamic> manualEntryMap = {
-        "pdf_name": pdfName,
-        "pdf_path": pdfPath,
-        "pdf_height": pdfHeight,
-        "supplier_name": supplierName,
-        "amount": amount,
-        "date": date,
-        "category": category
-      };
-      _prefs.setString('manualEntry', jsonEncode(manualEntryMap));
-    } catch (e) {
-      debugPrint(e.toString());
-    }
-  }
-
-  Map<String, dynamic> getManualEntry() {
-    try {
-      Map<String, dynamic> manualEntryMap =
-          jsonDecode(_prefs.getString('manualEntry') ?? '{}');
-      return manualEntryMap;
-    } catch (e) {
-      debugPrint(e.toString());
-      return {};
-    }
-  }
-
-  Future<void> forgetManualEntry() async {
-    try {
-      _prefs.remove('manualEntry');
-    } catch (e) {
-      debugPrint(e.toString());
-    }
-  }
-
-  List<String> getImages() {
-    debugPrint("gotImages");
-    return _prefs.getStringList('images') ?? [];
-  }
-
-  Future<void> clearImages() async {
-    try {
-      _prefs.remove('images');
-    } catch (e) {
-      debugPrint(e.toString());
-    }
-  }
-
   Future<void> setAccount(
       {required String id,
       required String heading,
@@ -119,8 +69,6 @@ class AccountsService extends ChangeNotifier {
         .map((accountString) => Account.fromJson(jsonDecode(accountString)))
         .toList();
 
-    debugPrint("get accounts length: ${accounts.length.toString()}");
-
     return accounts;
   }
 
@@ -167,16 +115,6 @@ class AccountsService extends ChangeNotifier {
       }
 
       setAccounts(accounts: accounts);
-    } catch (e) {
-      debugPrint(e.toString());
-    }
-  }
-
-  Future<void> deleteImage(String path) async {
-    try {
-      List<String> images = _prefs.getStringList('images') ?? [];
-      if (images.isNotEmpty) images.remove(path);
-      _prefs.setStringList('images', images);
     } catch (e) {
       debugPrint(e.toString());
     }

@@ -2,9 +2,12 @@ import 'package:frontend/constants/colors.dart';
 import 'package:frontend/constants/fonts.dart';
 import 'package:frontend/models/account.dart';
 import 'package:flutter/material.dart';
+import 'package:frontend/start.dart';
 import 'package:frontend/widgets/accounts/account_item.dart';
 import 'package:frontend/widgets/button.dart';
-import 'package:frontend/widgets/transactions/transaction_item.dart';
+import 'package:provider/provider.dart';
+
+import '../../services/accounts_service.dart';
 
 class AccountsOverview extends StatefulWidget {
   const AccountsOverview({required this.accounts, super.key});
@@ -31,8 +34,21 @@ class _AccountsOverviewState extends State<AccountsOverview> {
             ),
           ),
           ...widget.accounts
-              .map((account) => AccountItem(
-                    account: account,
+              .map((account) => GestureDetector(
+                    onTap: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => Start(
+                            pageId: 3,
+                            accountId: account.id,
+                          ),
+                        ),
+                      );
+                    },
+                    child: AccountItem(
+                      account: account,
+                    ),
                   ))
               .toList(),
           Container(
@@ -42,7 +58,16 @@ class _AccountsOverviewState extends State<AccountsOverview> {
             ),
             child: Button(
               btnText: "ZUR KONTOÜBERSICHT",
-              onTap: () {},
+              onTap: () async {
+                await Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => Start(
+                      pageId: 1,
+                    ),
+                  ),
+                );
+              },
               theme: ButtonColorTheme.secondaryLight,
             ),
           )
