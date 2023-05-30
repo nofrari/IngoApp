@@ -38,10 +38,26 @@ class DatepickerField extends StatefulWidget {
 }
 
 class _DatepickerFieldState extends State<DatepickerField> {
+  bool showCalendarIcon = true;
+  @override
+  @override
+  void initState() {
+    super.initState();
+    widget.controller.addListener(updateIconVisibility);
+  }
+
   @override
   void dispose() {
+    widget.controller.removeListener(updateIconVisibility);
     widget.controller.dispose();
+
     super.dispose();
+  }
+
+  void updateIconVisibility() {
+    setState(() {
+      showCalendarIcon = !widget.controller.text.contains('/');
+    });
   }
 
   @override
@@ -65,14 +81,15 @@ class _DatepickerFieldState extends State<DatepickerField> {
           filled: true,
           fillColor: AppColor.neutral400,
           errorStyle: Fonts.errorMessage,
-          suffixIcon: const Align(
-            widthFactor: 1.0,
-            heightFactor: 1.0,
-            child: Icon(
-              Icons.calendar_month,
-              color: Colors.white,
-            ),
-          ),
+          suffixIcon: showCalendarIcon
+              ? const Icon(
+                  Icons.calendar_month,
+                  color: Colors.white,
+                )
+              : IconButton(
+                  onPressed: widget.controller.clear,
+                  icon: const Icon(Icons.clear),
+                  color: AppColor.blueActive),
           border: DecoratedInputBorder(
             child: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(Values.inputRadius),
@@ -97,6 +114,11 @@ class _DatepickerFieldState extends State<DatepickerField> {
           ),
         ),
         readOnly: true,
+        onChanged: (value) {
+          setState(() {
+            showCalendarIcon = !widget.controller.text.contains('/');
+          });
+        },
         onTap: () async {
           DateTime? pickedDate = await showDatePicker(
             context: context,
@@ -151,6 +173,8 @@ class _DatepickerFieldState extends State<DatepickerField> {
             if (widget.onChanged != null) {
               widget.onChanged!(formattedDate);
             }
+          } else {
+            print("empty");
           }
         },
       ),
