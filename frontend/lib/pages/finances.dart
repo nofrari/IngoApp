@@ -145,9 +145,13 @@ class _FinancesState extends State<Finances> {
         isCategory: false,
         onTap: () {
           setState(() {
-            selectedAccountTags.remove(item);
+            if (selectedAccountTags.contains(item)) {
+              selectedAccountTags.remove(item);
+            }
           });
           onAccountSelected(selectedAccountTags);
+          debugPrint(
+              "selected account tags after remove: ${selectedAccountTags.toList().toString()}");
         },
       );
     }));
@@ -162,23 +166,24 @@ class _FinancesState extends State<Finances> {
     colors = context.watch<InitialService>().getColors();
     icons = context.watch<InitialService>().getIcons();
     accounts = context.watch<AccountsService>().getAccounts();
-    // if (widget.accountId != null && widget.accountId != "") {
-    //   accountSelectedFromHome =
-    //       context.watch<AccountsService>().getAccount(widget.accountId ?? "");
-    //   debugPrint(
-    //       "account selected name: ${accountSelectedFromHome!.name.toString()}");
 
-    //   setState(() {
-    //     selectedAccountTags.insert(0, accountSelectedFromHome!.name);
-    //   });
+    if (widget.accountId != null && widget.accountId != "") {
+      accountSelectedFromHome =
+          context.watch<AccountsService>().getAccount(widget.accountId ?? "");
+      debugPrint(
+          "account selected name: ${accountSelectedFromHome!.name.toString()}");
 
-    //   onAccountSelected(selectedAccountTags);
+      setState(() {
+        selectedAccountTags = [accountSelectedFromHome!.name];
+      });
 
-    //   setState(() {
-    //     widget.accountId = null;
-    //     previouslySelected = true;
-    //   });
-    // }
+      onAccountSelected(selectedAccountTags);
+      handleAccountTagsChanged(selectedAccountTags);
+
+      setState(() {
+        widget.accountId = null;
+      });
+    }
 
     List<Widget> tags = generateTags();
 
@@ -242,7 +247,6 @@ class _FinancesState extends State<Finances> {
                           DateTime endDate = DateTime.parse(endDateString);
 
                           if (endDate.isBefore(startDate)) {
-                            return "Startdatum < Enddatum";
                             return "Startdatum darf nicht\nnach dem Enddatum\nliegen";
                           } else {
                             return null;
@@ -282,7 +286,6 @@ class _FinancesState extends State<Finances> {
                           DateTime endDate = DateTime.parse(endDateString);
 
                           if (endDate.isBefore(startDate)) {
-                            return "Enddatum darf nicht vor dem Startdatum liegen";
                             return "Enddatum darf nicht\nvor dem Startdatum\nliegen";
                           } else {
                             return null;
