@@ -22,8 +22,8 @@ import '../constants/fonts.dart';
 import '../widgets/tag.dart';
 
 class Finances extends StatefulWidget {
-  const Finances({super.key});
-
+  Finances({this.accountId, super.key});
+  String? accountId;
   @override
   State<Finances> createState() => _FinancesState();
 }
@@ -40,6 +40,8 @@ class _FinancesState extends State<Finances> {
   List<String> selectedCategoryTags = [];
   List<String> selectedAccountTags = [];
   String? selectedEndDate;
+  Account? accountSelectedFromHome;
+  bool? previouslySelected = true;
 
   String? validatorDate;
 
@@ -69,8 +71,14 @@ class _FinancesState extends State<Finances> {
 
   void onAccountSelected(List<String> values) {
     setState(() {
-      selectedAccount = values.join(", ");
+      if (widget.accountId == null && previouslySelected == true) {
+        selectedAccount = "$selectedAccount, ${values.join(", ")}";
+        previouslySelected = false;
+      } else {
+        selectedAccount = values.join(", ");
+      }
     });
+    debugPrint("selectedAccounts: ${selectedAccount.toString()}");
   }
 
   void handleCategoryTagsChanged(List<String> tags) {
@@ -81,7 +89,7 @@ class _FinancesState extends State<Finances> {
 
   void handleAccountTagsChanged(List<String> tags) {
     setState(() {
-      selectedAccountTags = tags;
+      selectedAccountTags.addAll(tags);
     });
   }
 
@@ -151,7 +159,7 @@ class _FinancesState extends State<Finances> {
         },
       );
     }));
-    debugPrint(tags.toList().toString());
+
     return tags;
   }
 
@@ -162,6 +170,21 @@ class _FinancesState extends State<Finances> {
     colors = context.watch<InitialService>().getColors();
     icons = context.watch<InitialService>().getIcons();
     accounts = context.watch<AccountsService>().getAccounts();
+    if (widget.accountId != null) {
+      accountSelectedFromHome =
+          context.watch<AccountsService>().getAccount(widget.accountId ?? "");
+      debugPrint(accountSelectedFromHome?.name);
+
+      setState(() {
+        selectedAccount = accountSelectedFromHome?.name ?? "";
+
+        selectedAccountTags.add(selectedAccount!);
+
+        debugPrint("selectedTags: ${selectedAccountTags.toList()}");
+        onAccountSelected(selectedAccountTags);
+        widget.accountId = null;
+      });
+    }
     List<Widget> tags = generateTags();
 
     String test = DateFormat('yyyy-MM-dd')
@@ -224,7 +247,7 @@ class _FinancesState extends State<Finances> {
                           DateTime endDate = DateTime.parse(endDateString);
 
                           if (endDate.isBefore(startDate)) {
-                            return "Startdatum darf nicht nach dem Enddatum liegen";
+                            return "Startdatum < Enddatum";
                           } else {
                             return null;
                           }
