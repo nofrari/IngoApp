@@ -153,15 +153,15 @@ class _RegisterState extends State<Register> {
   //   });
   // }
 
-  late bool mailExists;
+  late bool mailExists = false;
 
   Dio dio = Dio();
 
   @override
   void initState() {
     super.initState();
-    // controllerLastName.text = "selina";
-    // controllerName.text = "lehner";
+    // controllerName.text = "selina";
+    // controllerLastName.text = "lehner";
     // controllerMail.text = "lehner.selina9@gmail.com";
     // controllerPassword.text = "123selina";
     // controllerPasswordRepeat.text = "123selina";
@@ -326,15 +326,11 @@ class _RegisterState extends State<Register> {
                         );
                         debugPrint('existiert diese mail bereits? $mailExists');
                         if (mailExists == false) {
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (context) => const StartAccount(),
-                            ),
-                          );
+                          _showConfirmationDialog(context);
                         } else {
                           ScaffoldMessenger.of(context).showSnackBar(
                             const SnackBar(
+                                behavior: SnackBarBehavior.floating,
                                 content: Text('Mailadresse existiert bereits')),
                           );
                         }
@@ -349,6 +345,25 @@ class _RegisterState extends State<Register> {
     );
   }
 
+  void _showConfirmationDialog(BuildContext context) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text('Confirm Email'),
+          content: Text(
+              'Please check your email and confirm your account to log in.'),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(context),
+              child: Text('OK'),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
   Future _sendData(
       String name, String sirname, String email, String password) async {
     Map<String, dynamic> formData = {
@@ -356,6 +371,7 @@ class _RegisterState extends State<Register> {
       "user_sirname": sirname,
       "email": email,
       "password": password,
+      "email_confirmed": false,
     };
 
     try {

@@ -6,6 +6,7 @@ import 'package:frontend/constants/values.dart';
 import 'package:frontend/pages/password_reset.dart';
 import 'package:frontend/services/profile_service.dart';
 import 'package:provider/provider.dart';
+import 'package:frontend/widgets/linkIntern.dart';
 
 import '../constants/fonts.dart';
 import '../start.dart';
@@ -46,7 +47,8 @@ class _LoginState extends State<Login> {
 
   final _formKey = GlobalKey<FormState>();
   final PageStorageBucket bucket = PageStorageBucket();
-  late bool userExists = false;
+  late bool userExists;
+  late bool emailVerified;
   late bool credentialsMatch;
 
   Dio dio = Dio();
@@ -109,21 +111,9 @@ class _LoginState extends State<Login> {
               },
             ),
             //TODO: Link Passwort vergessen
-            Align(
-              alignment: Alignment.centerLeft,
-              child: GestureDetector(
-                onTap: () => Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => PasswordReset(),
-                  ),
-                ),
-                child: Text(
-                  Strings.passwordForgot,
-                  style: Fonts.textLink,
-                ),
-              ),
-            ),
+            LinkIntern(
+                linkInternTo: PasswordReset(),
+                linkInternText: Strings.passwordForgot),
             Expanded(
               child: Align(
                 alignment: Alignment.bottomCenter,
@@ -133,15 +123,24 @@ class _LoginState extends State<Login> {
                       if (_formKey.currentState!.validate() != false) {
                         await _sendData(
                             controllerMail.text, controllerPassword.text);
-                        if (userExists == true) {
+                        if (userExists == true && emailVerified == true) {
                           debugPrint('los gehts');
+                          //Navigate to Start
                           Navigator.push(
                             context,
                             MaterialPageRoute(
-                              builder: (context) => const Start(),
+                              builder: (context) => Start(),
                             ),
                           );
-                        } else {
+                        } else if (userExists == true &&
+                            emailVerified == false) {
+                          debugPrint('email nicht verifiziert');
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            const SnackBar(
+                                content: Text(
+                                    'Bitte verifiziere zuerst deine E-Mail-Adresse.')),
+                          );
+                        } else if (userExists == false) {
                           debugPrint('da passt was nicht');
                           ScaffoldMessenger.of(context).showSnackBar(
                             const SnackBar(
@@ -177,6 +176,7 @@ class _LoginState extends State<Login> {
           email: response.data['email']);
       setState(() {
         userExists = true;
+        emailVerified = true;
       });
     } on DioError catch (dioError) {
       debugPrint(dioError.toString());
@@ -186,21 +186,38 @@ class _LoginState extends State<Login> {
             debugPrint('error: 404 - User does not exist');
             setState(() {
               userExists = false;
+              emailVerified = false;
             });
             break;
           case 401:
             debugPrint('error: 401 - Wrong email or password');
             setState(() {
               userExists = false;
+              emailVerified = false;
+            });
+            break;
+          case 403:
+            debugPrint('error: 403 - Email not verified');
+            setState(() {
+              userExists = true;
+              emailVerified = false;
             });
             break;
           default:
+            setState(() {
+              userExists = false;
+              emailVerified = false;
+            });
             debugPrint(
                 'error: ${dioError.response!.statusCode} - Something went wrong while trying to connect with the server');
             break;
         }
       }
     } catch (e) {
+      setState(() {
+        userExists = false;
+        emailVerified = false;
+      });
       debugPrint('error: Something went wrong : $e');
     }
   }
