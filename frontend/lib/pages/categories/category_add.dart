@@ -5,6 +5,7 @@ import 'package:flutter/services.dart';
 import 'package:frontend/constants/colors.dart';
 import 'package:frontend/constants/fonts.dart';
 import 'package:frontend/constants/icons.dart';
+import 'package:frontend/constants/strings.dart';
 import 'package:frontend/constants/values.dart';
 import 'package:frontend/models/category.dart';
 import 'package:frontend/pages/categories/categories.dart';
@@ -93,7 +94,7 @@ class _CategoryAddState extends State<CategoryAdd> {
         },
         element: TextGoogle(
           align: TextAlign.center,
-          text: "Kategorie hinzufügen".toUpperCase(),
+          text: Strings.addCategoryHeading.toUpperCase(),
           style: Fonts.text400,
         ),
       ),
