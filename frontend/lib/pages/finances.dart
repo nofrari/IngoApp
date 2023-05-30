@@ -243,6 +243,7 @@ class _FinancesState extends State<Finances> {
 
                           if (endDate.isBefore(startDate)) {
                             return "Startdatum < Enddatum";
+                            return "Startdatum darf nicht\nnach dem Enddatum\nliegen";
                           } else {
                             return null;
                           }
@@ -282,6 +283,7 @@ class _FinancesState extends State<Finances> {
 
                           if (endDate.isBefore(startDate)) {
                             return "Enddatum darf nicht vor dem Startdatum liegen";
+                            return "Enddatum darf nicht\nvor dem Startdatum\nliegen";
                           } else {
                             return null;
                           }
