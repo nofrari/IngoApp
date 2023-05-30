@@ -75,7 +75,7 @@ class _CategoryAddState extends State<CategoryAdd> {
 
   Dio dio = Dio();
   TextInputFormatter letters = FilteringTextInputFormatter.allow(
-      RegExp(r"[a-zA-Z0-9#+:'()&/^\-{2}|\s]"));
+      RegExp(r"[a-zA-Z0-9ÄÖÜäöüß#+:'()&/^\-{2}|\s\.]"));
   TextInputType text = TextInputType.text;
   TextEditingController controllerCategoryName = TextEditingController();
 
