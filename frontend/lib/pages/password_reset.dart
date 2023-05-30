@@ -169,7 +169,7 @@ class _PasswordResetState extends State<PasswordReset> {
                         ),
                       );
                     },
-                    theme: ButtonColorTheme.secondary,
+                    theme: ButtonColorTheme.secondaryLight,
                   )),
             ]));
   }
@@ -179,7 +179,7 @@ class _PasswordResetState extends State<PasswordReset> {
       "email": email,
     };
     try {
-      await dio.post("http://localhost:5432/users/reset-password",
+      await dio.post("${Values.serverURL}/users/reset-password",
           data: formData);
       debugPrint('wir sind dabei');
       setState(() {

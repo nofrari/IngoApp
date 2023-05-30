@@ -13,7 +13,8 @@ const registerSchema = z.object({
     user_name: z.string(),
     user_sirname: z.string(),
     email: z.string(),
-    password: z.string()
+    password: z.string(),
+    email_confirmed: z.boolean().optional(),
 });
 type RegisterSchema = z.infer<typeof registerSchema>;
 
@@ -37,6 +38,12 @@ const resetPasswordSchema = z.object({
     email: z.string(),
 });
 type ResetPasswordSchema = z.infer<typeof resetPasswordSchema>;
+
+// const confirmEmailSchema = z.object({
+//     email: z.string(),
+//     email_confirmed: z.boolean()
+// });
+// type ConfirmEmailSchema = z.infer<typeof confirmEmailSchema>;
 
 const transporter = nodemailer.createTransport({
     host: 'smtp.world4you.com',
@@ -134,23 +141,28 @@ router.post('/users/register', async (req, res) => {
     }
 
     const hash = await bcrypt.hash(body.password, 10);
+
+    //create confirmation token and send email
+    const confirmationToken = jwt.sign({
+     //token expires after 1 minute
+      exp: Math.floor(Date.now() / 1000) + (60 * 1)
+    }, process.env.JWT_SECRET as string,);
+
     const user = await prisma.user.create({
         data: {
             user_name: body.user_name,
             user_sirname: body.user_sirname,
             email: body.email,
-            password: hash
+            password: hash,
+            email_confirmed: false,
         }
     });
 
-    // const token = jwt.sign({
-    //     userId: user.user_id,
-    //     exp: Math.floor(Date.now() / 1000) + (60 * 60)
-    // }, <string>process.env.JWT_SECRET);
-
-    res.send({
-        //accessToken: token,
-        user_id: user.user_id,
+    sendConfirmationEmail(user.email, confirmationToken);   
+ 
+    res.status(200).send({
+    message: 'Registration successful. Please check your email for confirmation.',
+    user_id: user.user_id,
         username: user.user_name,
         user_sirname: user.user_sirname,
         email: user.email
@@ -176,11 +188,41 @@ router.get('/users/delete/:id', async (req, res) => {
         res.send(200);
     } catch (error) {
         res.send(error);
+    }});
+
+//confirm email
+router.get('/users/confirm-email/:confirmationToken', async (req, res) => {
+  const confirmationToken = req.params.confirmationToken;
+  const { userId } = <any>jwt.verify(req.params.confirmationToken, <string>process.env.JWT_SECRET);
+
+  jwt.verify(confirmationToken, <string>process.env.JWT_SECRET, (err: any, decoded: any) => {
+    if (err) {
+      console.log(err);
+      res.status(400).send('Invalid token');
+    } else {  
+
+     prisma.user.update({
+      where: {
+        user_id: userId,
+      },
+      data: {
+        email_confirmed: true,
+      },
+    });
+      res.redirect('https://www.ingoapp.at/email-bestaetigt');
     }
+  });
+
+  // try {
+  //   const { userId } = <any>jwt.verify(req.params.token, <string>process.env.JWT_SECRET);
+
+
+  //   res.status(200).send('Email confirmed successfully');
+  // } catch (error) { res.status(123).send(); }
 });
 
-//user login
-router.post('/users/login', async (req, res) => {
+  //user login
+  router.post('/users/login', async (req, res) => {
     const body = <LoginSchema>req.body;
     const validationResult = loginSchema.safeParse(body);
 
@@ -207,10 +249,12 @@ router.post('/users/login', async (req, res) => {
         return;
     }
 
-    // const token = jwt.sign({
-    //     userId: user.user_id,
-    //     exp: Math.floor(Date.now() / 1000) + (60 * 60 * 24 * 30)
-    // }, <string>process.env.JWT_SECRET);
+    const confirmed = user.email_confirmed;
+
+    if (!confirmed) { 
+        res.status(403).send();
+        return; 
+    }
 
     res.status(200).send({
         //accessToken: token,
@@ -220,10 +264,10 @@ router.post('/users/login', async (req, res) => {
         email: user.email,
         pin: user.pin
     });
-})
+  })
 
-// Reset password / send mail
-router.post('/users/reset-password', async (req, res) => {
+  // Reset password / send mail
+  router.post('/users/reset-password', async (req, res) => {
     const body = <ResetPasswordSchema>req.body;
     const validationResult = resetPasswordSchema.safeParse(body);
 
@@ -263,7 +307,31 @@ router.post('/users/reset-password', async (req, res) => {
   
     res.status(200).send("Password reset successfully");
   });
+
+  // --------------------------- Functions ---------------------------
   
+  // Email confirmation
+  function sendConfirmationEmail(email: any, confirmationToken: string | number) {
+    const confirmationLink = 'https://data.ingoapp.at/users/confirm-email/${confirmationToken}'; 
+    //`https://157.90.249.232:5432/users/confirm-email/${confirmationToken}`;
+  
+    const mailOptions = {
+      from: 'office@ingoapp.at',
+      to: email, 
+      subject: 'Email bestätigen',
+      text: `Hi! \n\nDanke für deine Registrierung! Als letzten Schritt klicke bitte auf folgenden Link, um deine Email zu bestätigen: ${confirmationLink}\n\nDieser Link ist für 1 Minute gültig. \n\nSolltest du dich nicht registriert haben, ignoriere diese Email bitte.`
+    };
+  
+    transporter.sendMail(mailOptions, (error, info) => {
+      if (error) {
+        console.error('Error sending email:', error);
+      } else {
+        console.log('Email sent:', info.response);
+      }
+    });}
+
+   
+  // Password reset
   function generateNewPassword() {
     const length = 10; // Length of the new password
     const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789'; // Characters to include in the new password
