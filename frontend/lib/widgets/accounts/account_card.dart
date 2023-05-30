@@ -43,7 +43,7 @@ class _AccountCardState extends State<AccountCard> {
   Dio dio = Dio();
 
   final TextInputFormatter _letters = FilteringTextInputFormatter.allow(
-      RegExp(r"[a-zA-Z0-9#+:'()&/^\-{2}|\s]"));
+      RegExp(r"[a-zA-Z0-9ÄÖÜäöüß#+:'()&/^\-{2}|\s\.]"));
 
   void onStateChanged(ThreeDotMenuState accountCardState) {
     setState(() {

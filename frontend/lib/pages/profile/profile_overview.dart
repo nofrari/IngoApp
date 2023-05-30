@@ -25,7 +25,7 @@ class ProfileOverview extends StatefulWidget {
 class _ProfileOverviewState extends State<ProfileOverview> {
   User user = User(id: "", firstName: " ", lastName: " ", email: " ");
   TextInputFormatter letters = FilteringTextInputFormatter.allow(
-      RegExp(r"[a-zA-Z0-9#+:'@()&/^\-{2}|\s\.]"));
+      RegExp(r"[a-zA-Z0-9ÄÖÜäöüß#+:'()&/^\-{2}|\s]"));
 
   TextEditingController controllerFirstName = TextEditingController();
   TextEditingController controllerLastName = TextEditingController();

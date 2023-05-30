@@ -81,7 +81,7 @@ class ManualEntry extends StatefulWidget {
 class _ManualEntryState extends State<ManualEntry> {
   TextInputFormatter digits = FilteringTextInputFormatter.digitsOnly;
   TextInputFormatter letters = FilteringTextInputFormatter.allow(
-      RegExp(r"[a-zA-Z0-9#+:'()&/^\-{2}|\s]"));
+      RegExp(r"[a-zA-Z0-9ÄÖÜäöüß#+:'()&/^\-{2}|\s\.]"));
 
   TextInputType numeric = TextInputType.number;
   TextInputType text = TextInputType.text;

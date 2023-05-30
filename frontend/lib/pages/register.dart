@@ -36,11 +36,11 @@ class _RegisterState extends State<Register> {
   String? valuePWValidator;
   TextInputFormatter digits = FilteringTextInputFormatter.digitsOnly;
   TextInputFormatter letters = FilteringTextInputFormatter.allow(
-      RegExp(r"[a-zA-Z0-9#+:'()&/^\-{2}|\s]"));
+      RegExp(r"[a-zA-Z0-9ÄÖÜäöüß#+:'()&/^\-{2}|\s]"));
   TextInputFormatter mail = FilteringTextInputFormatter.allow(
-      RegExp(r"[a-zA-Z0-9#+:'()&/^\-{2}|\s@.]"));
+      RegExp(r"[a-zA-Z0-9ÄÖÜäöüß@#+:'()&/^\-{2}|\s@.]"));
   TextInputFormatter password = FilteringTextInputFormatter.allow(
-      RegExp(r"[a-zA-Z0-9#+:'()&/^\-{2}|\s@.!?]"));
+      RegExp(r"[a-zA-Z0-9ÄÖÜäöüß#+:'()&/^\-{2}|\s@.!?]"));
   TextInputType numeric = TextInputType.number;
   TextInputType text = TextInputType.text;
 
@@ -52,6 +52,8 @@ class _RegisterState extends State<Register> {
 
   void _getCategories() async {
     try {
+      String val = context.read<ProfileService>().getUser().id;
+      print("ID $val");
       Response response = await Dio().get(
           '${Values.serverURL}/categories/${context.read<ProfileService>().getUser().id}');
       List<CategoryModel> categories = [];
@@ -77,8 +79,8 @@ class _RegisterState extends State<Register> {
             label: response.data["categories"][i]['category_name'].toString()));
       }
       await context.read<InitialService>().setCategories(categories);
-    } catch (e) {
-      print(e);
+    } catch (error) {
+      print(error);
     }
   }
 
@@ -153,7 +155,7 @@ class _RegisterState extends State<Register> {
   //   });
   // }
 
-  late bool mailExists;
+  late bool mailExists = false;
 
   Dio dio = Dio();
 
@@ -362,6 +364,7 @@ class _RegisterState extends State<Register> {
     try {
       dynamic response =
           await dio.post("${Values.serverURL}/users/register", data: formData);
+
       await context.read<ProfileService>().setUser(
           id: response.data['user_id'],
           firstname: response.data['user_name'],

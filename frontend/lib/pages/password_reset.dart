@@ -26,7 +26,7 @@ class _PasswordResetState extends State<PasswordReset> {
   final _formKey = GlobalKey<FormState>();
 
   TextInputFormatter mail = FilteringTextInputFormatter.allow(
-      RegExp(r"[a-zA-Z0-9#+:'()&/^\-{2}|\s@.]"));
+      RegExp(r"[a-zA-Z0-9ÄÖÜäöüß#+:'()&/^\-{2}|\s@\.]"));
   TextInputType text = TextInputType.text;
   TextEditingController controllerMail = TextEditingController();
 

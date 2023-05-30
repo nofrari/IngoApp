@@ -46,7 +46,7 @@ class _FinancesState extends State<Finances> {
   String? validatorDate;
 
   TextInputFormatter letters = FilteringTextInputFormatter.allow(
-      RegExp(r"[a-zA-Z0-9#+:'()&/^\-{2}|\s\.]"));
+      RegExp(r"[a-zA-Z0-9ÄÖÜäöüß#+:'()&/^\-{2}|\s\.]"));
 
   TextInputType text = TextInputType.text;
   Dio dio = Dio();
