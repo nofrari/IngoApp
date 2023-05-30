@@ -70,15 +70,7 @@ class _FinancesState extends State<Finances> {
   }
 
   void onAccountSelected(List<String> values) {
-    setState(() {
-      if (widget.accountId == null && previouslySelected == true) {
-        selectedAccount = "$selectedAccount, ${values.join(", ")}";
-        previouslySelected = false;
-      } else {
-        selectedAccount = values.join(", ");
-      }
-    });
-    debugPrint("selectedAccounts: ${selectedAccount.toString()}");
+    selectedAccount = values.join(", ");
   }
 
   void handleCategoryTagsChanged(List<String> tags) {
@@ -89,7 +81,7 @@ class _FinancesState extends State<Finances> {
 
   void handleAccountTagsChanged(List<String> tags) {
     setState(() {
-      selectedAccountTags.addAll(tags);
+      selectedAccountTags = tags;
     });
   }
 
@@ -170,21 +162,24 @@ class _FinancesState extends State<Finances> {
     colors = context.watch<InitialService>().getColors();
     icons = context.watch<InitialService>().getIcons();
     accounts = context.watch<AccountsService>().getAccounts();
-    if (widget.accountId != null) {
-      accountSelectedFromHome =
-          context.watch<AccountsService>().getAccount(widget.accountId ?? "");
-      debugPrint(accountSelectedFromHome?.name);
+    // if (widget.accountId != null && widget.accountId != "") {
+    //   accountSelectedFromHome =
+    //       context.watch<AccountsService>().getAccount(widget.accountId ?? "");
+    //   debugPrint(
+    //       "account selected name: ${accountSelectedFromHome!.name.toString()}");
 
-      setState(() {
-        selectedAccount = accountSelectedFromHome?.name ?? "";
+    //   setState(() {
+    //     selectedAccountTags.insert(0, accountSelectedFromHome!.name);
+    //   });
 
-        selectedAccountTags.add(selectedAccount!);
+    //   onAccountSelected(selectedAccountTags);
 
-        debugPrint("selectedTags: ${selectedAccountTags.toList()}");
-        onAccountSelected(selectedAccountTags);
-        widget.accountId = null;
-      });
-    }
+    //   setState(() {
+    //     widget.accountId = null;
+    //     previouslySelected = true;
+    //   });
+    // }
+
     List<Widget> tags = generateTags();
 
     String test = DateFormat('yyyy-MM-dd')
