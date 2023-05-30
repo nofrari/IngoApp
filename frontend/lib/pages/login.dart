@@ -3,6 +3,7 @@ import 'package:flutter/services.dart';
 import 'package:email_validator/email_validator.dart';
 import 'package:dio/dio.dart';
 import 'package:frontend/constants/values.dart';
+import 'package:frontend/pages/accounts/startaccount.dart';
 import 'package:frontend/pages/password_reset.dart';
 import 'package:frontend/services/profile_service.dart';
 import 'package:provider/provider.dart';
@@ -50,6 +51,7 @@ class _LoginState extends State<Login> {
   late bool userExists;
   late bool emailVerified;
   late bool credentialsMatch;
+  bool hasAccounts = true;
 
   Dio dio = Dio();
 
@@ -129,7 +131,8 @@ class _LoginState extends State<Login> {
                           Navigator.push(
                             context,
                             MaterialPageRoute(
-                              builder: (context) => Start(),
+                              builder: (context) =>
+                                  hasAccounts ? Start() : StartAccount(),
                             ),
                           );
                         } else if (userExists == true &&
@@ -178,6 +181,9 @@ class _LoginState extends State<Login> {
       setState(() {
         userExists = true;
         emailVerified = true;
+        response.data['number_accounts'] == 0
+            ? hasAccounts = false
+            : hasAccounts = true;
       });
     } on DioError catch (dioError) {
       debugPrint(dioError.toString());

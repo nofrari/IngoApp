@@ -256,13 +256,21 @@ router.get('/users/confirm-email/:confirmationToken', async (req, res) => {
         return; 
     }
 
+    //check how many accounts the user has
+    const accounts = await prisma.account.findMany({
+        where: {
+            user_id: user.user_id
+        }
+    });
+
     res.status(200).send({
         //accessToken: token,
         user_id: user.user_id,
         user_name: user.user_name,
         user_sirname: user.user_sirname,
         email: user.email,
-        pin: user.pin
+        pin: user.pin,
+        number_accounts: accounts.length
     });
   })
 
