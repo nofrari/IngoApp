@@ -71,6 +71,6 @@ class _MyAppState extends State<MyApp> {
         theme: ThemeData(
           primarySwatch: Colors.blue,
         ),
-        home: user.id == "" ? Auth() : const Start());
+        home: user.id == "" ? Auth() : Start());
   }
 }

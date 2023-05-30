@@ -120,7 +120,7 @@ class _ScannerCameraState extends State<ScannerCamera>
                                     Navigator.push(
                                       context,
                                       MaterialPageRoute(
-                                        builder: (context) => const Start(),
+                                        builder: (context) => Start(),
                                       ),
                                     );
                                   },
@@ -135,7 +135,7 @@ class _ScannerCameraState extends State<ScannerCamera>
                   Navigator.push(
                     context,
                     MaterialPageRoute(
-                      builder: (context) => const Start(),
+                      builder: (context) => Start(),
                     ),
                   );
                 }
