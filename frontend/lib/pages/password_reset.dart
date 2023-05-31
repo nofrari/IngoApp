@@ -3,19 +3,16 @@ import 'package:email_validator/email_validator.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:frontend/pages/userauth.dart';
+import 'package:frontend/widgets/linkIntern.dart';
 
 import '../constants/fonts.dart';
 import '../constants/strings.dart';
 import '../widgets/button.dart';
 import '../widgets/input_fields/input_field.dart';
 import '../widgets/popup.dart';
-import 'register.dart';
-import 'login.dart';
 
 import '../constants/colors.dart';
 import '../constants/values.dart';
-
-import '../widgets/toggle_button_selina.dart';
 
 class PasswordReset extends StatefulWidget {
   @override
@@ -24,6 +21,7 @@ class PasswordReset extends StatefulWidget {
 
 class _PasswordResetState extends State<PasswordReset> {
   final _formKey = GlobalKey<FormState>();
+  late bool userExists;
 
   TextInputFormatter mail = FilteringTextInputFormatter.allow(
       RegExp(r"[a-zA-Z0-9ÄÖÜäöüß#+:'()&/^\-{2}|\s@\.]"));
@@ -76,11 +74,14 @@ class _PasswordResetState extends State<PasswordReset> {
                     child: Container(
                         margin: Values.bigCardMargin,
                         child: Column(children: <Widget>[
-                          Padding(
-                            padding: EdgeInsets.only(top: 60, bottom: 20),
-                            child: Text(
-                              Strings.passwordForgot.toUpperCase(),
-                              style: Fonts.text400,
+                          Align(
+                            alignment: Alignment.centerLeft,
+                            child: Padding(
+                              padding: EdgeInsets.only(top: 60, bottom: 20),
+                              child: Text(
+                                Strings.passwordForgot.toUpperCase(),
+                                style: Fonts.text400,
+                              ),
                             ),
                           ),
                           Padding(
@@ -111,21 +112,9 @@ class _PasswordResetState extends State<PasswordReset> {
                               return null;
                             },
                           ),
-                          Align(
-                            alignment: Alignment.centerLeft,
-                            child: GestureDetector(
-                              onTap: () => Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                  builder: (context) => Auth(),
-                                ),
-                              ),
-                              child: Text(
-                                Strings.notRegistered,
-                                style: Fonts.textLink,
-                              ),
-                            ),
-                          ),
+                          LinkIntern(
+                              linkInternTo: Auth(),
+                              linkInternText: Strings.notRegistered),
                           Expanded(
                             child: Align(
                               alignment: Alignment.bottomCenter,
@@ -134,34 +123,18 @@ class _PasswordResetState extends State<PasswordReset> {
                                 onTap: () async {
                                   if (_formKey.currentState!.validate() !=
                                       false) {
-                                    showDialog(
-                                        context: context,
-                                        builder: (BuildContext context) =>
-                                            PopUp(
-                                                content:
-                                                    Strings.passwordForgotPopup,
-                                                actions: [
-                                                  Container(
-                                                      margin:
-                                                          Values.buttonPadding,
-                                                      child: Button(
-                                                        btnText: Strings
-                                                            .btnBackToLogin
-                                                            .toUpperCase(),
-                                                        onTap: () {
-                                                          Navigator.push(
-                                                            context,
-                                                            MaterialPageRoute(
-                                                              builder:
-                                                                  (context) =>
-                                                                      Auth(),
-                                                            ),
-                                                          );
-                                                        },
-                                                        theme: ButtonColorTheme
-                                                            .secondaryLight,
-                                                      )),
-                                                ]));
+                                    await _sendData(controllerMail.text);
+                                    if (userExists == true) {
+                                      showPopup(context);
+                                    } else {
+                                      debugPrint('da passt was nicht');
+                                      ScaffoldMessenger.of(context)
+                                          .showSnackBar(
+                                        const SnackBar(
+                                            content: Text(
+                                                'Keinen User gefunden, bitte überprüfe deine Eingaben.')),
+                                      );
+                                    }
                                   }
                                 },
                                 theme: ButtonColorTheme.secondaryLight,
@@ -178,4 +151,90 @@ class _PasswordResetState extends State<PasswordReset> {
       ),
     );
   }
+
+  Future<dynamic> showPopup(BuildContext context) {
+    return showDialog(
+        context: context,
+        builder: (BuildContext context) =>
+            PopUp(content: Strings.passwordForgotPopup, actions: [
+              Container(
+                  margin: Values.buttonPadding,
+                  child: Button(
+                    btnText: Strings.btnBackToLogin.toUpperCase(),
+                    onTap: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => Auth(),
+                        ),
+                      );
+                    },
+                    theme: ButtonColorTheme.secondaryLight,
+                  )),
+            ]));
+  }
+
+  Future _sendData(String email) async {
+    Map<String, dynamic> formData = {
+      "email": email,
+    };
+    try {
+      await dio.post("${Values.serverURL}/users/reset-password",
+          data: formData);
+      debugPrint('wir sind dabei');
+      setState(() {
+        userExists = true;
+      });
+    } on DioError catch (dioError) {
+      debugPrint(dioError.toString());
+      if (dioError.response != null) {
+        switch (dioError.response!.statusCode) {
+          case 404:
+            debugPrint('error: 404 - keinen User gefunden');
+            setState(() {
+              userExists = false;
+            });
+            break;
+          default:
+            debugPrint(
+                'error: ${dioError.response!.statusCode} - Something went wrong while trying to connect with the server');
+            break;
+        }
+      }
+    } catch (e) {
+      debugPrint('error: Something went wrong : $e');
+    }
+  }
+
+  // Future _resetPassword(String email) async {
+  //   Map<String, dynamic> formData = {
+  //     "email": email,
+  //   };
+
+  //   try {
+  //     await dio.post("http://localhost:5432/users/edit", data: formData);
+  //     debugPrint('wir sind dabei');
+  //     setState(() {
+  //       userExists = true;
+  //     });
+  //   } on DioError catch (dioError) {
+  //     debugPrint(dioError.toString());
+  //     if (dioError.response != null) {
+  //       switch (dioError.response!.statusCode) {
+  //         case 404:
+  //           debugPrint('error: 404 - keinen User gefunden');
+  //           setState(() {
+  //             userExists = false;
+  //           });
+  //           break;
+  //         default:
+  //           debugPrint(
+  //               'error: ${dioError.response!.statusCode} - Something went wrong while trying to connect with the server');
+  //           break;
+  //       }
+  //     }
+  //   } catch (e) {
+  //     debugPrint('error: Something went wrong : $e');
+  //   }
+  // }
 }
