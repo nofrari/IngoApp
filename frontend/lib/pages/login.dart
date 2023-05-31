@@ -112,7 +112,6 @@ class _LoginState extends State<Login> {
                 return null;
               },
             ),
-            //TODO: Link Passwort vergessen
             LinkIntern(
                 linkInternTo: PasswordReset(),
                 linkInternText: Strings.passwordForgot),
