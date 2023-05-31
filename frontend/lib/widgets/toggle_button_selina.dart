@@ -65,13 +65,12 @@ class _ToggleState extends State<Toggle> {
             ),
             GestureDetector(
               onTap: () {
-                setState(() {
+                if (xAlign != loginAlign) {
                   widget.toggleView();
-                  xAlign = loginAlign;
-                  //selectedScreen[index] = !selectedScreen[index];
-                  //loginColor = selectedColor;
-                  //signInColor = normalColor;
-                });
+                  setState(() {
+                    xAlign = loginAlign;
+                  });
+                }
               },
               child: Align(
                 alignment: Alignment(-1, 0),
@@ -88,12 +87,12 @@ class _ToggleState extends State<Toggle> {
             ),
             GestureDetector(
               onTap: () {
-                widget.toggleView();
-                setState(() {
-                  xAlign = signInAlign;
-                  //signInColor = selectedColor;
-                  //loginColor = normalColor;
-                });
+                if (xAlign != signInAlign) {
+                  widget.toggleView();
+                  setState(() {
+                    xAlign = signInAlign;
+                  });
+                }
               },
               child: Align(
                 alignment: Alignment(1, 0),
