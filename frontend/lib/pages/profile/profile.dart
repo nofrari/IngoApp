@@ -29,71 +29,74 @@ class _ProfileState extends State<Profile> {
     setState(() {
       user = context.watch<ProfileService>().getUser();
     });
-    return Scaffold(
-      backgroundColor: AppColor.backgroundFullScreen,
-      body: Padding(
-        padding: Values.accountHeading,
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            OptionBlock(
-              title: Strings.profileAccount,
-              pages: const [ProfileOverview()],
-              children: [
-                Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Container(
-                      margin: const EdgeInsets.only(bottom: 5),
-                      child: Text(Strings.profileName, style: Fonts.text100),
-                    ),
-                    Container(
-                      margin: const EdgeInsets.only(bottom: 8),
-                      child: Text("${user.firstName} ${user.lastName}",
-                          style: Fonts.text200),
-                    ),
-                    Container(
-                      margin: const EdgeInsets.only(bottom: 5),
-                      child: Text(Strings.profileMail, style: Fonts.text100),
-                    ),
-                    Container(
-                      margin: const EdgeInsets.only(bottom: 5),
-                      child: Text(user.email, style: Fonts.text200),
-                    ),
-                  ],
-                ),
-              ],
-            ),
-            OptionBlock(
-              title: Strings.profileManage,
-              pages: const [Categories(), ReccuringTransactions()],
-              children: [
-                Text(Strings.profileCategory, style: Fonts.optionTitle),
-                Text(Strings.profileTransactions, style: Fonts.optionTitle),
-              ],
-            ),
-            OptionBlock(
-              title: Strings.profileMore,
-              pages: const [Guidelines(), DataProtection()],
-              children: [
-                Text(Strings.profileGuidelines, style: Fonts.optionTitle),
-                Text(Strings.profileDataprotection, style: Fonts.optionTitle),
-              ],
-            ),
-            const Spacer(),
-            Padding(
-              padding: Values.buttonPadding,
-              child: Button(
-                  btnText: Strings.profileLogout,
-                  onTap: () async {
-                    await context.read<ProfileService>().setUser(
-                        id: "", firstname: "", lastname: "", email: "");
-                    Navigator.push(context,
-                        MaterialPageRoute(builder: (context) => Auth()));
-                  },
-                  theme: ButtonColorTheme.secondaryDark),
-            ),
-          ],
+    return WillPopScope(
+      onWillPop: () async => false,
+      child: Scaffold(
+        backgroundColor: AppColor.backgroundFullScreen,
+        body: Padding(
+          padding: Values.accountHeading,
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              OptionBlock(
+                title: Strings.profileAccount,
+                pages: const [ProfileOverview()],
+                children: [
+                  Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Container(
+                        margin: const EdgeInsets.only(bottom: 5),
+                        child: Text(Strings.profileName, style: Fonts.text100),
+                      ),
+                      Container(
+                        margin: const EdgeInsets.only(bottom: 8),
+                        child: Text("${user.firstName} ${user.lastName}",
+                            style: Fonts.text200),
+                      ),
+                      Container(
+                        margin: const EdgeInsets.only(bottom: 5),
+                        child: Text(Strings.profileMail, style: Fonts.text100),
+                      ),
+                      Container(
+                        margin: const EdgeInsets.only(bottom: 5),
+                        child: Text(user.email, style: Fonts.text200),
+                      ),
+                    ],
+                  ),
+                ],
+              ),
+              OptionBlock(
+                title: Strings.profileManage,
+                pages: const [Categories(), ReccuringTransactions()],
+                children: [
+                  Text(Strings.profileCategory, style: Fonts.optionTitle),
+                  Text(Strings.profileTransactions, style: Fonts.optionTitle),
+                ],
+              ),
+              OptionBlock(
+                title: Strings.profileMore,
+                pages: const [Guidelines(), DataProtection()],
+                children: [
+                  Text(Strings.profileGuidelines, style: Fonts.optionTitle),
+                  Text(Strings.profileDataprotection, style: Fonts.optionTitle),
+                ],
+              ),
+              const Spacer(),
+              Padding(
+                padding: Values.buttonPadding,
+                child: Button(
+                    btnText: Strings.profileLogout,
+                    onTap: () async {
+                      await context.read<ProfileService>().setUser(
+                          id: "", firstname: "", lastname: "", email: "");
+                      Navigator.push(context,
+                          MaterialPageRoute(builder: (context) => Auth()));
+                    },
+                    theme: ButtonColorTheme.secondaryDark),
+              ),
+            ],
+          ),
         ),
       ),
     );

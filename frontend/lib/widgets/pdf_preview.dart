@@ -168,107 +168,111 @@ class _PdfPreviewState extends State<PdfPreview> {
 
   @override
   Widget build(BuildContext context) {
-    return (_pdfFile != null || widget.pdfUrl != null) && _showPdf
-        ? Focus(
-            child: Container(
-              height: 450,
-              decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(Values.cardRadius),
-                border: Border.all(color: AppColor.blueActive, width: 2),
-              ),
-              child: Stack(
-                alignment: Alignment.bottomCenter,
-                children: [
-                  ClipRRect(
-                    borderRadius: BorderRadius.circular(Values.cardRadius - 4),
-                    child: SingleChildScrollView(
-                      child: Container(
-                        color: Colors.white,
-                        height: (widget.pdfHeight != null)
-                            ? widget.pdfHeight!.ceilToDouble()
-                            : containerHeight,
-                        child: InteractiveViewer(
-                          clipBehavior: Clip.none,
-                          constrained: true,
-                          child: PdfViewer.openFile(
-                            widget.pdfUrl ?? _pdfFile!.path,
+    return WillPopScope(
+      onWillPop: () async => false,
+      child: (_pdfFile != null || widget.pdfUrl != null) && _showPdf
+          ? Focus(
+              child: Container(
+                height: 450,
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(Values.cardRadius),
+                  border: Border.all(color: AppColor.blueActive, width: 2),
+                ),
+                child: Stack(
+                  alignment: Alignment.bottomCenter,
+                  children: [
+                    ClipRRect(
+                      borderRadius:
+                          BorderRadius.circular(Values.cardRadius - 4),
+                      child: SingleChildScrollView(
+                        child: Container(
+                          color: Colors.white,
+                          height: (widget.pdfHeight != null)
+                              ? widget.pdfHeight!.ceilToDouble()
+                              : containerHeight,
+                          child: InteractiveViewer(
+                            clipBehavior: Clip.none,
+                            constrained: true,
+                            child: PdfViewer.openFile(
+                              widget.pdfUrl ?? _pdfFile!.path,
+                            ),
                           ),
                         ),
                       ),
                     ),
-                  ),
-                  Container(
-                    margin: const EdgeInsets.only(bottom: 10),
-                    child: RoundButton(
-                      icon: Icons.delete,
-                      onTap: _deletePdf,
+                    Container(
+                      margin: const EdgeInsets.only(bottom: 10),
+                      child: RoundButton(
+                        icon: Icons.delete,
+                        onTap: _deletePdf,
+                      ),
                     ),
+                  ],
+                ),
+              ),
+            )
+          : Container(
+              margin: const EdgeInsets.symmetric(vertical: 15),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Container(
+                    margin: const EdgeInsets.only(bottom: 20),
+                    child: TextGoogle(
+                      align: TextAlign.start,
+                      text: "Foto der Rechnung hochladen",
+                      style: Fonts.popupText,
+                    ),
+                  ),
+                  Row(
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    children: [
+                      RoundButton(
+                          onTap: () {
+                            showDialog(
+                              context: context,
+                              builder: (BuildContext context) => PopUp(
+                                content: '',
+                                actions: [
+                                  Container(
+                                    margin: Values.buttonPadding,
+                                    child: Column(
+                                      children: [
+                                        Button(
+                                            btnText: "CAMERA",
+                                            onTap: () {
+                                              _addPdf("camera");
+                                              Navigator.pop(context);
+                                            },
+                                            theme: ButtonColorTheme
+                                                .secondaryLight),
+                                        Button(
+                                            btnText: "GALLERY",
+                                            onTap: () {
+                                              _addPdf("gallery");
+                                              Navigator.pop(context);
+                                            },
+                                            theme: ButtonColorTheme
+                                                .secondaryLight),
+                                      ],
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            );
+                          },
+                          icon: Icons.add),
+                      TextGoogle(
+                        align: TextAlign.start,
+                        text: "Keine Datei ausgewählt",
+                        style: Fonts.popupText,
+                      ),
+                    ],
                   ),
                 ],
               ),
             ),
-          )
-        : Container(
-            margin: const EdgeInsets.symmetric(vertical: 15),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Container(
-                  margin: const EdgeInsets.only(bottom: 20),
-                  child: TextGoogle(
-                    align: TextAlign.start,
-                    text: "Foto der Rechnung hochladen",
-                    style: Fonts.popupText,
-                  ),
-                ),
-                Row(
-                  crossAxisAlignment: CrossAxisAlignment.center,
-                  children: [
-                    RoundButton(
-                        onTap: () {
-                          showDialog(
-                            context: context,
-                            builder: (BuildContext context) => PopUp(
-                              content: '',
-                              actions: [
-                                Container(
-                                  margin: Values.buttonPadding,
-                                  child: Column(
-                                    children: [
-                                      Button(
-                                          btnText: "CAMERA",
-                                          onTap: () {
-                                            _addPdf("camera");
-                                            Navigator.pop(context);
-                                          },
-                                          theme:
-                                              ButtonColorTheme.secondaryLight),
-                                      Button(
-                                          btnText: "GALLERY",
-                                          onTap: () {
-                                            _addPdf("gallery");
-                                            Navigator.pop(context);
-                                          },
-                                          theme:
-                                              ButtonColorTheme.secondaryLight),
-                                    ],
-                                  ),
-                                ),
-                              ],
-                            ),
-                          );
-                        },
-                        icon: Icons.add),
-                    TextGoogle(
-                      align: TextAlign.start,
-                      text: "Keine Datei ausgewählt",
-                      style: Fonts.popupText,
-                    ),
-                  ],
-                ),
-              ],
-            ),
-          );
+    );
   }
 }
 

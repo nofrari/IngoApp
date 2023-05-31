@@ -167,7 +167,7 @@ class _ManualEntryState extends State<ManualEntry> {
     setState(() {
       _currentTransaction = TransactionModel(
           transaction_id: _loadedTransactionId ?? "",
-          transaction_name: controllerTitle.text,
+          transaction_name: "", //controller
           transaction_amount: currencyToDouble(controllerAmount.text),
           description: controllerDescription.text,
           date: controllerDate.text != ""
@@ -265,21 +265,17 @@ class _ManualEntryState extends State<ManualEntry> {
     }
   }
 
-  @override
-  void dispose() {
-    controllerTitle.dispose();
-    controllerAmount.dispose();
-    controllerDescription.dispose();
-    controllerDate.dispose();
-    super.dispose();
-  }
-
   final DatepickerField datePicker = DatepickerField(
     controller: TextEditingController(),
     errorMsgBgColor: AppColor.neutral500,
   );
 
   final pdfPreview = PdfPreview();
+
+  @override
+  void dispose() {
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -308,412 +304,416 @@ class _ManualEntryState extends State<ManualEntry> {
     String? valueAccount1;
     String? valueAccount2;
 
-    return GestureDetector(
-      onTap: () {
-        setState(() {
-          _isFocused = false;
-        });
-        FocusManager.instance.primaryFocus?.unfocus();
-      },
-      child: Scaffold(
-        appBar: Header(
-          onTap: () async {
-            if (_enableExitPopUp(images)) {
-              // warning dialog
-              showDialog(
-                context: context,
-                builder: (BuildContext context) => PopUp(
-                  content: widget.isEditMode == false
-                      ? "Wenn du diese Seite verlässt, verliest du den Fortschritt mit dieser Eingabe. Bist du sicher, dass du zurück zum Scanner möchtest?"
-                      : "Bist du sicher, dass du die Änderungen verwefen möchtest?",
-                  actions: [
-                    Container(
-                      margin: Values.buttonPadding,
-                      child: Column(
-                        children: [
-                          Button(
-                              btnText: "ABBRECHEN",
-                              onTap: () {
-                                Navigator.pop(context);
-                              },
-                              theme: ButtonColorTheme.secondaryLight),
-                          Button(
-                              btnText: "FORTFAHREN",
-                              onTap: () async {
-                                if (context.mounted) {
-                                  try {
-                                    await CustomCacheManager.clearCache(
-                                        context, images);
-                                    await context
-                                        .read<ManualEntryService>()
-                                        .forgetManualEntry();
-                                    await context
-                                        .read<TransactionService>()
-                                        .clearTransaction();
-                                  } catch (e) {
-                                    debugPrint(e.toString());
-                                  }
-                                }
-                                manualEntry.isNotEmpty
-                                    ? await deletePdfFile(
-                                        manualEntry['pdf_name'])
-                                    : null;
-                                if (widget.isEditMode) {
-                                  Navigator.push(
-                                    context,
-                                    MaterialPageRoute(
-                                      builder: (context) => widget.returnToStart
-                                          ? Start()
-                                          : Start(pageId: 3),
-                                    ),
-                                  );
-                                } else {
-                                  Navigator.push(
-                                    context,
-                                    MaterialPageRoute(
-                                      builder: (context) =>
-                                          const ScannerCamera(),
-                                    ),
-                                  );
-                                }
-                              },
-                              theme: ButtonColorTheme.primary),
-                        ],
-                      ),
-                    )
-                  ],
-                ),
-              );
-            } else {
-              //TODO: check if this causes problems
-              // Navigator.push(
-              //   context,
-              //   MaterialPageRoute(
-              //     builder: (context) => const Start(),
-              //   ),
-              // );
-              Navigator.pop(context);
-            }
-          },
-          element: Text(
-            (controllerTitle.text.isNotEmpty)
-                ? controllerTitle.text.toUpperCase()
-                : "NEUER EINTRAG",
-            style: Fonts.textHeadingBold,
-          ),
-        ),
-        backgroundColor: AppColor.backgroundFullScreen,
-        body: Stack(
-          alignment: Alignment.bottomCenter,
-          children: [
-            Align(
-              alignment: Alignment.topCenter,
-              child: SingleChildScrollView(
-                child: Container(
-                  padding: Values.bigCardPadding,
-                  decoration: BoxDecoration(
-                      border: Border.all(
-                          color: AppColor.neutral500,
-                          width: 0,
-                          style: BorderStyle.solid),
-                      borderRadius: BorderRadius.circular(11),
-                      color: AppColor.neutral500),
-                  margin: Values.bigCardMargin,
-                  child: Form(
-                    key: _formKey,
-                    child: Column(
-                      children: [
-                        InputField(
-                          lblText: "Titel",
-                          reqFormatter: letters,
-                          keyboardType: text,
-                          controller: controllerTitle,
-                          maxLines: 1,
-                          hidePassword: false,
-                          validator: (value) {
-                            if (value == null || value.isEmpty) {
-                              return 'Das Feld darf nicht leer sein';
-                            }
-                            return null;
-                          },
-                          maxLength: 50,
-                          onFocusChanged: onTextFieldFocusChanged,
-                        ),
-                        InputField(
-                          lblText: "Betrag in €",
-                          reqFormatter: currencyFormatter,
-                          keyboardType: numeric,
-                          controller: controllerAmount,
-                          maxLines: 1,
-                          hidePassword: false,
-                          validator: (value) {
-                            if (value == null || value.isEmpty) {
-                              return 'Das Feld darf nicht leer sein';
-                            }
-                            return null;
-                          },
-                          maxLength: 15,
-                          onFocusChanged: onTextFieldFocusChanged,
-                        ),
-                        Dropdown(
-                          label: Strings.dropdownTypeCategory,
-                          dropdownItems: typeNames,
-                          needsNewCategoryButton: false,
-                          initialValue: _initialType,
-                          setValue: (value) {
-                            setState(() {
-                              selectedType = allTypes
-                                  .firstWhere((type) => type.name == value);
-                            });
-                            updateCurrentTransaction();
-                          },
-                          validator: (value) {
-                            if (value == null || value.isEmpty) {
-                              return 'Das Feld darf nicht leer sein';
-                            }
-                            return null;
-                          },
-                        ),
-                        Dropdown(
-                          label: Strings.dropdownCategory,
-                          dropdownItems: categoryNames,
-                          needsNewCategoryButton: true,
-                          initialValue: _initialCategory,
-                          validator: (value) {
-                            if (value == null || value.isEmpty) {
-                              return 'Das Feld darf nicht leer sein';
-                            }
-                            return null;
-                          },
-                          setValue: (value) {
-                            setState(() {
-                              selectedCategory = allCategories.firstWhere(
-                                  (category) => category.label == value);
-                            });
-                            updateCurrentTransaction();
-                          },
-                        ),
-                        Dropdown(
-                          label: Strings.dropdownAccount1,
-                          dropdownItems: accountNames,
-                          needsNewCategoryButton: false,
-                          initialValue: _initialAccount,
-                          validator: (value) {
-                            valueAccount1 = value;
-                            if (value == null || value.isEmpty) {
-                              return 'Das Feld darf nicht leer sein';
-                            }
-
-                            if (valueAccount1 == valueAccount2) {
-                              return 'Zeimal dasselbe Konto ausgewählt';
-                            }
-                            return null;
-                          },
-                          setValue: (value) {
-                            setState(() {
-                              selectedAccount = allAccounts.firstWhere(
-                                  (account) => account.name == value);
-                            });
-                            updateCurrentTransaction();
-                          },
-                        ),
-                        (selectedType != null &&
-                                selectedType!.name == 'Transfer')
-                            ? Dropdown(
-                                label: Strings.dropdownAccount2,
-                                dropdownItems: accountNames,
-                                needsNewCategoryButton: false,
-                                validator: (value) {
-                                  valueAccount2 = value;
-                                  if (value == null || value.isEmpty) {
-                                    return 'Das Feld darf nicht leer sein';
-                                  }
-
-                                  if (valueAccount1 == valueAccount2) {
-                                    return 'Zeimal dasselbe Konto ausgewählt';
-                                  }
-                                  return null;
+    return WillPopScope(
+      onWillPop: () async => false,
+      child: GestureDetector(
+        onTap: () {
+          setState(() {
+            _isFocused = false;
+          });
+          FocusManager.instance.primaryFocus?.unfocus();
+        },
+        child: Scaffold(
+          appBar: Header(
+            onTap: () async {
+              if (_enableExitPopUp(images)) {
+                // warning dialog
+                showDialog(
+                  context: context,
+                  builder: (BuildContext context) => PopUp(
+                    content: widget.isEditMode == false
+                        ? "Wenn du diese Seite verlässt, verliest du den Fortschritt mit dieser Eingabe. Bist du sicher, dass du zurück zum Scanner möchtest?"
+                        : "Bist du sicher, dass du die Änderungen verwefen möchtest?",
+                    actions: [
+                      Container(
+                        margin: Values.buttonPadding,
+                        child: Column(
+                          children: [
+                            Button(
+                                btnText: "ABBRECHEN",
+                                onTap: () {
+                                  Navigator.pop(context);
                                 },
-                                setValue: (value) {
-                                  updateCurrentTransaction();
-                                },
-                              )
-                            : Container(),
-                        DatepickerField(
-                          controller: controllerDate,
-                          serverDate: manualEntry['date'],
-                          errorMsgBgColor: AppColor.neutral500,
-                          validator: (value) {
-                            if (value == null || value.isEmpty) {
-                              return 'Das Feld darf nicht leer sein';
-                            }
-                            return null;
-                          },
-                          //TODO: Add callback to call updateCurrentTransaction
-                        ),
-                        Dropdown(
-                          dropdownItems: intervalNames,
-                          label: Strings.dropdownFrequency,
-                          needsNewCategoryButton: false,
-                          initialValue: _initialFrequency ?? intervalNames[0],
-                          validator: (value) {
-                            if (value == null || value.isEmpty) {
-                              return 'Das Feld darf nicht leer sein';
-                            }
-                            return null;
-                          },
-                          setValue: (value) {
-                            setState(() {
-                              selectedInterval = allIntervals.firstWhere(
-                                  (interval) => interval.name == value);
-                            });
-                            updateCurrentTransaction();
-                          },
-                        ),
-                        (selectedInterval != null &&
-                                selectedInterval!.name == intervalNames[2])
-                            ? Dropdown(
-                                dropdownItems: allIntervalSubtypesNames(),
-                                label: Strings.dropdownPattern,
-                                needsNewCategoryButton: false,
-                                initialValue: _initialFrequencySubtype,
-                                validator: (value) {
-                                  if (value == null || value.isEmpty) {
-                                    return 'Das Feld darf nicht leer sein';
-                                  }
-                                  return null;
-                                },
-                                setValue: (value) {
-                                  setState(() {
-                                    selectedIntervalSubtype =
-                                        allIntervalSubtypes[
-                                            allIntervalSubtypesNames()
-                                                .indexOf(value)];
-                                  });
-                                  debugPrint(
-                                      "Selected interval subtype: ${selectedIntervalSubtype!.name} id: ${selectedIntervalSubtype!.interval_subtype_id}");
-                                  updateCurrentTransaction();
-                                },
-                              )
-                            : Container(),
-                        InputField(
-                          lblText: "Beschreibung",
-                          reqFormatter: letters,
-                          keyboardType: text,
-                          controller: controllerDescription,
-                          maxLines: 4,
-                          hidePassword: false,
-                          alignLabelLeftCorner: true,
-                          maxLength: 250,
-                          onFocusChanged: onTextFieldFocusChanged,
-                        ),
-                        PdfPreview(
-                          pdfUrl: manualEntry['pdf_path'],
-                          pdfHeight: manualEntry['pdf_height'],
-                        ),
-                        const SizedBox(
-                          height: 100,
-                        ),
-                      ],
-                    ),
-                  ),
-                ),
-              ),
-            ),
-            (_isFocused == false)
-                ? ButtonTransparentContainer(
-                    child: Container(
-                      margin: Values.buttonPadding,
-                      child: Row(
-                        children: [
-                          if (widget.isEditMode)
-                            RoundButton(
-                              onTap: () async {
-                                await dio.delete(
-                                    "${Values.serverURL}/transactions/delete/${_currentTransaction.transaction_id}");
-                                await context
-                                    .read<ManualEntryService>()
-                                    .forgetManualEntry();
-                                await context
-                                    .read<TransactionService>()
-                                    .clearTransaction();
-                                manualEntry.isNotEmpty
-                                    ? await deletePdfFile(
-                                        manualEntry['pdf_name'])
-                                    : null;
-                                Navigator.push(
-                                  context,
-                                  MaterialPageRoute(
-                                    builder: (context) => Start(),
-                                  ),
-                                );
-                              },
-                              icon: Icons.delete,
-                              isTransparent: true,
-                            ),
-                          Expanded(
-                            child: Button(
-                                isTransparent: true,
-                                btnText: widget.isEditMode
-                                    ? "ÄDERUNGEN SPEICHERN"
-                                    : "SPEICHERN",
+                                theme: ButtonColorTheme.secondaryLight),
+                            Button(
+                                btnText: "FORTFAHREN",
                                 onTap: () async {
-                                  updateCurrentTransaction();
-                                  if (_formKey.currentState!.validate()) {
-                                    // ScaffoldMessenger.of(context).showSnackBar(
-                                    //   const SnackBar(
-                                    //       content:
-                                    //           Text('Daten werden gespeichert')),
-                                    // );
-                                    final date = datePicker.selectedDate;
-
-                                    String? pdf_name = PdfFile.getName();
-
-                                    debugPrint(
-                                        "is complete: ${_currentTransaction.isCompleted()}");
-                                    if (_currentTransaction.isCompleted()) {
-                                      await _sendData(
-                                          manualEntry.isNotEmpty
-                                              ? manualEntry['pdf_name']
-                                              : pdf_name ?? " ",
-                                          _currentTransaction);
-                                    } else {
-                                      debugPrint(
-                                          "current Transaction Id: ${_currentTransaction.transaction_id} name: ${_currentTransaction.transaction_name} amount: ${_currentTransaction.transaction_amount} date: ${_currentTransaction.date} description: ${_currentTransaction.description} category_id: ${_currentTransaction.category_id} type_id: ${_currentTransaction.type_id} interval_id: ${_currentTransaction.interval_id} interval_subtype_id: ${_currentTransaction.interval_subtype_id} account_id: ${_currentTransaction.account_id}");
-                                    }
-
-                                    List<String> images = context
-                                        .read<ScannerService>()
-                                        .getImages();
-
-                                    await CustomCacheManager.clearCache(
-                                        context, images);
-
-                                    if (context.mounted) {
+                                  if (context.mounted) {
+                                    try {
+                                      await CustomCacheManager.clearCache(
+                                          context, images);
                                       await context
                                           .read<ManualEntryService>()
                                           .forgetManualEntry();
                                       await context
                                           .read<TransactionService>()
                                           .clearTransaction();
+                                    } catch (e) {
+                                      debugPrint(e.toString());
                                     }
-                                    // ignore: use_build_context_synchronously
-                                    await Navigator.push(
+                                  }
+                                  manualEntry.isNotEmpty
+                                      ? await deletePdfFile(
+                                          manualEntry['pdf_name'])
+                                      : null;
+                                  if (widget.isEditMode) {
+                                    Navigator.push(
                                       context,
                                       MaterialPageRoute(
-                                        builder: (context) => Start(),
+                                        builder: (context) =>
+                                            widget.returnToStart
+                                                ? Start()
+                                                : Start(pageId: 3),
+                                      ),
+                                    );
+                                  } else {
+                                    Navigator.push(
+                                      context,
+                                      MaterialPageRoute(
+                                        builder: (context) =>
+                                            const ScannerCamera(),
                                       ),
                                     );
                                   }
                                 },
-                                theme: ButtonColorTheme.secondaryLight),
+                                theme: ButtonColorTheme.primary),
+                          ],
+                        ),
+                      )
+                    ],
+                  ),
+                );
+              } else {
+                //TODO: check if this causes problems
+                // Navigator.push(
+                //   context,
+                //   MaterialPageRoute(
+                //     builder: (context) => const Start(),
+                //   ),
+                // );
+                Navigator.pop(context);
+              }
+            },
+            element: Text(
+              (controllerTitle.text.isNotEmpty)
+                  ? controllerTitle.text.toUpperCase()
+                  : "NEUER EINTRAG",
+              style: Fonts.textHeadingBold,
+            ),
+          ),
+          backgroundColor: AppColor.backgroundFullScreen,
+          body: Stack(
+            alignment: Alignment.bottomCenter,
+            children: [
+              Align(
+                alignment: Alignment.topCenter,
+                child: SingleChildScrollView(
+                  child: Container(
+                    padding: Values.bigCardPadding,
+                    decoration: BoxDecoration(
+                        border: Border.all(
+                            color: AppColor.neutral500,
+                            width: 0,
+                            style: BorderStyle.solid),
+                        borderRadius: BorderRadius.circular(11),
+                        color: AppColor.neutral500),
+                    margin: Values.bigCardMargin,
+                    child: Form(
+                      key: _formKey,
+                      child: Column(
+                        children: [
+                          InputField(
+                            lblText: "Titel",
+                            reqFormatter: letters,
+                            keyboardType: text,
+                            controller: controllerTitle,
+                            maxLines: 1,
+                            hidePassword: false,
+                            validator: (value) {
+                              if (value == null || value.isEmpty) {
+                                return 'Das Feld darf nicht leer sein';
+                              }
+                              return null;
+                            },
+                            maxLength: 50,
+                            onFocusChanged: onTextFieldFocusChanged,
+                          ),
+                          InputField(
+                            lblText: "Betrag in €",
+                            reqFormatter: currencyFormatter,
+                            keyboardType: numeric,
+                            controller: controllerAmount,
+                            maxLines: 1,
+                            hidePassword: false,
+                            validator: (value) {
+                              if (value == null || value.isEmpty) {
+                                return 'Das Feld darf nicht leer sein';
+                              }
+                              return null;
+                            },
+                            maxLength: 15,
+                            onFocusChanged: onTextFieldFocusChanged,
+                          ),
+                          Dropdown(
+                            label: Strings.dropdownTypeCategory,
+                            dropdownItems: typeNames,
+                            needsNewCategoryButton: false,
+                            initialValue: _initialType,
+                            setValue: (value) {
+                              setState(() {
+                                selectedType = allTypes
+                                    .firstWhere((type) => type.name == value);
+                              });
+                              updateCurrentTransaction();
+                            },
+                            validator: (value) {
+                              if (value == null || value.isEmpty) {
+                                return 'Das Feld darf nicht leer sein';
+                              }
+                              return null;
+                            },
+                          ),
+                          Dropdown(
+                            label: Strings.dropdownCategory,
+                            dropdownItems: categoryNames,
+                            needsNewCategoryButton: true,
+                            initialValue: _initialCategory,
+                            validator: (value) {
+                              if (value == null || value.isEmpty) {
+                                return 'Das Feld darf nicht leer sein';
+                              }
+                              return null;
+                            },
+                            setValue: (value) {
+                              setState(() {
+                                selectedCategory = allCategories.firstWhere(
+                                    (category) => category.label == value);
+                              });
+                              updateCurrentTransaction();
+                            },
+                          ),
+                          Dropdown(
+                            label: Strings.dropdownAccount1,
+                            dropdownItems: accountNames,
+                            needsNewCategoryButton: false,
+                            initialValue: _initialAccount,
+                            validator: (value) {
+                              valueAccount1 = value;
+                              if (value == null || value.isEmpty) {
+                                return 'Das Feld darf nicht leer sein';
+                              }
+
+                              if (valueAccount1 == valueAccount2) {
+                                return 'Zeimal dasselbe Konto ausgewählt';
+                              }
+                              return null;
+                            },
+                            setValue: (value) {
+                              setState(() {
+                                selectedAccount = allAccounts.firstWhere(
+                                    (account) => account.name == value);
+                              });
+                              updateCurrentTransaction();
+                            },
+                          ),
+                          (selectedType != null &&
+                                  selectedType!.name == 'Transfer')
+                              ? Dropdown(
+                                  label: Strings.dropdownAccount2,
+                                  dropdownItems: accountNames,
+                                  needsNewCategoryButton: false,
+                                  validator: (value) {
+                                    valueAccount2 = value;
+                                    if (value == null || value.isEmpty) {
+                                      return 'Das Feld darf nicht leer sein';
+                                    }
+
+                                    if (valueAccount1 == valueAccount2) {
+                                      return 'Zeimal dasselbe Konto ausgewählt';
+                                    }
+                                    return null;
+                                  },
+                                  setValue: (value) {
+                                    updateCurrentTransaction();
+                                  },
+                                )
+                              : Container(),
+                          DatepickerField(
+                            controller: controllerDate,
+                            serverDate: manualEntry['date'],
+                            errorMsgBgColor: AppColor.neutral500,
+                            validator: (value) {
+                              if (value == null || value.isEmpty) {
+                                return 'Das Feld darf nicht leer sein';
+                              }
+                              return null;
+                            },
+                            //TODO: Add callback to call updateCurrentTransaction
+                          ),
+                          Dropdown(
+                            dropdownItems: intervalNames,
+                            label: Strings.dropdownFrequency,
+                            needsNewCategoryButton: false,
+                            initialValue: _initialFrequency ?? intervalNames[0],
+                            validator: (value) {
+                              if (value == null || value.isEmpty) {
+                                return 'Das Feld darf nicht leer sein';
+                              }
+                              return null;
+                            },
+                            setValue: (value) {
+                              setState(() {
+                                selectedInterval = allIntervals.firstWhere(
+                                    (interval) => interval.name == value);
+                              });
+                              updateCurrentTransaction();
+                            },
+                          ),
+                          (selectedInterval != null &&
+                                  selectedInterval!.name == intervalNames[2])
+                              ? Dropdown(
+                                  dropdownItems: allIntervalSubtypesNames(),
+                                  label: Strings.dropdownPattern,
+                                  needsNewCategoryButton: false,
+                                  initialValue: _initialFrequencySubtype,
+                                  validator: (value) {
+                                    if (value == null || value.isEmpty) {
+                                      return 'Das Feld darf nicht leer sein';
+                                    }
+                                    return null;
+                                  },
+                                  setValue: (value) {
+                                    setState(() {
+                                      selectedIntervalSubtype =
+                                          allIntervalSubtypes[
+                                              allIntervalSubtypesNames()
+                                                  .indexOf(value)];
+                                    });
+                                    debugPrint(
+                                        "Selected interval subtype: ${selectedIntervalSubtype!.name} id: ${selectedIntervalSubtype!.interval_subtype_id}");
+                                    updateCurrentTransaction();
+                                  },
+                                )
+                              : Container(),
+                          InputField(
+                            lblText: "Beschreibung",
+                            reqFormatter: letters,
+                            keyboardType: text,
+                            controller: controllerDescription,
+                            maxLines: 4,
+                            hidePassword: false,
+                            alignLabelLeftCorner: true,
+                            maxLength: 250,
+                            onFocusChanged: onTextFieldFocusChanged,
+                          ),
+                          PdfPreview(
+                            pdfUrl: manualEntry['pdf_path'],
+                            pdfHeight: manualEntry['pdf_height'],
+                          ),
+                          const SizedBox(
+                            height: 100,
                           ),
                         ],
                       ),
                     ),
-                  )
-                : Container(),
-          ],
+                  ),
+                ),
+              ),
+              (_isFocused == false)
+                  ? ButtonTransparentContainer(
+                      child: Container(
+                        margin: Values.buttonPadding,
+                        child: Row(
+                          children: [
+                            if (widget.isEditMode)
+                              RoundButton(
+                                onTap: () async {
+                                  await dio.delete(
+                                      "${Values.serverURL}/transactions/delete/${_currentTransaction.transaction_id}");
+                                  await context
+                                      .read<ManualEntryService>()
+                                      .forgetManualEntry();
+                                  await context
+                                      .read<TransactionService>()
+                                      .clearTransaction();
+                                  manualEntry.isNotEmpty
+                                      ? await deletePdfFile(
+                                          manualEntry['pdf_name'])
+                                      : null;
+                                  Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                      builder: (context) => Start(),
+                                    ),
+                                  );
+                                },
+                                icon: Icons.delete,
+                                isTransparent: true,
+                              ),
+                            Expanded(
+                              child: Button(
+                                  isTransparent: true,
+                                  btnText: widget.isEditMode
+                                      ? "ÄDERUNGEN SPEICHERN"
+                                      : "SPEICHERN",
+                                  onTap: () async {
+                                    updateCurrentTransaction();
+                                    if (_formKey.currentState!.validate()) {
+                                      // ScaffoldMessenger.of(context).showSnackBar(
+                                      //   const SnackBar(
+                                      //       content:
+                                      //           Text('Daten werden gespeichert')),
+                                      // );
+                                      final date = datePicker.selectedDate;
+
+                                      String? pdf_name = PdfFile.getName();
+
+                                      debugPrint(
+                                          "is complete: ${_currentTransaction.isCompleted()}");
+                                      if (_currentTransaction.isCompleted()) {
+                                        await _sendData(
+                                            manualEntry.isNotEmpty
+                                                ? manualEntry['pdf_name']
+                                                : pdf_name ?? " ",
+                                            _currentTransaction);
+                                      } else {
+                                        debugPrint(
+                                            "current Transaction Id: ${_currentTransaction.transaction_id} name: ${_currentTransaction.transaction_name} amount: ${_currentTransaction.transaction_amount} date: ${_currentTransaction.date} description: ${_currentTransaction.description} category_id: ${_currentTransaction.category_id} type_id: ${_currentTransaction.type_id} interval_id: ${_currentTransaction.interval_id} interval_subtype_id: ${_currentTransaction.interval_subtype_id} account_id: ${_currentTransaction.account_id}");
+                                      }
+
+                                      List<String> images = context
+                                          .read<ScannerService>()
+                                          .getImages();
+
+                                      await CustomCacheManager.clearCache(
+                                          context, images);
+
+                                      if (context.mounted) {
+                                        await context
+                                            .read<ManualEntryService>()
+                                            .forgetManualEntry();
+                                        await context
+                                            .read<TransactionService>()
+                                            .clearTransaction();
+                                      }
+                                      // ignore: use_build_context_synchronously
+                                      await Navigator.push(
+                                        context,
+                                        MaterialPageRoute(
+                                          builder: (context) => Start(),
+                                        ),
+                                      );
+                                    }
+                                  },
+                                  theme: ButtonColorTheme.secondaryLight),
+                            ),
+                          ],
+                        ),
+                      ),
+                    )
+                  : Container(),
+            ],
+          ),
         ),
       ),
     );

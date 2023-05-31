@@ -33,66 +33,70 @@ class _ReccuringTransactionsState extends State<ReccuringTransactions> {
       intervals = context.watch<InitialService>().getInterval();
       intervals.removeAt(0);
     });
-    return Scaffold(
-      appBar: Header(
-        onTap: () {
-          Navigator.push(
-            context,
-            MaterialPageRoute(
-              builder: (context) => Start(pageId: 4),
-            ),
-          );
-        },
-        element: Text(
-          Strings.transactionsReccuringHeading,
-          style: Fonts.textHeadingBold,
-          textAlign: TextAlign.center,
+    return WillPopScope(
+      onWillPop: () async => false,
+      child: Scaffold(
+        appBar: Header(
+          onTap: () {
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (context) => Start(pageId: 4),
+              ),
+            );
+          },
+          element: Text(
+            Strings.transactionsReccuringHeading,
+            style: Fonts.textHeadingBold,
+            textAlign: TextAlign.center,
+          ),
         ),
-      ),
-      backgroundColor: AppColor.backgroundFullScreen,
-      body: Stack(
-        alignment: Alignment.bottomCenter,
-        children: [
-          Align(
-            alignment: Alignment.topCenter,
-            child: SingleChildScrollView(
-              child: Container(
-                margin: Values.bigCardMargin,
-                child: Column(
-                  children: [
-                    Column(
-                      children: <Widget>[
-                        ...intervals
-                            .map((intervalData) => TransactionsTypeListItem(
-                                transactions: transactions,
-                                interval: intervalData))
-                            .toList(),
-                      ],
-                    ),
-                    const SizedBox(height: 100),
-                  ],
+        backgroundColor: AppColor.backgroundFullScreen,
+        body: Stack(
+          alignment: Alignment.bottomCenter,
+          children: [
+            Align(
+              alignment: Alignment.topCenter,
+              child: SingleChildScrollView(
+                child: Container(
+                  margin: Values.bigCardMargin,
+                  child: Column(
+                    children: [
+                      Column(
+                        children: <Widget>[
+                          ...intervals
+                              .map((intervalData) => TransactionsTypeListItem(
+                                  transactions: transactions,
+                                  interval: intervalData))
+                              .toList(),
+                        ],
+                      ),
+                      const SizedBox(height: 100),
+                    ],
+                  ),
                 ),
               ),
             ),
-          ),
-          ButtonTransparentContainer(
-            child: Container(
-              margin: const EdgeInsets.symmetric(horizontal: 40, vertical: 20),
-              child: Button(
-                  isTransparent: true,
-                  btnText: Strings.transactionsAdd.toUpperCase(),
-                  onTap: () async {
-                    await Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) => ManualEntry(),
-                      ),
-                    );
-                  },
-                  theme: ButtonColorTheme.secondaryLight),
+            ButtonTransparentContainer(
+              child: Container(
+                margin:
+                    const EdgeInsets.symmetric(horizontal: 40, vertical: 20),
+                child: Button(
+                    isTransparent: true,
+                    btnText: Strings.transactionsAdd.toUpperCase(),
+                    onTap: () async {
+                      await Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => ManualEntry(),
+                        ),
+                      );
+                    },
+                    theme: ButtonColorTheme.secondaryLight),
+              ),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }

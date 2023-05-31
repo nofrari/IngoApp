@@ -82,161 +82,166 @@ class _ScannerCameraState extends State<ScannerCamera>
       }
     }
 
-    return FutureBuilder(
-        future: _future,
-        builder: (context, snapshot) {
-          return Scaffold(
-            appBar: Header(
-              onTap: () async {
-                if (images.isNotEmpty) {
-                  // warning dialog
-                  showDialog(
-                    context: context,
-                    builder: (BuildContext context) => PopUp(
-                      content:
-                          "Wenn du den Scanner verlässt, werden alle gescannten Bilder gelöscht. Bist du sicher, dass du den Scanner verlassen möchtest?",
-                      actions: [
-                        Container(
-                          margin: Values.buttonPadding,
-                          child: Column(
-                            children: [
-                              Button(
-                                  btnText: "ABBRECHEN",
-                                  onTap: () {
-                                    Navigator.pop(context);
-                                  },
-                                  theme: ButtonColorTheme.secondaryLight),
-                              Button(
-                                  btnText: "FORTFAHREN",
-                                  onTap: () async {
-                                    if (context.mounted) {
-                                      try {
-                                        await CustomCacheManager.clearCache(
-                                            context, images);
-                                      } catch (e) {
-                                        debugPrint(e.toString());
-                                      }
-                                    }
-                                    Navigator.push(
-                                      context,
-                                      MaterialPageRoute(
-                                        builder: (context) => Start(),
-                                      ),
-                                    );
-                                  },
-                                  theme: ButtonColorTheme.primary),
-                            ],
-                          ),
-                        )
-                      ],
-                    ),
-                  );
-                } else {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) => Start(),
-                    ),
-                  );
-                }
-              },
-              element: TextGoogle(
-                style: Fonts.text400,
-                text: headerText(),
-                align: TextAlign.center,
-              ),
-            ),
-            backgroundColor: _isPermissionGranted ? Colors.transparent : null,
-            body: _isPermissionGranted
-                ? Container(
-                    padding: Values.paddingHorizontal,
-                    color: AppColor.backgroundFullScreen,
-                    child: SafeArea(
-                      child: Column(
-                        children: [
-                          Expanded(
-                            child: Stack(
-                              alignment: Alignment.bottomCenter,
-                              children: [
-                                Container(
-                                  decoration: BoxDecoration(
-                                    borderRadius: BorderRadius.circular(
-                                        Values.cardRadius),
-                                    color: Colors.transparent,
-                                    border: Border.all(
-                                      color: AppColor.blueActive,
-                                      width: 4,
-                                    ),
-                                  ),
-                                  child: FutureBuilder<List<CameraDescription>>(
-                                    future: availableCameras(),
-                                    builder: (context, snapshot) {
-                                      if (snapshot.hasData) {
-                                        _initCameraController(snapshot.data!);
-                                        return Container(
-                                          width: double.infinity,
-                                          child: ClipRRect(
-                                            borderRadius: BorderRadius.circular(
-                                                Values.cardRadius - 4),
-                                            child: CameraPreview(
-                                                _cameraController!),
-                                          ),
-                                        );
-                                      } else {
-                                        return const LinearProgressIndicator();
-                                      }
-                                    },
-                                  ),
-                                ),
-                                Container(
-                                  width: double.infinity,
-                                  margin: Values.buttonPadding,
-                                  child: Button(
-                                    btnText: (images.isEmpty || position == 0)
-                                        ? "SCANNEN"
-                                        : "AUFNEHMEN",
-                                    onTap: _scanImage,
-                                    theme: ButtonColorTheme.primary,
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ),
+    return WillPopScope(
+      onWillPop: () async => false,
+      child: FutureBuilder(
+          future: _future,
+          builder: (context, snapshot) {
+            return Scaffold(
+              appBar: Header(
+                onTap: () async {
+                  if (images.isNotEmpty) {
+                    // warning dialog
+                    showDialog(
+                      context: context,
+                      builder: (BuildContext context) => PopUp(
+                        content:
+                            "Wenn du den Scanner verlässt, werden alle gescannten Bilder gelöscht. Bist du sicher, dass du den Scanner verlassen möchtest?",
+                        actions: [
                           Container(
                             margin: Values.buttonPadding,
-                            child: Button(
-                              btnText: (position == null && images.isEmpty)
-                                  ? "MANUELLE EINGABE"
-                                  : "ABBRECHEN",
-                              onTap: () async {
-                                await Navigator.push(
-                                  context,
-                                  MaterialPageRoute(
-                                    builder: (context) =>
-                                        (position == null && images.isEmpty)
-                                            ? ManualEntry()
-                                            : const ScannerPreview(),
-                                  ),
-                                );
-                              },
-                              theme: ButtonColorTheme.secondaryDark,
+                            child: Column(
+                              children: [
+                                Button(
+                                    btnText: "ABBRECHEN",
+                                    onTap: () {
+                                      Navigator.pop(context);
+                                    },
+                                    theme: ButtonColorTheme.secondaryLight),
+                                Button(
+                                    btnText: "FORTFAHREN",
+                                    onTap: () async {
+                                      if (context.mounted) {
+                                        try {
+                                          await CustomCacheManager.clearCache(
+                                              context, images);
+                                        } catch (e) {
+                                          debugPrint(e.toString());
+                                        }
+                                      }
+                                      Navigator.push(
+                                        context,
+                                        MaterialPageRoute(
+                                          builder: (context) => Start(),
+                                        ),
+                                      );
+                                    },
+                                    theme: ButtonColorTheme.primary),
+                              ],
                             ),
-                          ),
+                          )
                         ],
                       ),
-                    ),
-                  )
-                : Center(
-                    child: Container(
-                      padding: const EdgeInsets.only(left: 24.0, right: 24.0),
-                      child: const Text(
-                        'Camera permission denied',
-                        textAlign: TextAlign.center,
+                    );
+                  } else {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => Start(),
+                      ),
+                    );
+                  }
+                },
+                element: TextGoogle(
+                  style: Fonts.text400,
+                  text: headerText(),
+                  align: TextAlign.center,
+                ),
+              ),
+              backgroundColor: _isPermissionGranted ? Colors.transparent : null,
+              body: _isPermissionGranted
+                  ? Container(
+                      padding: Values.paddingHorizontal,
+                      color: AppColor.backgroundFullScreen,
+                      child: SafeArea(
+                        child: Column(
+                          children: [
+                            Expanded(
+                              child: Stack(
+                                alignment: Alignment.bottomCenter,
+                                children: [
+                                  Container(
+                                    decoration: BoxDecoration(
+                                      borderRadius: BorderRadius.circular(
+                                          Values.cardRadius),
+                                      color: Colors.transparent,
+                                      border: Border.all(
+                                        color: AppColor.blueActive,
+                                        width: 4,
+                                      ),
+                                    ),
+                                    child:
+                                        FutureBuilder<List<CameraDescription>>(
+                                      future: availableCameras(),
+                                      builder: (context, snapshot) {
+                                        if (snapshot.hasData) {
+                                          _initCameraController(snapshot.data!);
+                                          return Container(
+                                            width: double.infinity,
+                                            child: ClipRRect(
+                                              borderRadius:
+                                                  BorderRadius.circular(
+                                                      Values.cardRadius - 4),
+                                              child: CameraPreview(
+                                                  _cameraController!),
+                                            ),
+                                          );
+                                        } else {
+                                          return const LinearProgressIndicator();
+                                        }
+                                      },
+                                    ),
+                                  ),
+                                  Container(
+                                    width: double.infinity,
+                                    margin: Values.buttonPadding,
+                                    child: Button(
+                                      btnText: (images.isEmpty || position == 0)
+                                          ? "SCANNEN"
+                                          : "AUFNEHMEN",
+                                      onTap: _scanImage,
+                                      theme: ButtonColorTheme.primary,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                            Container(
+                              margin: Values.buttonPadding,
+                              child: Button(
+                                btnText: (position == null && images.isEmpty)
+                                    ? "MANUELLE EINGABE"
+                                    : "ABBRECHEN",
+                                onTap: () async {
+                                  await Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                      builder: (context) =>
+                                          (position == null && images.isEmpty)
+                                              ? ManualEntry()
+                                              : const ScannerPreview(),
+                                    ),
+                                  );
+                                },
+                                theme: ButtonColorTheme.secondaryDark,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    )
+                  : Center(
+                      child: Container(
+                        padding: const EdgeInsets.only(left: 24.0, right: 24.0),
+                        child: const Text(
+                          'Camera permission denied',
+                          textAlign: TextAlign.center,
+                        ),
                       ),
                     ),
-                  ),
-          );
-        });
+            );
+          }),
+    );
   }
 
   Future<void> _scanImage() async {

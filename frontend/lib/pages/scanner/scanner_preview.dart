@@ -95,163 +95,125 @@ class _ScannerPreviewState extends State<ScannerPreview>
       debugPrint(pdfPath);
     }
 
-    return Scaffold(
-      appBar: Header(
-        onTap: () async {
-          showDialog(
-            context: context,
-            builder: (BuildContext context) => PopUp(
-              content:
-                  "Wenn du die Preview verlässt, werden alle gescannten Bilder gelöscht. Bist du sicher, dass du zurück zum Scanner möchtest?",
-              actions: [
-                Container(
-                  margin: Values.buttonPadding,
-                  child: Column(
-                    children: [
-                      Button(
-                          btnText: "ABBRECHEN",
-                          onTap: () {
-                            Navigator.pop(context);
-                          },
-                          theme: ButtonColorTheme.secondaryLight),
-                      Button(
-                          btnText: "FORTFAHREN",
-                          onTap: () async {
-                            if (context.mounted) {
-                              try {
-                                await CustomCacheManager.clearCache(
-                                    context, images);
-                              } catch (e) {
-                                debugPrint(e.toString());
+    return WillPopScope(
+      onWillPop: () async => false,
+      child: Scaffold(
+        appBar: Header(
+          onTap: () async {
+            showDialog(
+              context: context,
+              builder: (BuildContext context) => PopUp(
+                content:
+                    "Wenn du die Preview verlässt, werden alle gescannten Bilder gelöscht. Bist du sicher, dass du zurück zum Scanner möchtest?",
+                actions: [
+                  Container(
+                    margin: Values.buttonPadding,
+                    child: Column(
+                      children: [
+                        Button(
+                            btnText: "ABBRECHEN",
+                            onTap: () {
+                              Navigator.pop(context);
+                            },
+                            theme: ButtonColorTheme.secondaryLight),
+                        Button(
+                            btnText: "FORTFAHREN",
+                            onTap: () async {
+                              if (context.mounted) {
+                                try {
+                                  await CustomCacheManager.clearCache(
+                                      context, images);
+                                } catch (e) {
+                                  debugPrint(e.toString());
+                                }
                               }
-                            }
-                            Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                builder: (context) => const ScannerCamera(),
-                              ),
-                            );
-                          },
-                          theme: ButtonColorTheme.primary),
-                    ],
-                  ),
-                )
-              ],
-            ),
-          );
-        },
-        element: SizedBox(
-          height: 50,
-          // horizontal list of preview images with length of the list of images in the cache
-          //Couldn't use Listview because it couldn't center the items
-          child: SingleChildScrollView(
-            scrollDirection: Axis.horizontal,
-            controller: _controller,
-            child: Row(
-              children: [
-                for (var image in images)
-                  GestureDetector(
-                    onTap: () {
-                      setState(() {
-                        selectedImage = image;
-                      });
-                      debugPrint('Selected Image: $selectedImage');
-                    },
-                    child: TinyPreview(
-                      selectedImage: selectedImage!,
-                      images: images,
-                      index: images.indexOf(image),
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (context) => const ScannerCamera(),
+                                ),
+                              );
+                            },
+                            theme: ButtonColorTheme.primary),
+                      ],
                     ),
-                  ),
-              ],
+                  )
+                ],
+              ),
+            );
+          },
+          element: SizedBox(
+            height: 50,
+            // horizontal list of preview images with length of the list of images in the cache
+            //Couldn't use Listview because it couldn't center the items
+            child: SingleChildScrollView(
+              scrollDirection: Axis.horizontal,
+              controller: _controller,
+              child: Row(
+                children: [
+                  for (var image in images)
+                    GestureDetector(
+                      onTap: () {
+                        setState(() {
+                          selectedImage = image;
+                        });
+                        debugPrint('Selected Image: $selectedImage');
+                      },
+                      child: TinyPreview(
+                        selectedImage: selectedImage!,
+                        images: images,
+                        index: images.indexOf(image),
+                      ),
+                    ),
+                ],
+              ),
             ),
           ),
         ),
-      ),
-      body: Container(
-        padding: Values.paddingHorizontal,
-        child: SafeArea(
-          child: Column(
-            children: [
-              Expanded(
-                child: Stack(
-                  alignment: Alignment.center,
-                  children: [
-                    selectedImage != null
-                        ? Container(
-                            width: double.infinity,
-                            decoration: BoxDecoration(
-                              borderRadius:
-                                  BorderRadius.circular(Values.cardRadius),
-                              border: Border.all(
-                                  color: AppColor.blueActive, width: 4),
-                            ),
-                            child: ClipRRect(
-                                borderRadius: BorderRadius.circular(
-                                    Values.cardRadius - 4),
-                                child: Image.file(File(selectedImage!),
-                                    fit: BoxFit.cover)),
-                          )
-                        : const Center(
-                            child: Text("No Images"),
-                          ),
-                    Padding(
-                      padding: const EdgeInsets.symmetric(vertical: 20.0),
-                      child: Column(
-                        children: [
-                          Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            children: [
-                              // redo button
-                              RoundButton(
-                                icon: Icons.redo,
-                                onTap: () async {
-                                  if (context.mounted) {
-                                    context
-                                        .read<ScannerService>()
-                                        .rememberPosition(
-                                            images.indexOf(selectedImage!));
-                                  }
-                                  await Navigator.push(
-                                    context,
-                                    MaterialPageRoute(
-                                      builder: (context) =>
-                                          const ScannerCamera(),
-                                    ),
-                                  );
-                                },
+        body: Container(
+          padding: Values.paddingHorizontal,
+          child: SafeArea(
+            child: Column(
+              children: [
+                Expanded(
+                  child: Stack(
+                    alignment: Alignment.center,
+                    children: [
+                      selectedImage != null
+                          ? Container(
+                              width: double.infinity,
+                              decoration: BoxDecoration(
+                                borderRadius:
+                                    BorderRadius.circular(Values.cardRadius),
+                                border: Border.all(
+                                    color: AppColor.blueActive, width: 4),
                               ),
-                              //delete button
-                              RoundButton(
-                                icon: Icons.delete,
-                                onTap: () async {
-                                  if (context.mounted) {
-                                    context
-                                        .read<ScannerService>()
-                                        .forgetPosition();
-                                    context
-                                        .read<ScannerService>()
-                                        .deleteImage(selectedImage!);
-                                    images = context
-                                        .read<ScannerService>()
-                                        .getImages(); // Hier aktualisieren Sie die `images`-Liste
-                                    selectedImage = images.isNotEmpty
-                                        ? images.last
-                                        : null; // Hier aktualisieren Sie die `selectedImage`-Variable
-                                  }
-
-                                  setState(() {
-                                    if (images.isNotEmpty) {
-                                      selectedImage = images.last;
-                                    } else {
-                                      selectedImage = null;
+                              child: ClipRRect(
+                                  borderRadius: BorderRadius.circular(
+                                      Values.cardRadius - 4),
+                                  child: Image.file(File(selectedImage!),
+                                      fit: BoxFit.cover)),
+                            )
+                          : const Center(
+                              child: Text("No Images"),
+                            ),
+                      Padding(
+                        padding: const EdgeInsets.symmetric(vertical: 20.0),
+                        child: Column(
+                          children: [
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                                // redo button
+                                RoundButton(
+                                  icon: Icons.redo,
+                                  onTap: () async {
+                                    if (context.mounted) {
+                                      context
+                                          .read<ScannerService>()
+                                          .rememberPosition(
+                                              images.indexOf(selectedImage!));
                                     }
-                                  });
-
-                                  if (images.isNotEmpty) {
-                                    _controller.jumpTo(
-                                        _controller.position.maxScrollExtent);
-                                  } else if (images.isEmpty) {
                                     await Navigator.push(
                                       context,
                                       MaterialPageRoute(
@@ -259,100 +221,141 @@ class _ScannerPreviewState extends State<ScannerPreview>
                                             const ScannerCamera(),
                                       ),
                                     );
+                                  },
+                                ),
+                                //delete button
+                                RoundButton(
+                                  icon: Icons.delete,
+                                  onTap: () async {
+                                    if (context.mounted) {
+                                      context
+                                          .read<ScannerService>()
+                                          .forgetPosition();
+                                      context
+                                          .read<ScannerService>()
+                                          .deleteImage(selectedImage!);
+                                      images = context
+                                          .read<ScannerService>()
+                                          .getImages(); // Hier aktualisieren Sie die `images`-Liste
+                                      selectedImage = images.isNotEmpty
+                                          ? images.last
+                                          : null; // Hier aktualisieren Sie die `selectedImage`-Variable
+                                    }
+
+                                    setState(() {
+                                      if (images.isNotEmpty) {
+                                        selectedImage = images.last;
+                                      } else {
+                                        selectedImage = null;
+                                      }
+                                    });
+
+                                    if (images.isNotEmpty) {
+                                      _controller.jumpTo(
+                                          _controller.position.maxScrollExtent);
+                                    } else if (images.isEmpty) {
+                                      await Navigator.push(
+                                        context,
+                                        MaterialPageRoute(
+                                          builder: (context) =>
+                                              const ScannerCamera(),
+                                        ),
+                                      );
+                                    }
+                                  },
+                                ),
+                              ],
+                            ),
+                            const Spacer(),
+                            // add button
+                            Align(
+                              alignment: Alignment.bottomCenter,
+                              child: RoundButton(
+                                icon: Icons.add,
+                                onTap: () {
+                                  if (images.length == 1) {
+                                    // warning dialog
+                                    showDialog(
+                                      context: context,
+                                      builder: (BuildContext context) => PopUp(
+                                        content:
+                                            "Vom Scanner wird nur der erste Scan auf Werte geprüft. Es kann vorkommen, dass die Einträge manuell überarbeitet werden müssen.",
+                                        actions: [
+                                          Container(
+                                            margin: Values.buttonPadding,
+                                            child: Column(
+                                              children: [
+                                                Button(
+                                                    btnText: "ABBRECHEN",
+                                                    onTap: () {
+                                                      Navigator.pop(context);
+                                                    },
+                                                    theme: ButtonColorTheme
+                                                        .secondaryLight),
+                                                Button(
+                                                    btnText: "FORTFAHREN",
+                                                    onTap: () {
+                                                      Navigator.push(
+                                                        context,
+                                                        MaterialPageRoute(
+                                                          builder: (context) =>
+                                                              const ScannerCamera(),
+                                                        ),
+                                                      );
+                                                    },
+                                                    theme: ButtonColorTheme
+                                                        .primary),
+                                              ],
+                                            ),
+                                          )
+                                        ],
+                                      ),
+                                    );
+                                  } else {
+                                    Navigator.push(
+                                      context,
+                                      MaterialPageRoute(
+                                        builder: (context) =>
+                                            //not done yet
+                                            const ScannerCamera(),
+                                      ),
+                                    );
                                   }
                                 },
                               ),
-                            ],
-                          ),
-                          const Spacer(),
-                          // add button
-                          Align(
-                            alignment: Alignment.bottomCenter,
-                            child: RoundButton(
-                              icon: Icons.add,
-                              onTap: () {
-                                if (images.length == 1) {
-                                  // warning dialog
-                                  showDialog(
-                                    context: context,
-                                    builder: (BuildContext context) => PopUp(
-                                      content:
-                                          "Vom Scanner wird nur der erste Scan auf Werte geprüft. Es kann vorkommen, dass die Einträge manuell überarbeitet werden müssen.",
-                                      actions: [
-                                        Container(
-                                          margin: Values.buttonPadding,
-                                          child: Column(
-                                            children: [
-                                              Button(
-                                                  btnText: "ABBRECHEN",
-                                                  onTap: () {
-                                                    Navigator.pop(context);
-                                                  },
-                                                  theme: ButtonColorTheme
-                                                      .secondaryLight),
-                                              Button(
-                                                  btnText: "FORTFAHREN",
-                                                  onTap: () {
-                                                    Navigator.push(
-                                                      context,
-                                                      MaterialPageRoute(
-                                                        builder: (context) =>
-                                                            const ScannerCamera(),
-                                                      ),
-                                                    );
-                                                  },
-                                                  theme:
-                                                      ButtonColorTheme.primary),
-                                            ],
-                                          ),
-                                        )
-                                      ],
-                                    ),
-                                  );
-                                } else {
-                                  Navigator.push(
-                                    context,
-                                    MaterialPageRoute(
-                                      builder: (context) =>
-                                          //not done yet
-                                          const ScannerCamera(),
-                                    ),
-                                  );
-                                }
-                              },
-                            ),
-                          )
-                        ],
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-              Container(
-                margin: Values.buttonPadding,
-                child: Button(
-                    btnText: "BESTÄTIGEN",
-                    onTap: () async {
-                      try {
-                        await sendImages();
-                      } catch (e) {
-                        debugPrint(e.toString());
-                      }
-
-                      await Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) => ManualEntry(),
+                            )
+                          ],
                         ),
-                      );
-                    },
-                    theme: ButtonColorTheme.primary),
-              )
-            ],
+                      ),
+                    ],
+                  ),
+                ),
+                Container(
+                  margin: Values.buttonPadding,
+                  child: Button(
+                      btnText: "BESTÄTIGEN",
+                      onTap: () async {
+                        try {
+                          await sendImages();
+                        } catch (e) {
+                          debugPrint(e.toString());
+                        }
+
+                        await Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => ManualEntry(),
+                          ),
+                        );
+                      },
+                      theme: ButtonColorTheme.primary),
+                )
+              ],
+            ),
           ),
         ),
+        backgroundColor: AppColor.backgroundFullScreen,
       ),
-      backgroundColor: AppColor.backgroundFullScreen,
     );
   }
 }

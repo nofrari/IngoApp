@@ -45,111 +45,115 @@ class _StartAccountState extends State<StartAccount> {
 
   @override
   Widget build(BuildContext context) {
-    return GestureDetector(
-      onTap: () => FocusManager.instance.primaryFocus?.unfocus(),
-      child: Scaffold(
-        backgroundColor: AppColor.backgroundFullScreen,
-        body: Container(
-          padding: Values.bigCardPadding,
-          child: SingleChildScrollView(
-            child: Column(
-              children: [
-                Container(
-                  padding: const EdgeInsets.only(top: 60, bottom: 20),
-                  child: Image.asset(
-                    'assets/images/logo_slogan.png',
-                    alignment: Alignment.topCenter,
-                    height: 150,
+    return WillPopScope(
+      onWillPop: () async => false,
+      child: GestureDetector(
+        onTap: () => FocusManager.instance.primaryFocus?.unfocus(),
+        child: Scaffold(
+          backgroundColor: AppColor.backgroundFullScreen,
+          body: Container(
+            padding: Values.bigCardPadding,
+            child: SingleChildScrollView(
+              child: Column(
+                children: [
+                  Container(
+                    padding: const EdgeInsets.only(top: 60, bottom: 20),
+                    child: Image.asset(
+                      'assets/images/logo_slogan.png',
+                      alignment: Alignment.topCenter,
+                      height: 150,
+                    ),
                   ),
-                ),
-                Container(
-                  height: MediaQuery.of(context).size.height * 0.7,
-                  decoration: BoxDecoration(
-                    border: Border.all(
-                        color: AppColor.neutral500, style: BorderStyle.solid),
-                    borderRadius: const BorderRadius.only(
-                        topRight: Radius.circular(20),
-                        topLeft: Radius.circular(20),
-                        bottomRight: Radius.circular(11),
-                        bottomLeft: Radius.circular(11)),
-                    color: AppColor.backgroundGray,
-                  ),
-                  child: Form(
-                    key: _formKey,
-                    child: Container(
-                      margin: const EdgeInsets.all(20),
-                      child: Column(
-                        children: [
-                          SizedBox(
-                            height: MediaQuery.of(context).size.height * 0.15,
-                            child: Center(
-                              child: Text(
-                                  "Erstelle dein Startkonto".toUpperCase(),
-                                  style: Fonts.text400),
+                  Container(
+                    height: MediaQuery.of(context).size.height * 0.7,
+                    decoration: BoxDecoration(
+                      border: Border.all(
+                          color: AppColor.neutral500, style: BorderStyle.solid),
+                      borderRadius: const BorderRadius.only(
+                          topRight: Radius.circular(20),
+                          topLeft: Radius.circular(20),
+                          bottomRight: Radius.circular(11),
+                          bottomLeft: Radius.circular(11)),
+                      color: AppColor.backgroundGray,
+                    ),
+                    child: Form(
+                      key: _formKey,
+                      child: Container(
+                        margin: const EdgeInsets.all(20),
+                        child: Column(
+                          children: [
+                            SizedBox(
+                              height: MediaQuery.of(context).size.height * 0.15,
+                              child: Center(
+                                child: Text(
+                                    "Erstelle dein Startkonto".toUpperCase(),
+                                    style: Fonts.text400),
+                              ),
                             ),
-                          ),
-                          InputField(
-                            lblText: "Kontoname",
-                            reqFormatter: letters,
-                            keyboardType: text,
-                            controller: controllerTitle,
-                            maxLines: 1,
-                            validator: (value) {
-                              if (value == null || value.isEmpty) {
-                                return 'Das Feld darf nicht leer sein';
-                              }
-                              return null;
-                            },
-                            maxLength: 50,
-                            onFocusChanged: onTextFieldFocusChanged,
-                            hidePassword: false,
-                          ),
-                          InputField(
-                            lblText: "Startkapital (Betrag)",
-                            reqFormatter: currencyFormatter,
-                            keyboardType: numeric,
-                            controller: controllerAmount,
-                            maxLines: 1,
-                            validator: (value) {
-                              if (value == null || value.isEmpty) {
-                                return 'Das Feld darf nicht leer sein';
-                              }
-                              return null;
-                            },
-                            maxLength: 15,
-                            onFocusChanged: onTextFieldFocusChanged,
-                            hidePassword: false,
-                          ),
-                          //(_isFocused == false)
-                          Expanded(
-                            child: Align(
-                              alignment: Alignment.bottomCenter,
-                              child: Button(
-                                  btnText: "Startkonto erstellen".toUpperCase(),
-                                  onTap: () async {
-                                    if (_formKey.currentState!.validate()) {
-                                      await _sendData(
-                                          controllerTitle.text,
-                                          currencyToDouble(
-                                              controllerAmount.text));
-                                      Navigator.push(
-                                        context,
-                                        MaterialPageRoute(
-                                          builder: (context) => Start(),
-                                        ),
-                                      );
-                                    }
-                                  },
-                                  theme: ButtonColorTheme.secondaryLight),
+                            InputField(
+                              lblText: "Kontoname",
+                              reqFormatter: letters,
+                              keyboardType: text,
+                              controller: controllerTitle,
+                              maxLines: 1,
+                              validator: (value) {
+                                if (value == null || value.isEmpty) {
+                                  return 'Das Feld darf nicht leer sein';
+                                }
+                                return null;
+                              },
+                              maxLength: 50,
+                              onFocusChanged: onTextFieldFocusChanged,
+                              hidePassword: false,
                             ),
-                          )
-                          //: Container(),
-                        ],
+                            InputField(
+                              lblText: "Startkapital (Betrag)",
+                              reqFormatter: currencyFormatter,
+                              keyboardType: numeric,
+                              controller: controllerAmount,
+                              maxLines: 1,
+                              validator: (value) {
+                                if (value == null || value.isEmpty) {
+                                  return 'Das Feld darf nicht leer sein';
+                                }
+                                return null;
+                              },
+                              maxLength: 15,
+                              onFocusChanged: onTextFieldFocusChanged,
+                              hidePassword: false,
+                            ),
+                            //(_isFocused == false)
+                            Expanded(
+                              child: Align(
+                                alignment: Alignment.bottomCenter,
+                                child: Button(
+                                    btnText:
+                                        "Startkonto erstellen".toUpperCase(),
+                                    onTap: () async {
+                                      if (_formKey.currentState!.validate()) {
+                                        await _sendData(
+                                            controllerTitle.text,
+                                            currencyToDouble(
+                                                controllerAmount.text));
+                                        Navigator.push(
+                                          context,
+                                          MaterialPageRoute(
+                                            builder: (context) => Start(),
+                                          ),
+                                        );
+                                      }
+                                    },
+                                    theme: ButtonColorTheme.secondaryLight),
+                              ),
+                            )
+                            //: Container(),
+                          ],
+                        ),
                       ),
                     ),
                   ),
-                ),
-              ],
+                ],
+              ),
             ),
           ),
         ),

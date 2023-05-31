@@ -16,18 +16,21 @@ class LinkIntern extends StatefulWidget {
 class _LinkInternState extends State<LinkIntern> {
   @override
   Widget build(BuildContext context) {
-    return Align(
-      alignment: Alignment.centerLeft,
-      child: GestureDetector(
-        onTap: () => Navigator.push(
-          context,
-          MaterialPageRoute(
-            builder: (context) => widget.linkInternTo,
+    return WillPopScope(
+      onWillPop: () async => false,
+      child: Align(
+        alignment: Alignment.centerLeft,
+        child: GestureDetector(
+          onTap: () => Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (context) => widget.linkInternTo,
+            ),
           ),
-        ),
-        child: Text(
-          widget.linkInternText,
-          style: Fonts.textLink,
+          child: Text(
+            widget.linkInternText,
+            style: Fonts.textLink,
+          ),
         ),
       ),
     );

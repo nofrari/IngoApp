@@ -43,107 +43,113 @@ class _PasswordResetState extends State<PasswordReset> {
 
   @override
   Widget build(BuildContext context) {
-    return GestureDetector(
-      onTap: () => FocusManager.instance.primaryFocus?.unfocus(),
-      child: Scaffold(
-        backgroundColor: AppColor.backgroundFullScreen,
-        body: Form(
-          key: _formKey,
-          child: Container(
-            padding: Values.bigCardPadding,
-            child: SingleChildScrollView(
-              child: Column(
-                children: [
-                  //Logo
-                  Container(
-                    padding: const EdgeInsets.only(top: 60, bottom: 20),
-                    child: Image.asset(
-                      'assets/images/logo_slogan.png',
-                      alignment: Alignment.topCenter,
-                      height: 150,
+    return WillPopScope(
+      onWillPop: () async => false,
+      child: GestureDetector(
+        onTap: () => FocusManager.instance.primaryFocus?.unfocus(),
+        child: Scaffold(
+          backgroundColor: AppColor.backgroundFullScreen,
+          body: Form(
+            key: _formKey,
+            child: Container(
+              padding: Values.bigCardPadding,
+              child: SingleChildScrollView(
+                child: Column(
+                  children: [
+                    //Logo
+                    Container(
+                      padding: const EdgeInsets.only(top: 60, bottom: 20),
+                      child: Image.asset(
+                        'assets/images/logo_slogan.png',
+                        alignment: Alignment.topCenter,
+                        height: 150,
+                      ),
                     ),
-                  ),
-                  Container(
-                    height: MediaQuery.of(context).size.height * 0.7,
-                    decoration: BoxDecoration(
-                      border: Border.all(
-                          color: AppColor.neutral500, style: BorderStyle.solid),
-                      borderRadius: const BorderRadius.all(Radius.circular(20)),
-                      color: AppColor.backgroundGray,
-                    ),
-                    child: Container(
-                        margin: Values.bigCardMargin,
-                        child: Column(children: <Widget>[
-                          Align(
-                            alignment: Alignment.centerLeft,
-                            child: Padding(
-                              padding: EdgeInsets.only(top: 60, bottom: 20),
-                              child: Text(
-                                Strings.passwordForgot.toUpperCase(),
-                                style: Fonts.text400,
+                    Container(
+                      height: MediaQuery.of(context).size.height * 0.7,
+                      decoration: BoxDecoration(
+                        border: Border.all(
+                            color: AppColor.neutral500,
+                            style: BorderStyle.solid),
+                        borderRadius:
+                            const BorderRadius.all(Radius.circular(20)),
+                        color: AppColor.backgroundGray,
+                      ),
+                      child: Container(
+                          margin: Values.bigCardMargin,
+                          child: Column(children: <Widget>[
+                            Align(
+                              alignment: Alignment.centerLeft,
+                              child: Padding(
+                                padding: EdgeInsets.only(top: 60, bottom: 20),
+                                child: Text(
+                                  Strings.passwordForgot.toUpperCase(),
+                                  style: Fonts.text400,
+                                ),
                               ),
                             ),
-                          ),
-                          Padding(
-                            padding: EdgeInsets.only(bottom: 40),
-                            child: Text(Strings.passwordForgotInfo,
-                                style: Fonts.text300),
-                          ),
-                          InputField(
-                            lblText: Strings.registerMail,
-                            reqFormatter: mail,
-                            keyboardType: text,
-                            controller: controllerMail,
-                            maxLength: 50,
-                            maxLines: 1,
-                            hidePassword: false,
-                            onFocusChanged: (hasFocus) {
-                              if (hasFocus) {
-                                // do stuff
-                              }
-                            },
-                            validator: (value) {
-                              if (value == null || value.isEmpty) {
-                                return Strings.alertInputfieldEmpty;
-                              } else if (EmailValidator.validate(value) ==
-                                  false) {
-                                return Strings.alertMail;
-                              }
-                              return null;
-                            },
-                          ),
-                          LinkIntern(
-                              linkInternTo: Auth(),
-                              linkInternText: Strings.notRegistered),
-                          Expanded(
-                            child: Align(
-                              alignment: Alignment.bottomCenter,
-                              child: Button(
-                                btnText: Strings.btnPasswordReset.toUpperCase(),
-                                onTap: () async {
-                                  if (_formKey.currentState!.validate() !=
-                                      false) {
-                                    await _sendData(controllerMail.text);
-                                    if (userExists == true) {
-                                      showPopup(context);
-                                    } else {
-                                      debugPrint('da passt was nicht');
-                                      ScaffoldMessenger.of(context)
-                                          .showSnackBar(
-                                        const SnackBar(
-                                            content: Text(
-                                                'Keinen User gefunden, bitte überprüfe deine Eingaben.')),
-                                      );
+                            Padding(
+                              padding: EdgeInsets.only(bottom: 40),
+                              child: Text(Strings.passwordForgotInfo,
+                                  style: Fonts.text300),
+                            ),
+                            InputField(
+                              lblText: Strings.registerMail,
+                              reqFormatter: mail,
+                              keyboardType: text,
+                              controller: controllerMail,
+                              maxLength: 50,
+                              maxLines: 1,
+                              hidePassword: false,
+                              onFocusChanged: (hasFocus) {
+                                if (hasFocus) {
+                                  // do stuff
+                                }
+                              },
+                              validator: (value) {
+                                if (value == null || value.isEmpty) {
+                                  return Strings.alertInputfieldEmpty;
+                                } else if (EmailValidator.validate(value) ==
+                                    false) {
+                                  return Strings.alertMail;
+                                }
+                                return null;
+                              },
+                            ),
+                            LinkIntern(
+                                linkInternTo: Auth(),
+                                linkInternText: Strings.notRegistered),
+                            Expanded(
+                              child: Align(
+                                alignment: Alignment.bottomCenter,
+                                child: Button(
+                                  btnText:
+                                      Strings.btnPasswordReset.toUpperCase(),
+                                  onTap: () async {
+                                    if (_formKey.currentState!.validate() !=
+                                        false) {
+                                      await _sendData(controllerMail.text);
+                                      if (userExists == true) {
+                                        showPopup(context);
+                                      } else {
+                                        debugPrint('da passt was nicht');
+                                        ScaffoldMessenger.of(context)
+                                            .showSnackBar(
+                                          const SnackBar(
+                                              content: Text(
+                                                  'Keinen User gefunden, bitte überprüfe deine Eingaben.')),
+                                        );
+                                      }
                                     }
-                                  }
-                                },
-                                theme: ButtonColorTheme.secondaryLight,
+                                  },
+                                  theme: ButtonColorTheme.secondaryLight,
+                                ),
                               ),
-                            ),
-                          )
-                        ])),
-                  ),
-                ],
+                            )
+                          ])),
+                    ),
+                  ],
+                ),
               ),
             ),
           ),

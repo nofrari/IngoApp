@@ -21,57 +21,60 @@ class AccountsOverview extends StatefulWidget {
 class _AccountsOverviewState extends State<AccountsOverview> {
   @override
   Widget build(BuildContext context) {
-    return Container(
-      color: AppColor.neutral500,
-      child: Column(
-        children: [
-          Container(
-            padding: const EdgeInsets.fromLTRB(10, 10, 0, 15),
-            width: double.infinity,
-            child: Text(
-              "KONTENÜBERSICHT",
-              style: Fonts.textHeadingBold,
+    return WillPopScope(
+      onWillPop: () async => false,
+      child: Container(
+        color: AppColor.neutral500,
+        child: Column(
+          children: [
+            Container(
+              padding: const EdgeInsets.fromLTRB(10, 10, 0, 15),
+              width: double.infinity,
+              child: Text(
+                "KONTENÜBERSICHT",
+                style: Fonts.textHeadingBold,
+              ),
             ),
-          ),
-          ...widget.accounts
-              .map((account) => GestureDetector(
-                    onTap: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) => Start(
-                            pageId: 3,
-                            accountId: account.id,
+            ...widget.accounts
+                .map((account) => GestureDetector(
+                      onTap: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => Start(
+                              pageId: 3,
+                              accountId: account.id,
+                            ),
                           ),
-                        ),
-                      );
-                    },
-                    child: AccountItem(
-                      account: account,
+                        );
+                      },
+                      child: AccountItem(
+                        account: account,
+                      ),
+                    ))
+                .toList(),
+            Container(
+              margin: const EdgeInsets.symmetric(
+                vertical: 20,
+                horizontal: 10,
+              ),
+              child: Button(
+                btnText: "ZUR KONTOÜBERSICHT",
+                onTap: () async {
+                  await Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => Start(
+                        pageId: 1,
+                      ),
                     ),
-                  ))
-              .toList(),
-          Container(
-            margin: const EdgeInsets.symmetric(
-              vertical: 20,
-              horizontal: 10,
-            ),
-            child: Button(
-              btnText: "ZUR KONTOÜBERSICHT",
-              onTap: () async {
-                await Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => Start(
-                      pageId: 1,
-                    ),
-                  ),
-                );
-              },
-              theme: ButtonColorTheme.secondaryLight,
-            ),
-          )
-        ],
+                  );
+                },
+                theme: ButtonColorTheme.secondaryLight,
+              ),
+            )
+          ],
+        ),
       ),
     );
   }

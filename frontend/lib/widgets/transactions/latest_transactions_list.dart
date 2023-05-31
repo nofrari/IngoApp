@@ -21,42 +21,45 @@ class _LatestTransactionListState extends State<LatestTransactionList> {
   @override
   Widget build(BuildContext context) {
     //for long lists use ListView
-    return Container(
-      color: AppColor.neutral500,
-      child: Column(
-        children: [
-          Container(
-            padding: const EdgeInsets.fromLTRB(10, 10, 0, 15),
-            width: double.infinity,
-            child: Text(
-              "LETZTE TRANSAKTIONEN",
-              style: Fonts.textHeadingBold,
+    return WillPopScope(
+      onWillPop: () async => false,
+      child: Container(
+        color: AppColor.neutral500,
+        child: Column(
+          children: [
+            Container(
+              padding: const EdgeInsets.fromLTRB(10, 10, 0, 15),
+              width: double.infinity,
+              child: Text(
+                "LETZTE TRANSAKTIONEN",
+                style: Fonts.textHeadingBold,
+              ),
             ),
-          ),
-          ...widget.transactions
-              .map((transaction) => TransactionItem(
-                    transaction: transaction,
-                  ))
-              .toList(),
-          Container(
-            margin: const EdgeInsets.symmetric(
-              vertical: 20,
-              horizontal: 10,
-            ),
-            child: Button(
-              btnText: "MEHR ANZEIGEN",
-              onTap: () async {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => Start(pageId: 3),
-                  ),
-                );
-              },
-              theme: ButtonColorTheme.secondaryLight,
-            ),
-          )
-        ],
+            ...widget.transactions
+                .map((transaction) => TransactionItem(
+                      transaction: transaction,
+                    ))
+                .toList(),
+            Container(
+              margin: const EdgeInsets.symmetric(
+                vertical: 20,
+                horizontal: 10,
+              ),
+              child: Button(
+                btnText: "MEHR ANZEIGEN",
+                onTap: () async {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => Start(pageId: 3),
+                    ),
+                  );
+                },
+                theme: ButtonColorTheme.secondaryLight,
+              ),
+            )
+          ],
+        ),
       ),
     );
   }

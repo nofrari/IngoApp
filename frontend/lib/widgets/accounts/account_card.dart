@@ -78,256 +78,263 @@ class _AccountCardState extends State<AccountCard> {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      margin: const EdgeInsets.only(
-        top: 10,
-      ),
-      height: _accountCardState == ThreeDotMenuState.create
-          ? Values.accountCardHeight + Values.roundButtonSize / 2
-          : Values.accountCardHeight,
-      child: Stack(
-        alignment: Alignment.bottomCenter,
-        children: [
-          Container(
-            margin: EdgeInsets.only(
-                bottom: _accountCardState == ThreeDotMenuState.create
-                    ? Values.roundButtonSize / 2
-                    : 0),
-            height: Values.accountCardHeight,
-            decoration: BoxDecoration(
-              color: AppColor.neutral500,
-              borderRadius: BorderRadius.circular(Values.cardRadius),
-            ),
-            child: Form(
-              key: _formKey,
-              child: Stack(
-                children: [
-                  Row(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Container(
-                        margin: const EdgeInsets.only(top: 15.0, left: 15),
-                        child: SizedBox(
-                          width: MediaQuery.of(context).size.width * 0.5,
-                          child: TextFormField(
-                            inputFormatters: [_letters],
-                            controller: _headingController,
-                            enabled: _isEditable,
-                            style: Fonts.accountsHeading,
-                            keyboardType: TextInputType.text,
-                            decoration: InputDecoration(
-                              isDense: true,
-                              contentPadding: const EdgeInsets.symmetric(
-                                  horizontal: 0, vertical: 0),
-                              enabledBorder: UnderlineInputBorder(
-                                borderSide:
-                                    BorderSide(color: AppColor.neutral100),
+    return WillPopScope(
+      onWillPop: () async => false,
+      child: Container(
+        margin: const EdgeInsets.only(
+          top: 10,
+        ),
+        height: _accountCardState == ThreeDotMenuState.create
+            ? Values.accountCardHeight + Values.roundButtonSize / 2
+            : Values.accountCardHeight,
+        child: Stack(
+          alignment: Alignment.bottomCenter,
+          children: [
+            Container(
+              margin: EdgeInsets.only(
+                  bottom: _accountCardState == ThreeDotMenuState.create
+                      ? Values.roundButtonSize / 2
+                      : 0),
+              height: Values.accountCardHeight,
+              decoration: BoxDecoration(
+                color: AppColor.neutral500,
+                borderRadius: BorderRadius.circular(Values.cardRadius),
+              ),
+              child: Form(
+                key: _formKey,
+                child: Stack(
+                  children: [
+                    Row(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Container(
+                          margin: const EdgeInsets.only(top: 15.0, left: 15),
+                          child: SizedBox(
+                            width: MediaQuery.of(context).size.width * 0.5,
+                            child: TextFormField(
+                              inputFormatters: [_letters],
+                              controller: _headingController,
+                              enabled: _isEditable,
+                              style: Fonts.accountsHeading,
+                              keyboardType: TextInputType.text,
+                              decoration: InputDecoration(
+                                isDense: true,
+                                contentPadding: const EdgeInsets.symmetric(
+                                    horizontal: 0, vertical: 0),
+                                enabledBorder: UnderlineInputBorder(
+                                  borderSide:
+                                      BorderSide(color: AppColor.neutral100),
+                                ),
+                                focusedBorder: UnderlineInputBorder(
+                                  borderSide:
+                                      BorderSide(color: AppColor.neutral100),
+                                ),
+                                disabledBorder: const UnderlineInputBorder(
+                                  borderSide: BorderSide.none,
+                                ),
                               ),
-                              focusedBorder: UnderlineInputBorder(
-                                borderSide:
-                                    BorderSide(color: AppColor.neutral100),
-                              ),
-                              disabledBorder: const UnderlineInputBorder(
-                                borderSide: BorderSide.none,
-                              ),
+                              validator: (value) {
+                                if (value == null || value.isEmpty) {
+                                  return 'Bitte gib einen Namen ein';
+                                }
+                                return null;
+                              },
+                              onEditingComplete: () {
+                                FocusScope.of(context).unfocus();
+
+                                if (_balanceController.text != "" &&
+                                    _headingController.text != "") {
+                                  setState(() {
+                                    _canFinishCreating = true;
+                                  });
+                                }
+                              },
                             ),
-                            validator: (value) {
-                              if (value == null || value.isEmpty) {
-                                return 'Bitte gib einen Namen ein';
-                              }
-                              return null;
-                            },
-                            onEditingComplete: () {
-                              FocusScope.of(context).unfocus();
-
-                              if (_balanceController.text != "" &&
-                                  _headingController.text != "") {
-                                setState(() {
-                                  _canFinishCreating = true;
-                                });
-                              }
-                            },
                           ),
                         ),
-                      ),
-                      _accountCardState != ThreeDotMenuState.create
-                          ? Container(
-                              margin:
-                                  const EdgeInsets.only(top: 10.0, right: 10),
-                              child: ThreeDotMenu(
-                                state: _accountCardState,
-                                onEdit: () {
-                                  setState(() {
-                                    _accountCardState = ThreeDotMenuState.edit;
-                                    _isEditable = true;
-                                  });
-                                },
-                                onDone: () async {
-                                  setState(() {
-                                    _accountCardState =
-                                        ThreeDotMenuState.collapsed;
-                                    _isEditable = false;
-                                  });
+                        _accountCardState != ThreeDotMenuState.create
+                            ? Container(
+                                margin:
+                                    const EdgeInsets.only(top: 10.0, right: 10),
+                                child: ThreeDotMenu(
+                                  state: _accountCardState,
+                                  onEdit: () {
+                                    setState(() {
+                                      _accountCardState =
+                                          ThreeDotMenuState.edit;
+                                      _isEditable = true;
+                                    });
+                                  },
+                                  onDone: () async {
+                                    setState(() {
+                                      _accountCardState =
+                                          ThreeDotMenuState.collapsed;
+                                      _isEditable = false;
+                                    });
 
-                                  //send data
-                                  Map<String, dynamic> formData = {
-                                    "account_id": widget.accountId,
-                                    "account_name": _headingController.text,
-                                    "account_balance": currencyToDouble(
-                                        _balanceController.text),
-                                    "user_id": context
-                                        .read<ProfileService>()
-                                        .getUser()
-                                        .id,
-                                  };
+                                    //send data
+                                    Map<String, dynamic> formData = {
+                                      "account_id": widget.accountId,
+                                      "account_name": _headingController.text,
+                                      "account_balance": currencyToDouble(
+                                          _balanceController.text),
+                                      "user_id": context
+                                          .read<ProfileService>()
+                                          .getUser()
+                                          .id,
+                                    };
 
-                                  var response = await dio.post(
-                                      "${Values.serverURL}/accounts/edit",
-                                      data: formData);
-                                  debugPrint(response.toString());
-                                },
-                                onDelete: () async {
-                                  dynamic response;
-                                  try {
-                                    response = await dio.get(
-                                        "${Values.serverURL}/transactions/account/${widget.accountId}");
-                                  } on DioError catch (e) {
-                                    debugPrint(e.message.toString());
-                                  }
+                                    var response = await dio.post(
+                                        "${Values.serverURL}/accounts/edit",
+                                        data: formData);
+                                    debugPrint(response.toString());
+                                  },
+                                  onDelete: () async {
+                                    dynamic response;
+                                    try {
+                                      response = await dio.get(
+                                          "${Values.serverURL}/transactions/account/${widget.accountId}");
+                                    } on DioError catch (e) {
+                                      debugPrint(e.message.toString());
+                                    }
 
-                                  debugPrint(response.data.toString());
-                                  if (response.data.length > 0) {
-                                    Navigator.push(
-                                      context,
-                                      MaterialPageRoute(
-                                        builder: (context) => AccountsDelete(
-                                            accountId: widget.accountId,
-                                            deleteCallback:
-                                                widget.deleteCallback),
-                                      ),
-                                    ).then((_) => widget.deleteCallback());
-                                  } else {
-                                    await dio.delete(
-                                      "${Values.serverURL}/accounts/${widget.accountId}",
-                                    );
-                                    await context
-                                        .read<AccountsService>()
-                                        .deleteAccount(id: widget.accountId);
-                                    widget.deleteCallback();
-                                  }
-                                },
-                                onStateChange: onStateChanged,
-                              ),
-                            )
-                          : Container(),
-                    ],
-                  ),
-                  Center(
-                    child: SizedBox(
-                      width: MediaQuery.of(context).size.width * 0.5,
-                      child: TextFormField(
-                        inputFormatters: [currencyFormatter],
-                        controller: _balanceController,
-                        enabled: _isEditable,
-                        style: Fonts.accountBalance,
-                        textAlign: TextAlign.center,
-                        keyboardType: TextInputType.number,
-                        decoration: InputDecoration(
-                          isDense: true,
-                          contentPadding: const EdgeInsets.symmetric(
-                              horizontal: 0, vertical: 0),
-                          enabledBorder: UnderlineInputBorder(
-                            borderSide: BorderSide(color: AppColor.neutral100),
+                                    debugPrint(response.data.toString());
+                                    if (response.data.length > 0) {
+                                      Navigator.push(
+                                        context,
+                                        MaterialPageRoute(
+                                          builder: (context) => AccountsDelete(
+                                              accountId: widget.accountId,
+                                              deleteCallback:
+                                                  widget.deleteCallback),
+                                        ),
+                                      ).then((_) => widget.deleteCallback());
+                                    } else {
+                                      await dio.delete(
+                                        "${Values.serverURL}/accounts/${widget.accountId}",
+                                      );
+                                      await context
+                                          .read<AccountsService>()
+                                          .deleteAccount(id: widget.accountId);
+                                      widget.deleteCallback();
+                                    }
+                                  },
+                                  onStateChange: onStateChanged,
+                                ),
+                              )
+                            : Container(),
+                      ],
+                    ),
+                    Center(
+                      child: SizedBox(
+                        width: MediaQuery.of(context).size.width * 0.5,
+                        child: TextFormField(
+                          inputFormatters: [currencyFormatter],
+                          controller: _balanceController,
+                          enabled: _isEditable,
+                          style: Fonts.accountBalance,
+                          textAlign: TextAlign.center,
+                          keyboardType: TextInputType.number,
+                          decoration: InputDecoration(
+                            isDense: true,
+                            contentPadding: const EdgeInsets.symmetric(
+                                horizontal: 0, vertical: 0),
+                            enabledBorder: UnderlineInputBorder(
+                              borderSide:
+                                  BorderSide(color: AppColor.neutral100),
+                            ),
+                            focusedBorder: UnderlineInputBorder(
+                              borderSide:
+                                  BorderSide(color: AppColor.neutral100),
+                            ),
+                            disabledBorder: const UnderlineInputBorder(
+                              borderSide: BorderSide.none,
+                            ),
                           ),
-                          focusedBorder: UnderlineInputBorder(
-                            borderSide: BorderSide(color: AppColor.neutral100),
-                          ),
-                          disabledBorder: const UnderlineInputBorder(
-                            borderSide: BorderSide.none,
-                          ),
+                          validator: (value) {
+                            if (value == null || value.isEmpty) {
+                              return 'Bitte gib einen Betrag ein';
+                            }
+                            return null;
+                          },
+                          onEditingComplete: () {
+                            FocusScope.of(context).unfocus();
+
+                            if (_balanceController.text != "" &&
+                                _headingController.text != "") {
+                              setState(() {
+                                _canFinishCreating = true;
+                              });
+                            }
+                          },
                         ),
-                        validator: (value) {
-                          if (value == null || value.isEmpty) {
-                            return 'Bitte gib einen Betrag ein';
-                          }
-                          return null;
-                        },
-                        onEditingComplete: () {
-                          FocusScope.of(context).unfocus();
-
-                          if (_balanceController.text != "" &&
-                              _headingController.text != "") {
-                            setState(() {
-                              _canFinishCreating = true;
-                            });
-                          }
-                        },
                       ),
                     ),
-                  ),
-                ],
+                  ],
+                ),
               ),
             ),
-          ),
-          _accountCardState == ThreeDotMenuState.create
-              ? Container(
-                  width: Values.roundButtonSize,
-                  height: Values.roundButtonSize,
-                  child: RoundButton(
-                    borderWidth: 1.5,
-                    onTap: () async {
-                      if (_canFinishCreating &&
-                          _formKey.currentState!.validate()) {
-                        //send data
-                        Map<String, dynamic> formData = {
-                          "account_name": _headingController.text,
-                          "account_balance":
-                              currencyToDouble(_balanceController.text),
-                          "user_id":
-                              context.read<ProfileService>().getUser().id,
-                        };
+            _accountCardState == ThreeDotMenuState.create
+                ? Container(
+                    width: Values.roundButtonSize,
+                    height: Values.roundButtonSize,
+                    child: RoundButton(
+                      borderWidth: 1.5,
+                      onTap: () async {
+                        if (_canFinishCreating &&
+                            _formKey.currentState!.validate()) {
+                          //send data
+                          Map<String, dynamic> formData = {
+                            "account_name": _headingController.text,
+                            "account_balance":
+                                currencyToDouble(_balanceController.text),
+                            "user_id":
+                                context.read<ProfileService>().getUser().id,
+                          };
 
-                        dynamic response;
+                          dynamic response;
 
-                        try {
-                          response = await dio.post(
-                              "${Values.serverURL}/accounts/input",
-                              data: formData);
-                          debugPrint(response.toString());
-                        } catch (e) {
-                          debugPrint(e.toString());
+                          try {
+                            response = await dio.post(
+                                "${Values.serverURL}/accounts/input",
+                                data: formData);
+                            debugPrint(response.toString());
+                          } catch (e) {
+                            debugPrint(e.toString());
+                          }
+
+                          setState(() {
+                            _accountCardState = ThreeDotMenuState.collapsed;
+                            _isEditable = false;
+                            _canFinishCreating = false;
+                          });
+                          await context
+                              .read<AccountsService>()
+                              .deleteAccount(id: widget.accountId);
+                          await context.read<AccountsService>().setAccount(
+                              id: response.data["account_id"],
+                              heading: _headingController.text,
+                              balance:
+                                  currencyToDouble(_balanceController.text));
+                          widget.doneCallback();
+                        } else {
+                          widget.deleteCallback();
+                          await context
+                              .read<AccountsService>()
+                              .deleteAccount(id: widget.accountId);
                         }
-
-                        setState(() {
-                          _accountCardState = ThreeDotMenuState.collapsed;
-                          _isEditable = false;
-                          _canFinishCreating = false;
-                        });
-                        await context
-                            .read<AccountsService>()
-                            .deleteAccount(id: widget.accountId);
-                        await context.read<AccountsService>().setAccount(
-                            id: response.data["account_id"],
-                            heading: _headingController.text,
-                            balance: currencyToDouble(_balanceController.text));
-                        widget.doneCallback();
-                      } else {
-                        widget.deleteCallback();
-                        await context
-                            .read<AccountsService>()
-                            .deleteAccount(id: widget.accountId);
-                      }
-                    },
-                    icon: (_canFinishCreating)
-                        ? Icons.done_rounded
-                        : Icons.close_rounded,
-                    padding: 0.0,
-                    iconSize: 20,
-                  ),
-                )
-              : Container(),
-        ],
+                      },
+                      icon: (_canFinishCreating)
+                          ? Icons.done_rounded
+                          : Icons.close_rounded,
+                      padding: 0.0,
+                      iconSize: 20,
+                    ),
+                  )
+                : Container(),
+          ],
+        ),
       ),
     );
   }
