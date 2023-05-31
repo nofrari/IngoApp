@@ -71,8 +71,9 @@ String getWeekDay() {
 }
 
 class ManualEntry extends StatefulWidget {
-  ManualEntry({super.key, this.isEditMode = false});
+  ManualEntry({super.key, this.isEditMode = false, this.returnToStart = true});
   bool isEditMode;
+  bool returnToStart;
 
   @override
   State<ManualEntry> createState() => _ManualEntryState();
@@ -234,7 +235,9 @@ class _ManualEntryState extends State<ManualEntry> {
         _initialFrequency = selectedInterval!.name;
       }
 
-      if (loadedTransaction.interval_subtype_id != "") {
+      if (loadedTransaction.interval_subtype_id != "" &&
+          loadedTransaction.interval_subtype_id != "null" &&
+          loadedTransaction.interval_subtype_id != null) {
         int index = allIntervalSubtypes.indexWhere((subtype) =>
             subtype.interval_subtype_id ==
             loadedTransaction.interval_subtype_id);
@@ -359,7 +362,9 @@ class _ManualEntryState extends State<ManualEntry> {
                                   Navigator.push(
                                     context,
                                     MaterialPageRoute(
-                                      builder: (context) => Start(),
+                                      builder: (context) => widget.returnToStart
+                                          ? Start()
+                                          : Start(pageId: 3),
                                     ),
                                   );
                                 } else {
