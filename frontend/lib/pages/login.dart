@@ -16,9 +16,11 @@ import '../widgets/input_fields/input_field.dart';
 import '../widgets/button.dart';
 
 class Login extends StatefulWidget {
-  const Login({
+  Login({
+    this.focus,
     super.key,
   });
+  bool? focus = false;
 
   @override
   State<Login> createState() => _LoginState();
@@ -62,104 +64,113 @@ class _LoginState extends State<Login> {
     // controllerPassword.text = "123selina";
   }
 
+  void changeVisibility(bool isFocused) {
+    setState(() {
+      widget.focus = isFocused;
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     return WillPopScope(
       onWillPop: () async => false,
       child: GestureDetector(
-        child: Form(
-          key: _formKey,
-          child: Column(
-            children: [
-              InputField(
-                lblText: Strings.registerMail,
-                reqFormatter: mail,
-                keyboardType: text,
-                controller: controllerMail,
-                maxLength: 50,
-                maxLines: 1,
-                hidePassword: false,
-                onFocusChanged: (hasFocus) {
-                  if (hasFocus) {
-                    // do stuff
-                  }
-                },
-                validator: (value) {
-                  if (value == null || value.isEmpty) {
-                    return Strings.alertInputfieldEmpty;
-                  } else if (EmailValidator.validate(value) == false) {
-                    return Strings.alertMail;
-                  }
-                  return null;
-                },
-              ),
-              InputField(
-                lblText: Strings.registerPassword,
-                reqFormatter: letters,
-                keyboardType: text,
-                controller: controllerPassword,
-                maxLength: 50,
-                maxLines: 1,
-                hidePassword: true,
-                onFocusChanged: (hasFocus) {
-                  if (hasFocus) {
-                    // do stuff
-                  }
-                },
-                autovalidateMode: AutovalidateMode.onUserInteraction,
-                validator: (valuePW) {
-                  if (valuePW == null || valuePW.isEmpty) {
-                    return Strings.alertInputfieldEmpty;
-                  }
-                  return null;
-                },
-              ),
-              LinkIntern(
-                  linkInternTo: PasswordReset(),
-                  linkInternText: Strings.passwordForgot),
-              Expanded(
-                child: Align(
-                  alignment: Alignment.bottomCenter,
-                  child: Button(
-                      btnText: Strings.btnLogin.toUpperCase(),
-                      onTap: () async {
-                        if (_formKey.currentState!.validate() != false) {
-                          await _sendData(
-                              controllerMail.text, controllerPassword.text);
-                          if (userExists == true && emailVerified == true) {
-                            debugPrint('los gehts');
-                            //Navigate to Start
-                            Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                builder: (context) =>
-                                    hasAccounts ? Start() : StartAccount(),
-                              ),
-                            );
-                          } else if (userExists == true &&
-                              emailVerified == false) {
-                            debugPrint('email nicht verifiziert');
-                            ScaffoldMessenger.of(context).showSnackBar(
-                              const SnackBar(
-                                  content: Text(
-                                      'Bitte verifiziere zuerst deine E-Mail-Adresse.')),
-                            );
-                          } else if (userExists == false) {
-                            debugPrint('da passt was nicht');
-                            ScaffoldMessenger.of(context).showSnackBar(
-                              const SnackBar(
-                                  behavior: SnackBarBehavior.floating,
-                                  content: Text(
-                                      'Keinen User gefunden, bitte überprüfe deine Eingaben.')),
-                            );
-                          }
+        onTap: () {
+          setState(() {
+            widget.focus = false;
+          });
+          FocusManager.instance.primaryFocus?.unfocus();
+        },
+        child: Column(
+          children: [
+            Expanded(
+              child: SingleChildScrollView(
+                  child: Form(
+                key: _formKey,
+                child: Column(
+                  children: [
+                    InputField(
+                      lblText: Strings.registerMail,
+                      reqFormatter: mail,
+                      keyboardType: text,
+                      controller: controllerMail,
+                      maxLength: 50,
+                      maxLines: 1,
+                      hidePassword: false,
+                      onFocusChanged: changeVisibility,
+                      validator: (value) {
+                        if (value == null || value.isEmpty) {
+                          return Strings.alertInputfieldEmpty;
+                        } else if (EmailValidator.validate(value) == false) {
+                          return Strings.alertMail;
                         }
+                        return null;
                       },
-                      theme: ButtonColorTheme.secondaryLight),
+                    ),
+                    InputField(
+                      lblText: Strings.registerPassword,
+                      reqFormatter: letters,
+                      keyboardType: text,
+                      controller: controllerPassword,
+                      maxLength: 50,
+                      maxLines: 1,
+                      hidePassword: true,
+                      onFocusChanged: changeVisibility,
+                      autovalidateMode: AutovalidateMode.onUserInteraction,
+                      validator: (valuePW) {
+                        if (valuePW == null || valuePW.isEmpty) {
+                          return Strings.alertInputfieldEmpty;
+                        }
+                        return null;
+                      },
+                    ),
+                    LinkIntern(
+                      linkInternTo: PasswordReset(),
+                      linkInternText: Strings.passwordForgot,
+                    ),
+                  ],
                 ),
-              ),
-            ],
-          ),
+              )),
+            ),
+            Visibility(
+              visible: widget.focus != true,
+              child: Button(
+                  btnText: Strings.btnLogin.toUpperCase(),
+                  onTap: () async {
+                    if (_formKey.currentState!.validate() != false) {
+                      await _sendData(
+                          controllerMail.text, controllerPassword.text);
+                      if (userExists == true && emailVerified == true) {
+                        debugPrint('los gehts');
+                        //Navigate to Start
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) =>
+                                hasAccounts ? Start() : StartAccount(),
+                          ),
+                        );
+                      } else if (userExists == true && emailVerified == false) {
+                        debugPrint('email nicht verifiziert');
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          const SnackBar(
+                              content: Text(
+                                  'Bitte verifiziere zuerst deine E-Mail-Adresse.')),
+                        );
+                      } else if (userExists == false) {
+                        debugPrint('da passt was nicht');
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          const SnackBar(
+                              behavior: SnackBarBehavior.floating,
+                              content: Text(
+                                  'Keinen User gefunden, bitte überprüfe deine Eingaben.')),
+                        );
+                      }
+                    }
+                  },
+                  theme: ButtonColorTheme.secondaryLight),
+            ),
+          ],
         ),
       ),
     );
