@@ -124,7 +124,7 @@ class _HomeOverviewCardState extends State<HomeOverviewCard> {
             ),
           );
         }
-        context.read<InitialService>().setCategories(categoryList);
+        await context.read<InitialService>().setCategories(categoryList);
       }
     } catch (e) {
       print(e);

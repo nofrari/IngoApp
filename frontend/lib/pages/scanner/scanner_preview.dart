@@ -76,14 +76,19 @@ class _ScannerPreviewState extends State<ScannerPreview>
           .putFile(pdfName, pdfData, fileExtension: 'pdf');
       final cacheDir = await DefaultCacheManager().getFileFromCache(pdfName);
       final pdfPath = '${cacheDir!.file.dirname}/${cacheDir.file.basename}';
+
+      final amount = double.tryParse(response.data['total_amount'].toString());
+      final height = int.tryParse(response.data['pdf_height'].toString());
+
+      if (amount == null || height == null) throw Error();
       //create manual entry
       if (context.mounted) {
         context.read<ManualEntryService>().setManualEntry(
             pdfName,
             pdfPath,
-            response.data['pdf_height'],
+            height,
             response.data['supplier_name'],
-            response.data['total_amount'],
+            amount,
             response.data['date'],
             response.data['category']);
       }
