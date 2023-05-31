@@ -133,6 +133,7 @@ class _ManualEntryState extends State<ManualEntry> {
   List<Account> allAccounts = [];
   List<transaction_interval.IntervalModel> allIntervals = [];
   List<IntervalSubtypeModel> allIntervalSubtypes = [];
+  Map<String, dynamic> manualEntry = {};
   String? _initialType;
   String? _initialCategory;
   String? _initialAccount;
@@ -233,7 +234,7 @@ class _ManualEntryState extends State<ManualEntry> {
         _initialFrequency = selectedInterval!.name;
       }
 
-      if (loadedTransaction.interval_subtype_id != "null") {
+      if (loadedTransaction.interval_subtype_id != "") {
         int index = allIntervalSubtypes.indexWhere((subtype) =>
             subtype.interval_subtype_id ==
             loadedTransaction.interval_subtype_id);
@@ -251,7 +252,14 @@ class _ManualEntryState extends State<ManualEntry> {
   @override
   void initState() {
     super.initState();
-    widget.isEditMode == true ? loadTransaction() : null;
+    loadTransaction();
+    manualEntry = context.read<ManualEntryService>().getManualEntry();
+    if (manualEntry.isNotEmpty) {
+      controllerTitle.text = manualEntry['supplier_name'];
+      controllerAmount.text = manualEntry['amount'].toString();
+      controllerDate.text = DateFormat("dd / MM / yyyy")
+          .format(DateFormat("yyyy-MM-dd").parse(manualEntry['date']));
+    }
   }
 
   @override
@@ -272,8 +280,7 @@ class _ManualEntryState extends State<ManualEntry> {
 
   @override
   Widget build(BuildContext context) {
-    Map<String, dynamic> manualEntry =
-        context.watch<ManualEntryService>().getManualEntry();
+    manualEntry = context.watch<ManualEntryService>().getManualEntry();
     List<String> images = context.watch<ScannerService>().getImages();
 
     allAccounts = context.watch<AccountsService>().getAccounts();
@@ -297,13 +304,6 @@ class _ManualEntryState extends State<ManualEntry> {
 
     String? valueAccount1;
     String? valueAccount2;
-
-    if (manualEntry.isNotEmpty) {
-      controllerTitle.text = manualEntry['supplier_name'];
-      controllerAmount.text = manualEntry['amount'].toString();
-      controllerDate.text = DateFormat("dd / MM / yyyy")
-          .format(DateFormat("yyyy-MM-dd").parse(manualEntry['date']));
-    }
 
     return GestureDetector(
       onTap: () {

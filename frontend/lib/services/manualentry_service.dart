@@ -11,7 +11,7 @@ class ManualEntryService extends ChangeNotifier {
   static late final SharedPreferences _prefs;
 
   Future<void> setManualEntry(String pdfName, String pdfPath, int pdfHeight,
-      String supplierName, int amount, String date, String category) async {
+      String supplierName, double amount, String date, String category) async {
     try {
       Map<String, dynamic> manualEntryMap = {
         "pdf_name": pdfName,
