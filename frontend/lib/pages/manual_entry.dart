@@ -167,7 +167,7 @@ class _ManualEntryState extends State<ManualEntry> {
     setState(() {
       _currentTransaction = TransactionModel(
           transaction_id: _loadedTransactionId ?? "",
-          transaction_name: "", //controller
+          transaction_name: controllerTitle.text,
           transaction_amount: currencyToDouble(controllerAmount.text),
           description: controllerDescription.text,
           date: controllerDate.text != ""
