@@ -31,7 +31,7 @@ class Values {
 
   static const EdgeInsets accountHeading = EdgeInsets.fromLTRB(10, 20, 10, 40);
 
-  static const String serverURL = //'https://data.ingoapp.at';
-      'http://10.0.2.2:5432';
+  static const String serverURL = 'https://data.ingoapp.at';
+  //  'http://10.0.2.2:5432';
   //'http://localhost:5432';
 }

@@ -2,9 +2,9 @@ import express from 'express';
 import { PrismaClient } from '@prisma/client';
 import { z } from 'zod';
 import jwt from 'jsonwebtoken';
-import verifyToken from '../middleware/verifyToken';
 import bcrypt from 'bcrypt';
 import nodemailer from 'nodemailer';
+const process = require('process');
 
 const prisma = new PrismaClient();
 const router = express.Router();
@@ -142,21 +142,22 @@ router.post('/users/register', async (req, res) => {
 
     const hash = await bcrypt.hash(body.password, 10);
 
+    const user = await prisma.user.create({
+      data: {
+        user_name: body.user_name,
+        user_sirname: body.user_sirname,
+        email: body.email,
+        password: hash,
+        email_confirmed: false,
+      }
+    });
+
     //create confirmation token and send email
     const confirmationToken = jwt.sign({
-     //token expires after 1 minute
-      exp: Math.floor(Date.now() / 1000) + (60 * 1)
-    }, process.env.JWT_SECRET as string,);
-
-    const user = await prisma.user.create({
-        data: {
-            user_name: body.user_name,
-            user_sirname: body.user_sirname,
-            email: body.email,
-            password: hash,
-            email_confirmed: false,
-        }
-    });
+     //token expires after 10 minutes
+     userId: user.user_id,
+      exp: Math.floor(Date.now() / 1000) + (60 * 10)
+    }, process.env.JWT_SECRET);
 
     sendConfirmationEmail(user.email, confirmationToken);   
  
@@ -168,12 +169,6 @@ router.post('/users/register', async (req, res) => {
         email: user.email
     });
 });
-
-//Get all users, not really needed in our case
-// router.get('/users', async (req, res) => {
-//     const users = await prisma.user.findMany();
-//     res.send(users);
-// });
 
 //get one user by id
 //for testing: copy token from login or register and paste it in the authorization header under Bearer token
@@ -192,33 +187,38 @@ router.get('/users/delete/:id', async (req, res) => {
 
 //confirm email
 router.get('/users/confirm-email/:confirmationToken', async (req, res) => {
-  const confirmationToken = req.params.confirmationToken;
-  const { userId } = <any>jwt.verify(req.params.confirmationToken, <string>process.env.JWT_SECRET);
 
-  jwt.verify(confirmationToken, <string>process.env.JWT_SECRET, (err: any, decoded: any) => {
-    if (err) {
-      console.log(err);
-      res.status(400).send('Invalid token');
-    } else {  
+  try {
+    var payload = await <any>jwt.verify(req.params.confirmationToken, process.env.JWT_SECRET); } 
+  catch (error) { 
+    console.log(error); 
+    res.status(400).send('Invalid token');
+    return;
+  }
 
-     prisma.user.update({
-      where: {
-        user_id: userId,
-      },
-      data: {
-        email_confirmed: true,
-      },
-    });
-      res.redirect('https://www.ingoapp.at/email-bestaetigt');
-    }
+  //get user by userid
+  const user = await prisma.user.findUnique({
+    where: {
+      user_id: payload.userId,
+    },
   });
 
-  // try {
-  //   const { userId } = <any>jwt.verify(req.params.token, <string>process.env.JWT_SECRET);
+  if (user === null) {
+    res.status(400).send('Could not find user');
+    return;
+  }
 
+  await prisma.user.update({
+    where: {
+      user_id: payload.userId,
+    },
+    data: {
+      email_confirmed: true,
+    },
 
-  //   res.status(200).send('Email confirmed successfully');
-  // } catch (error) { res.status(123).send(); }
+  });
+
+  res.redirect('https://www.ingoapp.at/email-bestaetigt');
 });
 
   //user login
@@ -320,7 +320,7 @@ router.get('/users/confirm-email/:confirmationToken', async (req, res) => {
   
   // Email confirmation
   function sendConfirmationEmail(email: any, confirmationToken: string | number) {
-    const confirmationLink = 'https://data.ingoapp.at/users/confirm-email/${confirmationToken}'; 
+    const confirmationLink = `https://data.ingoapp.at/users/confirm-email/${confirmationToken}`; 
     //`https://157.90.249.232:5432/users/confirm-email/${confirmationToken}`;
   
     const mailOptions = {
