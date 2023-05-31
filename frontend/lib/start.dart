@@ -103,6 +103,7 @@ class _StartState extends State<Start> {
 
   @override
   Widget build(BuildContext context) {
+    double buttonWidth = MediaQuery.of(context).size.width / 4;
     setState(() {
       user = context.read<ProfileService>().getUser();
     });
@@ -165,7 +166,6 @@ class _StartState extends State<Start> {
               context,
               MaterialPageRoute(
                 builder: (context) => const ScannerCamera(),
-                // builder: (context) => ManualEntry(),
               ),
             );
             // setState(() {
@@ -189,119 +189,114 @@ class _StartState extends State<Start> {
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: <Widget>[
-                Row(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    MaterialButton(
-                      minWidth: width,
-                      onPressed: () {
-                        setState(() {
-                          currentTab = 0;
-                          currentScreen = const Home();
-                        });
-                      },
-                      child: Column(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          Icon(
-                            Icons.home_rounded,
-                            color: currentTab == 0
-                                ? AppColor.activeMenu
-                                : AppColor.neutral100,
-                          ),
-                          Text(
-                            Strings.menuHome,
-                            style: TextStyle(
-                              color: AppColor.neutral100,
-                            ),
-                          )
-                        ],
+                MaterialButton(
+                  minWidth: width,
+                  padding: const EdgeInsets.symmetric(horizontal: 0),
+                  onPressed: () {
+                    setState(() {
+                      currentTab = 0;
+                      currentScreen = const Home();
+                    });
+                  },
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Icon(
+                        Icons.home_rounded,
+                        color: currentTab == 0
+                            ? AppColor.activeMenu
+                            : AppColor.neutral100,
                       ),
-                    ),
-                    MaterialButton(
-                      minWidth: width,
-                      onPressed: () {
-                        setState(() {
-                          currentTab = 1;
-                          currentScreen = Finances();
-                        });
-                      },
-                      child: Column(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          Icon(
-                            Icons.monetization_on_rounded,
-                            color: currentTab == 1
-                                ? AppColor.activeMenu
-                                : AppColor.neutral100,
-                          ),
-                          Text(
-                            Strings.menuFinance,
-                            style: TextStyle(
-                              color: AppColor.neutral100,
-                            ),
-                          )
-                        ],
-                      ),
-                    ),
-                  ],
+                      Text(
+                        Strings.menuHome,
+                        style: TextStyle(
+                          color: AppColor.neutral100,
+                        ),
+                      )
+                    ],
+                  ),
                 ),
-                Row(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    MaterialButton(
-                      minWidth: width,
-                      onPressed: () {
-                        setState(() {
-                          currentTab = 2;
-                          currentScreen = const Accounts();
-                        });
-                      },
-                      child: Column(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          Icon(
-                            Icons.account_balance_rounded,
-                            color: currentTab == 2
-                                ? AppColor.activeMenu
-                                : AppColor.neutral100,
-                          ),
-                          Text(
-                            Strings.menuAccounts,
-                            style: TextStyle(
-                              color: AppColor.neutral100,
-                            ),
-                          )
-                        ],
+                MaterialButton(
+                  minWidth: width,
+                  padding: const EdgeInsets.symmetric(horizontal: 0),
+                  onPressed: () {
+                    setState(() {
+                      currentTab = 1;
+                      currentScreen = Finances();
+                    });
+                  },
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Icon(
+                        Icons.monetization_on_rounded,
+                        color: currentTab == 1
+                            ? AppColor.activeMenu
+                            : AppColor.neutral100,
                       ),
-                    ),
-                    MaterialButton(
-                      minWidth: width,
-                      onPressed: () {
-                        setState(() {
-                          currentTab = 3;
-                          currentScreen = const Categories();
-                        });
-                      },
-                      child: Column(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          Icon(
-                            Icons.account_balance_wallet_rounded,
-                            color: currentTab == 3
-                                ? AppColor.activeMenu
-                                : AppColor.neutral100,
-                          ),
-                          Text(
-                            Strings.menuCategories,
-                            style: TextStyle(
-                              color: AppColor.neutral100,
-                            ),
-                          )
-                        ],
+                      Text(
+                        Strings.menuFinance,
+                        style: TextStyle(
+                          color: AppColor.neutral100,
+                        ),
+                      )
+                    ],
+                  ),
+                ),
+                const Spacer(),
+                MaterialButton(
+                  minWidth: width,
+                  padding: const EdgeInsets.symmetric(horizontal: 0),
+                  onPressed: () {
+                    setState(() {
+                      currentTab = 2;
+                      currentScreen = const Accounts();
+                    });
+                  },
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Icon(
+                        Icons.account_balance_rounded,
+                        color: currentTab == 2
+                            ? AppColor.activeMenu
+                            : AppColor.neutral100,
                       ),
-                    ),
-                  ],
+                      Text(
+                        Strings.menuAccounts,
+                        style: TextStyle(
+                          color: AppColor.neutral100,
+                        ),
+                      )
+                    ],
+                  ),
+                ),
+                MaterialButton(
+                  minWidth: width,
+                  padding: const EdgeInsets.symmetric(horizontal: 0),
+                  onPressed: () {
+                    setState(() {
+                      currentTab = 3;
+                      currentScreen = const Categories();
+                    });
+                  },
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Icon(
+                        Icons.account_balance_wallet_rounded,
+                        color: currentTab == 3
+                            ? AppColor.activeMenu
+                            : AppColor.neutral100,
+                      ),
+                      Text(
+                        Strings.menuCategories,
+                        style: TextStyle(
+                          color: AppColor.neutral100,
+                        ),
+                      )
+                    ],
+                  ),
                 ),
               ],
             ),
