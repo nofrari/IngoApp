@@ -58,16 +58,14 @@ class _MyAppState extends State<MyApp> {
   Widget build(BuildContext context) {
     User user = context.read<ProfileService>().getUser();
     return MaterialApp(
+        debugShowCheckedModeBanner: false,
         localizationsDelegates: const [
           GlobalMaterialLocalizations.delegate,
           GlobalCupertinoLocalizations.delegate,
           GlobalWidgetsLocalizations.delegate,
         ],
-        supportedLocales: const [
-          Locale('de'),
-          Locale('en')
-        ],
-        title: 'Flutter Demo',
+        supportedLocales: const [Locale('de'), Locale('en')],
+        title: 'Ingo',
         theme: ThemeData(
           primarySwatch: Colors.blue,
         ),
