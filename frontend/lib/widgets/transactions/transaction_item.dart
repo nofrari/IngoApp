@@ -67,7 +67,7 @@ class _TransactionItemState extends State<TransactionItem> {
                     isSmall: true,
                     bgColor:
                         AppColor.getColorFromString(desiredCategory.bgColor),
-                    isWhite: true,
+                    isWhite: (desiredCategory.isWhite) ? true : false,
                     icon: AppIcons.getIconFromString(desiredCategory.icon),
                   ),
                 ),
