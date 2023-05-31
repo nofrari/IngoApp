@@ -34,6 +34,15 @@ class Start extends StatefulWidget {
 }
 
 class _StartState extends State<Start> {
+  bool _isFocused = false;
+
+  //needed for finances filtering
+  void onTextFieldFocusChanged(bool isFocused) {
+    setState(() {
+      _isFocused = isFocused;
+    });
+  }
+
   @override
   void initState() {
     super.initState();
@@ -50,6 +59,7 @@ class _StartState extends State<Start> {
         case 3:
           currentTab = 1;
           currentScreen = Finances(
+            onFocusChanged: onTextFieldFocusChanged,
             accountId: widget.accountId,
           );
           break;
@@ -159,26 +169,28 @@ class _StartState extends State<Start> {
           child: currentScreen,
         ),
         backgroundColor: AppColor.backgroundFullScreen,
-        floatingActionButton: FloatingActionButton(
-          backgroundColor: AppColor.neutral100,
-          onPressed: () async {
-            await Navigator.push(
-              context,
-              MaterialPageRoute(
-                builder: (context) => const ScannerCamera(),
-              ),
-            );
-            // setState(() {
-            //   currentScreen = const ScannerCamera();
-            // });
-          },
-          //Icon of Scanner
-          child: Icon(
-            Icons.document_scanner_rounded,
-            color: AppColor.neutral600,
-            size: 35,
-          ),
-        ),
+        floatingActionButton: !_isFocused
+            ? FloatingActionButton(
+                backgroundColor: AppColor.neutral100,
+                onPressed: () async {
+                  await Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => const ScannerCamera(),
+                    ),
+                  );
+                  // setState(() {
+                  //   currentScreen = const ScannerCamera();
+                  // });
+                },
+                //Icon of Scanner
+                child: Icon(
+                  Icons.document_scanner_rounded,
+                  color: AppColor.neutral600,
+                  size: 35,
+                ),
+              )
+            : null,
         floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
         bottomNavigationBar: BottomAppBar(
           shape: const CircularNotchedRectangle(),
@@ -222,7 +234,9 @@ class _StartState extends State<Start> {
                   onPressed: () {
                     setState(() {
                       currentTab = 1;
-                      currentScreen = Finances();
+                      currentScreen = Finances(
+                        onFocusChanged: onTextFieldFocusChanged,
+                      );
                     });
                   },
                   child: Column(

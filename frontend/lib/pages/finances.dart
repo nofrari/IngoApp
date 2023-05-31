@@ -22,8 +22,10 @@ import '../constants/fonts.dart';
 import '../widgets/tag.dart';
 
 class Finances extends StatefulWidget {
-  Finances({this.accountId, super.key});
+  Finances({this.accountId, this.onFocusChanged, super.key});
   String? accountId;
+  //needed to disable floating action button in menu bar when keyboard appears
+  final ValueChanged<bool>? onFocusChanged;
   @override
   State<Finances> createState() => _FinancesState();
 }
@@ -214,7 +216,7 @@ class _FinancesState extends State<Finances> {
                 filterTransactions(transactions, controllerSearch.text);
               },
               maxLength: 50,
-              onFocusChanged: (value) {},
+              onFocusChanged: widget.onFocusChanged ?? (value) {},
             ),
             Container(
               width: double.infinity,
