@@ -380,12 +380,6 @@ class _RegisterState extends State<Register> {
       dynamic response =
           await dio.post("${Values.serverURL}/users/register", data: formData);
 
-      await context.read<ProfileService>().setUser(
-          id: response.data['user_id'],
-          firstname: response.data['user_name'],
-          lastname: response.data['user_sirname'],
-          email: response.data['email']);
-
       setState(() {
         mailExists = false;
       });
