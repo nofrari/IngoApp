@@ -46,8 +46,9 @@ class _ProfileOverviewState extends State<ProfileOverview> {
     });
   }
 
-  void disposeController(TextEditingController controller) {
-    controller.dispose();
+  @override
+  void dispose() {
+    super.dispose();
   }
 
   Dio dio = Dio();
@@ -194,9 +195,6 @@ class _ProfileOverviewState extends State<ProfileOverview> {
                               maxLength: 50,
                               onFocusChanged: onTextFieldFocusChanged,
                               hidePassword: false,
-                              onDispose: () {
-                                disposeController(controllerFirstName);
-                              },
                             ),
                             InputField(
                               lblText: Strings.registerLastName,
@@ -207,9 +205,6 @@ class _ProfileOverviewState extends State<ProfileOverview> {
                               maxLength: 50,
                               onFocusChanged: onTextFieldFocusChanged,
                               hidePassword: false,
-                              onDispose: () {
-                                disposeController(controllerLastName);
-                              },
                             ),
                             InputField(
                               lblText: Strings.registerMail,
@@ -220,9 +215,6 @@ class _ProfileOverviewState extends State<ProfileOverview> {
                               maxLength: 50,
                               onFocusChanged: onTextFieldFocusChanged,
                               hidePassword: false,
-                              onDispose: () {
-                                disposeController(controllerEmail);
-                              },
                             ),
                             Align(
                               alignment: Alignment.centerLeft,
@@ -269,10 +261,6 @@ class _ProfileOverviewState extends State<ProfileOverview> {
                                                     onFocusChanged:
                                                         onTextFieldFocusChanged,
                                                     hidePassword: true,
-                                                    onDispose: () {
-                                                      disposeController(
-                                                          controllerPasswordOld);
-                                                    },
                                                   ),
                                                   InputField(
                                                     lblText: Strings
@@ -286,10 +274,6 @@ class _ProfileOverviewState extends State<ProfileOverview> {
                                                     onFocusChanged:
                                                         onTextFieldFocusChanged,
                                                     hidePassword: true,
-                                                    onDispose: () {
-                                                      disposeController(
-                                                          controllerPasswordNew);
-                                                    },
                                                   ),
                                                   InputField(
                                                     lblText: Strings
@@ -311,10 +295,6 @@ class _ProfileOverviewState extends State<ProfileOverview> {
                                                         return "Passwörter stimmen nicht überein";
                                                       }
                                                       return null;
-                                                    },
-                                                    onDispose: () {
-                                                      disposeController(
-                                                          controllerPasswordNew2);
                                                     },
                                                   ),
                                                 ]),

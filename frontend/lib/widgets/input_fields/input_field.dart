@@ -36,21 +36,21 @@ double currencyToDouble(String currency) {
 }
 
 class InputField extends StatefulWidget {
-  const InputField(
-      {super.key,
-      required this.lblText,
-      required this.reqFormatter,
-      required this.keyboardType,
-      required this.controller,
-      required this.maxLength,
-      required this.onFocusChanged,
-      required this.hidePassword,
-      this.maxLines,
-      this.alignLabelLeftCorner,
-      this.validator,
-      this.autovalidateMode,
-      this.onChanged,
-      this.onDispose});
+  const InputField({
+    super.key,
+    required this.lblText,
+    required this.reqFormatter,
+    required this.keyboardType,
+    required this.controller,
+    required this.maxLength,
+    required this.onFocusChanged,
+    required this.hidePassword,
+    this.maxLines,
+    this.alignLabelLeftCorner,
+    this.validator,
+    this.autovalidateMode,
+    this.onChanged,
+  });
 
   final String lblText;
   final TextInputFormatter reqFormatter;
@@ -64,7 +64,6 @@ class InputField extends StatefulWidget {
   final ValueChanged<bool> onFocusChanged;
   final ValueChanged<String>? onChanged;
   final bool hidePassword;
-  final void Function()? onDispose;
 
   @override
   State<InputField> createState() => _InputFieldState();
@@ -73,8 +72,7 @@ class InputField extends StatefulWidget {
 class _InputFieldState extends State<InputField> {
   @override
   void dispose() {
-    //needed this for profile delete, no idea why it works
-    widget.onDispose ?? widget.controller.dispose();
+    widget.controller.dispose();
     super.dispose();
   }
 
