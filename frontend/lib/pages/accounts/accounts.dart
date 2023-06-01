@@ -96,7 +96,7 @@ class _AccountsState extends State<Accounts> {
                 Expanded(
                   child: ListView.builder(
                     padding:
-                        EdgeInsets.only(bottom: accounts.length == 4 ? 100 : 0),
+                        EdgeInsets.only(bottom: accounts.length >= 4 ? 100 : 0),
                     itemCount: accounts.length,
                     itemBuilder: (context, index) {
                       //return cards[index];
