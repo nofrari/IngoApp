@@ -137,6 +137,7 @@ class _TransactionListState extends State<TransactionList> {
               color: AppColor.neutral500,
             ),
             child: ListView.builder(
+              physics: const NeverScrollableScrollPhysics(),
               shrinkWrap: true,
               itemCount: filteredTransactions.length,
               itemBuilder: (context, index) {

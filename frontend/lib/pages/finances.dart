@@ -345,14 +345,17 @@ class _FinancesState extends State<Finances> {
               ),
             ),
             (matchFound)
-                ? TransactionList(
-                    accounts: selectedAccount,
-                    selectedCategory: selectedCategory,
-                    startDate: selectedStartDate,
-                    endDate: selectedEndDate,
-                    transactions: filteredTransactions.isEmpty
-                        ? transactions
-                        : filteredTransactions,
+                ? Container(
+                    margin: EdgeInsets.only(bottom: 20),
+                    child: TransactionList(
+                      accounts: selectedAccount,
+                      selectedCategory: selectedCategory,
+                      startDate: selectedStartDate,
+                      endDate: selectedEndDate,
+                      transactions: filteredTransactions.isEmpty
+                          ? transactions
+                          : filteredTransactions,
+                    ),
                   )
                 : Padding(
                     padding: const EdgeInsets.only(top: 30),
