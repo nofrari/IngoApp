@@ -42,6 +42,8 @@ class Strings {
   static const String passwordForgotPopup =
       "Passwort zurücksetzen wurde angefordert \n \n Wir haben dir gerade eine E-Mail mit einem Link zum Zurücksetzen gesendet. Bitte prüfe deine E-Mail und folge den Anweisungen.";
   static const String notRegistered = "Noch nicht registriert? Klicke hier";
+  static const String confirmEmail =
+      "E-Mail bestätigen \n \n Wir haben dir gerade eine E-Mail mit einem Link zum Bestätigen gesendet. Bitte prüfe deine E-Mail und folge dem Link, um deine Email zu bestätigen und die Registrierung abzuschließen.";
 
   //Buttons
   static const String btnRegister = "Registrieren";

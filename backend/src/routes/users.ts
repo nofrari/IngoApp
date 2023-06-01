@@ -187,39 +187,63 @@ router.get('/users/delete/:id', async (req, res) => {
 
 //confirm email
 router.get('/users/confirm-email/:confirmationToken', async (req, res) => {
+   try {
+    //decode token
+    var decodedToken = await <any>jwt.decode(req.params.confirmationToken, process.env.JWT_SECRET);
+    console.log('decodedToken', decodedToken);
 
-  try {
-    var payload = await <any>jwt.verify(req.params.confirmationToken, process.env.JWT_SECRET); } 
-  catch (error) { 
-    console.log(error); 
-    res.status(400).send('Invalid token');
-    return;
-  }
+    // Retrieve the user from the database
+    var user = await prisma.user.findUnique({
+      where: {
+        user_id: decodedToken.userId,
+      },
+    }); 
+    console.log('user', user);
 
-  //get user by userid
-  const user = await prisma.user.findUnique({
-    where: {
-      user_id: payload.userId,
-    },
+    if (!user) {
+      res.redirect('https://www.ingoapp.at/kein-user');
+      res.status(400).send('Could not find user');
+      return;
+    }
+
+    if (!user.email_confirmed) {
+      await jwt.verify(req.params.confirmationToken, process.env.JWT_SECRET);
+
+      // Update the user's email_confirmed property to true
+      const updatedUser = await prisma.user.update({
+        where: {
+          user_id: decodedToken.userId,
+        },
+        data: {
+          email_confirmed: true,
+        },
+      });
+      console.log('updatedUser', updatedUser);
+      
+      res.redirect('https://www.ingoapp.at/email-bestaetigt');
+    } else {
+      res.redirect('https://www.ingoapp.at/email-bestaetigt');
+      return;
+    }
+
+    } catch (error) {  
+      console.log('wir sind im catch');
+      // Retrieve the user from the database
+      var user = await prisma.user.findUnique({
+        where: {
+          user_id: decodedToken.userId,
+        },
+      }); 
+      //if there is no user with the provided id
+      if (user) {
+        await prisma.user.delete({ where: { user_id: decodedToken.userId } });
+        res.redirect('https://www.ingoapp.at/token-abgelaufen');
+        return;
+      } else {
+        return;
+      }   
+    }
   });
-
-  if (user === null) {
-    res.status(400).send('Could not find user');
-    return;
-  }
-
-  await prisma.user.update({
-    where: {
-      user_id: payload.userId,
-    },
-    data: {
-      email_confirmed: true,
-    },
-
-  });
-
-  res.redirect('https://www.ingoapp.at/email-bestaetigt');
-});
 
   //user login
   router.post('/users/login', async (req, res) => {
@@ -316,6 +340,57 @@ router.get('/users/confirm-email/:confirmationToken', async (req, res) => {
     res.status(200).send("Password reset successfully");
   });
 
+  router.post('/users/init', async (req, res) => {
+    try {
+        // Hier kannst du deine vordefinierten Werte angeben
+        const predefinedInterval = [
+            { interval_name: 'Nie' },
+            { interval_name: 'Wöchentlich' },
+            { interval_name: 'Monatlich' },
+            { interval_name: 'Vierteljährlich' },
+            { interval_name: 'Halbjährlich' },
+            { interval_name: 'Jährlich' },
+        ];
+
+        const predefinedTypes = [
+            { type_name: 'Einnahmen' },
+            { type_name: 'Ausgaben' },
+            { type_name: 'Transaktion' },
+        ];
+
+        // Hier kannst du den Code zum Speichern der Werte in die Datenbank einfügen
+        await prisma.interval.createMany({
+            data: predefinedInterval,
+        });
+
+        await prisma.type.createMany({
+            data: predefinedTypes,
+        });
+
+        res.status(200).json({ message: 'Vordefinierte Werte erfolgreich in die Datenbank geschrieben.' });
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ message: 'Interner Serverfehler.' });
+    }
+  });
+
+  router.get('/types', async (req, res) => {
+      const types = await prisma.type.findMany();
+      res.send(types);
+  });
+
+  router.get('/intervals', async (req, res) => {
+
+      const intervals = await prisma.interval.findMany();
+      res.send(intervals);
+  });
+
+  router.get('/intervalsubtypes', async (req, res) => {
+
+      const intervalsubtypes = await prisma.intervalSubtype.findMany();
+      res.send(intervalsubtypes);
+  });
+
   // --------------------------- Functions ---------------------------
   
   // Email confirmation
@@ -327,7 +402,7 @@ router.get('/users/confirm-email/:confirmationToken', async (req, res) => {
       from: 'office@ingoapp.at',
       to: email, 
       subject: 'Email bestätigen',
-      text: `Hi! \n\nDanke für deine Registrierung! Als letzten Schritt klicke bitte auf folgenden Link, um deine Email zu bestätigen: ${confirmationLink}\n\nDieser Link ist für 1 Minute gültig. \n\nSolltest du dich nicht registriert haben, ignoriere diese Email bitte.`
+      text: `Hi! \n\nDanke für deine Registrierung! Als letzten Schritt klicke bitte auf folgenden Link, um deine Email zu bestätigen: ${confirmationLink}\n\nDieser Link ist für 10 Minuten gültig. \n\nSolltest du dich nicht registriert haben, ignoriere diese Email bitte.`
     };
   
     transporter.sendMail(mailOptions, (error, info) => {
@@ -369,56 +444,6 @@ router.get('/users/confirm-email/:confirmationToken', async (req, res) => {
       }
     });
   }
-  
-router.post('/users/init', async (req, res) => {
-    try {
-        // Hier kannst du deine vordefinierten Werte angeben
-        const predefinedInterval = [
-            { interval_name: 'Nie' },
-            { interval_name: 'Wöchentlich' },
-            { interval_name: 'Monatlich' },
-            { interval_name: 'Vierteljährlich' },
-            { interval_name: 'Halbjährlich' },
-            { interval_name: 'Jährlich' },
-        ];
-
-        const predefinedTypes = [
-            { type_name: 'Einnahmen' },
-            { type_name: 'Ausgaben' },
-            { type_name: 'Transaktion' },
-        ];
-
-        // Hier kannst du den Code zum Speichern der Werte in die Datenbank einfügen
-        await prisma.interval.createMany({
-            data: predefinedInterval,
-        });
-
-        await prisma.type.createMany({
-            data: predefinedTypes,
-        });
-
-        res.status(200).json({ message: 'Vordefinierte Werte erfolgreich in die Datenbank geschrieben.' });
-    } catch (error) {
-        console.error(error);
-        res.status(500).json({ message: 'Interner Serverfehler.' });
-    }
-});
-
-router.get('/types', async (req, res) => {
-    const types = await prisma.type.findMany();
-    res.send(types);
-});
-
-router.get('/intervals', async (req, res) => {
-
-    const intervals = await prisma.interval.findMany();
-    res.send(intervals);
-});
-
-router.get('/intervalsubtypes', async (req, res) => {
-
-    const intervalsubtypes = await prisma.intervalSubtype.findMany();
-    res.send(intervalsubtypes);
-});
 
 export default router;
+

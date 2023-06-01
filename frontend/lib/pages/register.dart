@@ -6,6 +6,8 @@ import 'package:frontend/constants/colors.dart';
 import 'package:frontend/constants/values.dart';
 import 'package:frontend/models/interval_subtype.dart';
 import 'package:frontend/pages/accounts/startaccount.dart';
+import 'package:frontend/pages/login.dart';
+import 'package:frontend/pages/userauth.dart';
 import 'package:frontend/services/profile_service.dart';
 import 'package:frontend/widgets/checkbox.dart';
 import 'package:provider/provider.dart';
@@ -21,6 +23,7 @@ import '../models/transaction_type.dart';
 
 import '../constants/strings.dart';
 import '../start.dart';
+import '../widgets/popup.dart';
 import 'data_protection.dart';
 
 class Register extends StatefulWidget {
@@ -328,7 +331,7 @@ class _RegisterState extends State<Register> {
                       );
                       debugPrint('existiert diese mail bereits? $mailExists');
                       if (mailExists == false) {
-                        _showConfirmationDialog(context);
+                        showPopup(context);
                       } else {
                         ScaffoldMessenger.of(context).showSnackBar(
                           const SnackBar(
@@ -346,23 +349,26 @@ class _RegisterState extends State<Register> {
     );
   }
 
-  void _showConfirmationDialog(BuildContext context) {
-    showDialog(
-      context: context,
-      builder: (BuildContext context) {
-        return AlertDialog(
-          title: Text('Confirm Email'),
-          content: Text(
-              'Please check your email and confirm your account to log in.'),
-          actions: [
-            TextButton(
-              onPressed: () => Navigator.pop(context),
-              child: Text('OK'),
-            ),
-          ],
-        );
-      },
-    );
+  Future<dynamic> showPopup(BuildContext context) {
+    return showDialog(
+        context: context,
+        builder: (BuildContext context) =>
+            PopUp(content: Strings.confirmEmail, actions: [
+              Container(
+                  margin: Values.buttonPadding,
+                  child: Button(
+                    btnText: Strings.btnBackToLogin.toUpperCase(),
+                    onTap: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => Auth(),
+                        ),
+                      );
+                    },
+                    theme: ButtonColorTheme.secondaryLight,
+                  )),
+            ]));
   }
 
   Future _sendData(
