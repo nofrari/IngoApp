@@ -30,6 +30,7 @@ class OptionBlock extends StatelessWidget {
             ),
             ListView.builder(
                 shrinkWrap: true,
+                physics: const NeverScrollableScrollPhysics(),
                 itemCount: children.length,
                 itemBuilder: (context, index) {
                   return children.length == 1
