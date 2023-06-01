@@ -20,29 +20,15 @@ class Home extends StatefulWidget {
 
 class _HomeState extends State<Home> {
   Dio dio = Dio();
-  double _totalAmout = 0;
 
   @override
   void initState() {
     super.initState();
-    _getTotalAmount();
     getData(context);
   }
 
   List<ColorModel> colors = [];
   List<IconModel> icons = [];
-
-  void _getTotalAmount() async {
-    try {
-      Response response = await Dio().get(
-          '${Values.serverURL}/accounts/totalAmount/${context.read<ProfileService>().getUser().id}');
-      setState(() {
-        _totalAmout = double.parse(response.data['totalAmount'].toString());
-      });
-    } catch (e) {
-      print(e);
-    }
-  }
 
   void getData(BuildContext context) async {
     try {
@@ -74,7 +60,7 @@ class _HomeState extends State<Home> {
       child: SingleChildScrollView(
         child: Column(
           children: <Widget>[
-            TotalAmountCard(totalAmount: _totalAmout),
+            TotalAmountCard(),
             HomeOverviewCard(),
           ],
         ),

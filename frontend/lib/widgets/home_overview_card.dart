@@ -30,19 +30,25 @@ class HomeOverviewCard extends StatefulWidget {
 }
 
 class _HomeOverviewCardState extends State<HomeOverviewCard> {
+  late Future<bool> _loaded;
   @override
   void initState() {
     super.initState();
-    _getCategories();
-    _getTransactions();
-    _getAccounts();
+    _loaded = _loadData();
+  }
+
+  Future<bool> _loadData() async {
+    await _getCategories();
+    await _getTransactions();
+    await _getAccounts();
+    return Future.value(true);
   }
 
   final List<Account> accounts = [];
   final List<TransactionInterval.IntervalModel> interval = [];
   List<TransactionModel> _latestTransactions = [];
 
-  void _getTransactions() async {
+  Future<void> _getTransactions() async {
     try {
       Response response = await Dio().get(
           '${Values.serverURL}/transactions/list/${context.read<ProfileService>().getUser().id}');
@@ -103,7 +109,7 @@ class _HomeOverviewCardState extends State<HomeOverviewCard> {
   List<IconModel> icons = [];
   List<ColorModel> colors = [];
 
-  void _getCategories() async {
+  Future<void> _getCategories() async {
     try {
       Response response = await Dio().get(
           '${Values.serverURL}/categories/${context.read<ProfileService>().getUser().id}');
@@ -133,7 +139,7 @@ class _HomeOverviewCardState extends State<HomeOverviewCard> {
     }
   }
 
-  void _getAccounts() async {
+  Future<void> _getAccounts() async {
     try {
       Response response = await Dio().get(
           '${Values.serverURL}/accounts/list/${context.read<ProfileService>().getUser().id}');
@@ -168,13 +174,27 @@ class _HomeOverviewCardState extends State<HomeOverviewCard> {
           borderRadius: BorderRadius.circular(Values.cardRadius),
           color: AppColor.neutral500),
       padding: Values.bigCardPadding,
-      child: Column(
-        children: [
-          LatestTransactionList(transactions: _latestTransactions),
-          AccountsOverview(
-            accounts: accounts,
-          )
-        ],
+      child: FutureBuilder(
+        future: _loaded,
+        builder: (context, snapshot) {
+          if (snapshot.hasData) {
+            return Column(
+              children: [
+                LatestTransactionList(transactions: _latestTransactions),
+                AccountsOverview(
+                  accounts: accounts,
+                )
+              ],
+            );
+          } else {
+            return const Padding(
+              padding: EdgeInsets.all(30.0),
+              child: Center(
+                child: CircularProgressIndicator(),
+              ),
+            );
+          }
+        },
       ),
     );
   }
