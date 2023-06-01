@@ -313,32 +313,39 @@ class _RegisterState extends State<Register> {
                 ),
               ),
             ),
-            Visibility(
-              visible: widget.focus != true,
-              child: Button(
-                  btnText: Strings.btnRegister.toUpperCase(),
-                  onTap: () async {
-                    if (_formKey.currentState!.validate() != false) {
-                      // createUser();
-                      await _sendData(
-                        controllerName.text,
-                        controllerLastName.text,
-                        controllerMail.text,
-                        controllerPassword.text,
-                      );
-                      debugPrint('existiert diese mail bereits? $mailExists');
-                      if (mailExists == false) {
-                        _showConfirmationDialog(context);
-                      } else {
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          const SnackBar(
-                              behavior: SnackBarBehavior.floating,
-                              content: Text('Mailadresse existiert bereits')),
-                        );
-                      }
-                    }
-                  },
-                  theme: ButtonColorTheme.secondaryLight),
+            IntrinsicHeight(
+              child: Visibility(
+                visible: widget.focus != true,
+                child: Align(
+                  alignment: Alignment.bottomCenter,
+                  child: Button(
+                      btnText: Strings.btnRegister.toUpperCase(),
+                      onTap: () async {
+                        if (_formKey.currentState!.validate() != false) {
+                          // createUser();
+                          await _sendData(
+                            controllerName.text,
+                            controllerLastName.text,
+                            controllerMail.text,
+                            controllerPassword.text,
+                          );
+                          debugPrint(
+                              'existiert diese mail bereits? $mailExists');
+                          if (mailExists == false) {
+                            _showConfirmationDialog(context);
+                          } else {
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              const SnackBar(
+                                  behavior: SnackBarBehavior.floating,
+                                  content:
+                                      Text('Mailadresse existiert bereits')),
+                            );
+                          }
+                        }
+                      },
+                      theme: ButtonColorTheme.secondaryLight),
+                ),
+              ),
             )
           ],
         ),
