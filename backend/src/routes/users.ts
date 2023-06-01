@@ -4,6 +4,7 @@ import { z } from 'zod';
 import jwt from 'jsonwebtoken';
 import bcrypt from 'bcrypt';
 import nodemailer from 'nodemailer';
+import { us } from 'mindee';
 const process = require('process');
 
 const prisma = new PrismaClient();
@@ -44,16 +45,6 @@ type ResetPasswordSchema = z.infer<typeof resetPasswordSchema>;
 //     email_confirmed: z.boolean()
 // });
 // type ConfirmEmailSchema = z.infer<typeof confirmEmailSchema>;
-
-const transporter = nodemailer.createTransport({
-    host: 'smtp.world4you.com',
-    port: 587,
-    secure: false,
-    auth: {
-      user: 'office@ingoapp.at',
-      pass: 'IagnryNX!26_4go',
-    },
-  });
 
 //edit user
 router.post('/users/edit', async (req, res) => {
@@ -156,7 +147,7 @@ router.post('/users/register', async (req, res) => {
     const confirmationToken = jwt.sign({
      //token expires after 10 minutes
      userId: user.user_id,
-      exp: Math.floor(Date.now() / 1000) + (60 * 10)
+      exp: Math.floor(Date.now() / 1000) + (60 * 1)
     }, process.env.JWT_SECRET);
 
     sendConfirmationEmail(user.email, confirmationToken);   
@@ -229,17 +220,20 @@ router.get('/users/confirm-email/:confirmationToken', async (req, res) => {
     } catch (error) {  
       console.log('wir sind im catch');
       // Retrieve the user from the database
+      var decodedToken = await <any>jwt.decode(req.params.confirmationToken, process.env.JWT_SECRET);
+
       var user = await prisma.user.findUnique({
         where: {
           user_id: decodedToken.userId,
         },
-      }); 
-      //if there is no user with the provided id
-      if (user) {
-        await prisma.user.delete({ where: { user_id: decodedToken.userId } });
-        res.redirect('https://www.ingoapp.at/token-abgelaufen');
+      });
+
+      if (!user) {
         return;
       } else {
+        //if the user exists but the token is expired, delete the user
+        await prisma.user.delete({ where: { user_id: decodedToken.userId } });
+        res.redirect('https://www.ingoapp.at/token-abgelaufen');
         return;
       }   
     }
@@ -394,6 +388,16 @@ router.get('/users/confirm-email/:confirmationToken', async (req, res) => {
   // --------------------------- Functions ---------------------------
   
   // Email confirmation
+  const transporter = nodemailer.createTransport({
+    host: 'smtp.world4you.com',
+    port: 587,
+    secure: false,
+    auth: {
+      user: 'office@ingoapp.at',
+      pass: 'IagnryNX!26_4go',
+    },
+  });
+
   function sendConfirmationEmail(email: any, confirmationToken: string | number) {
     const confirmationLink = `https://data.ingoapp.at/users/confirm-email/${confirmationToken}`; 
     //`https://157.90.249.232:5432/users/confirm-email/${confirmationToken}`;
@@ -411,7 +415,7 @@ router.get('/users/confirm-email/:confirmationToken', async (req, res) => {
       } else {
         console.log('Email sent:', info.response);
       }
-    });}
+  });}  
 
    
   // Password reset
