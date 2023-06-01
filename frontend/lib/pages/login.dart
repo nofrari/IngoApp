@@ -132,43 +132,49 @@ class _LoginState extends State<Login> {
                 ),
               )),
             ),
-            Visibility(
-              visible: widget.focus != true,
-              child: Button(
-                  btnText: Strings.btnLogin.toUpperCase(),
-                  onTap: () async {
-                    if (_formKey.currentState!.validate() != false) {
-                      await _sendData(
-                          controllerMail.text, controllerPassword.text);
-                      if (userExists == true && emailVerified == true) {
-                        debugPrint('los gehts');
-                        //Navigate to Start
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) =>
-                                hasAccounts ? Start() : StartAccount(),
-                          ),
-                        );
-                      } else if (userExists == true && emailVerified == false) {
-                        debugPrint('email nicht verifiziert');
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          const SnackBar(
-                              content: Text(
-                                  'Bitte verifiziere zuerst deine E-Mail-Adresse.')),
-                        );
-                      } else if (userExists == false) {
-                        debugPrint('da passt was nicht');
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          const SnackBar(
-                              behavior: SnackBarBehavior.floating,
-                              content: Text(
-                                  'Keinen User gefunden, bitte überprüfe deine Eingaben.')),
-                        );
-                      }
-                    }
-                  },
-                  theme: ButtonColorTheme.secondaryLight),
+            IntrinsicHeight(
+              child: Visibility(
+                visible: widget.focus != true,
+                child: Align(
+                  alignment: Alignment.bottomCenter,
+                  child: Button(
+                      btnText: Strings.btnLogin.toUpperCase(),
+                      onTap: () async {
+                        if (_formKey.currentState!.validate() != false) {
+                          await _sendData(
+                              controllerMail.text, controllerPassword.text);
+                          if (userExists == true && emailVerified == true) {
+                            debugPrint('los gehts');
+                            //Navigate to Start
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) =>
+                                    hasAccounts ? Start() : StartAccount(),
+                              ),
+                            );
+                          } else if (userExists == true &&
+                              emailVerified == false) {
+                            debugPrint('email nicht verifiziert');
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              const SnackBar(
+                                  content: Text(
+                                      'Bitte verifiziere zuerst deine E-Mail-Adresse.')),
+                            );
+                          } else if (userExists == false) {
+                            debugPrint('da passt was nicht');
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              const SnackBar(
+                                  behavior: SnackBarBehavior.floating,
+                                  content: Text(
+                                      'Keinen User gefunden, bitte überprüfe deine Eingaben.')),
+                            );
+                          }
+                        }
+                      },
+                      theme: ButtonColorTheme.secondaryLight),
+                ),
+              ),
             ),
           ],
         ),
