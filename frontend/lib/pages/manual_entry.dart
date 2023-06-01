@@ -291,10 +291,15 @@ class _ManualEntryState extends State<ManualEntry> {
     _loadedPDFUrl = loadPDF();
     manualEntry = context.read<ManualEntryService>().getManualEntry();
     if (manualEntry.isNotEmpty) {
-      controllerTitle.text = manualEntry['supplier_name'];
-      controllerAmount.text = manualEntry['amount'].toString();
-      controllerDate.text = DateFormat("dd / MM / yyyy")
-          .format(DateFormat("yyyy-MM-dd").parse(manualEntry['date']));
+      controllerTitle.text = manualEntry['supplier_name'] ?? "";
+      controllerAmount.text = manualEntry['amount'] != null
+          ? NumberFormat.currency(locale: 'de', name: "EUR", symbol: '€')
+              .format(manualEntry['amount'])
+          : "";
+      controllerDate.text = manualEntry['date'] != null
+          ? DateFormat("dd / MM / yyyy")
+              .format(DateFormat("yyyy-MM-dd").parse(manualEntry['date']))
+          : "";
     }
   }
 
