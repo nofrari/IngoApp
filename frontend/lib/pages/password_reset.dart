@@ -122,27 +122,39 @@ class _PasswordResetState extends State<PasswordReset> {
                             Expanded(
                               child: Align(
                                 alignment: Alignment.bottomCenter,
-                                child: Button(
-                                  btnText:
-                                      Strings.btnPasswordReset.toUpperCase(),
-                                  onTap: () async {
-                                    if (_formKey.currentState!.validate() !=
-                                        false) {
-                                      await _sendData(controllerMail.text);
-                                      if (userExists == true) {
-                                        showPopup(context);
-                                      } else {
-                                        debugPrint('da passt was nicht');
-                                        ScaffoldMessenger.of(context)
-                                            .showSnackBar(
-                                          const SnackBar(
-                                              content: Text(
-                                                  'Keinen User gefunden, bitte überprüfe deine Eingaben.')),
-                                        );
-                                      }
-                                    }
-                                  },
-                                  theme: ButtonColorTheme.secondaryLight,
+                                child: Column(
+                                  mainAxisSize: MainAxisSize.min,
+                                  children: [
+                                    Button(
+                                      btnText: Strings.btnPasswordReset
+                                          .toUpperCase(),
+                                      onTap: () async {
+                                        if (_formKey.currentState!.validate() !=
+                                            false) {
+                                          await _sendData(controllerMail.text);
+                                          if (userExists == true) {
+                                            showPopup(context);
+                                          } else {
+                                            debugPrint('da passt was nicht');
+                                            ScaffoldMessenger.of(context)
+                                                .showSnackBar(
+                                              const SnackBar(
+                                                  content: Text(
+                                                      'Keinen User gefunden, bitte überprüfe deine Eingaben.')),
+                                            );
+                                          }
+                                        }
+                                      },
+                                      theme: ButtonColorTheme.secondaryLight,
+                                    ),
+                                    Button(
+                                      btnText: Strings.abort.toUpperCase(),
+                                      onTap: () {
+                                        Navigator.pop(context);
+                                      },
+                                      theme: ButtonColorTheme.secondaryLight,
+                                    )
+                                  ],
                                 ),
                               ),
                             )
