@@ -89,112 +89,123 @@ class _CategoryAddState extends State<CategoryAdd> {
     icons = context.watch<InitialService>().getIcons();
     return WillPopScope(
       onWillPop: () async => false,
-      child: Scaffold(
-        appBar: Header(
-          onTap: () {
-            Navigator.pop(context);
-          },
-          element: TextGoogle(
-            align: TextAlign.center,
-            text: Strings.addCategoryHeading.toUpperCase(),
-            style: Fonts.text400,
+      child: GestureDetector(
+        onTap: () {
+          setState(() {
+            _isFocused = false;
+          });
+          FocusManager.instance.primaryFocus?.unfocus();
+        },
+        child: Scaffold(
+          appBar: Header(
+            onTap: () {
+              Navigator.pop(context);
+            },
+            element: TextGoogle(
+              align: TextAlign.center,
+              text: Strings.addCategoryHeading.toUpperCase(),
+              style: Fonts.text400,
+            ),
           ),
-        ),
-        backgroundColor: AppColor.backgroundFullScreen,
-        body: Stack(
-          alignment: Alignment.bottomCenter,
-          children: [
-            Align(
-              alignment: Alignment.topCenter,
-              child: SingleChildScrollView(
-                child: Container(
-                  margin:
-                      const EdgeInsets.symmetric(horizontal: 20, vertical: 20),
-                  child: Column(
-                    children: [
-                      Container(
-                        margin: const EdgeInsets.only(bottom: 20),
-                        child: CategoryIcon(
-                          bgColor: bgColor != ""
-                              ? AppColor.getColorFromString(bgColor)
-                              : AppColor.neutral600,
-                          isWhite: isWhite,
-                          icon: icon != ""
-                              ? AppIcons.getIconFromString(icon)
-                              : null,
-                          isSmall: false,
-                          border: border ?? true,
+          backgroundColor: AppColor.backgroundFullScreen,
+          body: Stack(
+            alignment: Alignment.bottomCenter,
+            children: [
+              Align(
+                alignment: Alignment.topCenter,
+                child: SingleChildScrollView(
+                  child: Container(
+                    margin: const EdgeInsets.symmetric(
+                        horizontal: 20, vertical: 20),
+                    child: Column(
+                      children: [
+                        Container(
+                          margin: const EdgeInsets.only(bottom: 20),
+                          child: CategoryIcon(
+                            bgColor: bgColor != ""
+                                ? AppColor.getColorFromString(bgColor)
+                                : AppColor.neutral600,
+                            isWhite: isWhite,
+                            icon: icon != ""
+                                ? AppIcons.getIconFromString(icon)
+                                : null,
+                            isSmall: false,
+                            border: border ?? true,
+                          ),
                         ),
-                      ),
-                      InputField(
-                        onFocusChanged: onTextFieldFocusChanged,
-                        lblText: "KATEGORIENAME",
-                        reqFormatter: letters,
-                        keyboardType: text,
-                        controller: controllerCategoryName,
-                        maxLength: 30,
-                        hidePassword: false,
-                      ),
-                      const SizedBox(
-                        height: 20,
-                      ),
-                      ColorSelector(
-                        onColorSelected: _updateSelectedColor,
-                      ),
-                      const SizedBox(
-                        height: 10,
-                      ),
-                      CategoryToggleBlack(onToggleChange: _updateIsBlack),
-                      const SizedBox(
-                        height: 10,
-                      ),
-                      CategoryIconSelect(
-                        onIconSelected: _updateSelectedIcon,
-                      ),
-                      const SizedBox(height: 100),
-                    ],
+                        InputField(
+                          onFocusChanged: onTextFieldFocusChanged,
+                          lblText: "KATEGORIENAME",
+                          reqFormatter: letters,
+                          keyboardType: text,
+                          controller: controllerCategoryName,
+                          maxLength: 30,
+                          hidePassword: false,
+                        ),
+                        const SizedBox(
+                          height: 20,
+                        ),
+                        ColorSelector(
+                          onColorSelected: _updateSelectedColor,
+                        ),
+                        const SizedBox(
+                          height: 10,
+                        ),
+                        CategoryToggleBlack(onToggleChange: _updateIsBlack),
+                        const SizedBox(
+                          height: 10,
+                        ),
+                        CategoryIconSelect(
+                          onIconSelected: _updateSelectedIcon,
+                        ),
+                        const SizedBox(height: 100),
+                      ],
+                    ),
                   ),
                 ),
               ),
-            ),
-            ButtonTransparentContainer(
-              child: Container(
-                margin: Values.buttonPadding,
-                child: Button(
-                    isTransparent: true,
-                    btnText: "KATEGORIE HINZUFÜGEN",
-                    onTap: isFormValid()
-                        ? () async {
-                            await _createCategory(
-                              controllerCategoryName.text,
-                              bgColor,
-                              isWhite,
-                              icon,
-                            );
+              Visibility(
+                visible: _isFocused != true,
+                child: ButtonTransparentContainer(
+                  child: Container(
+                    margin: Values.buttonPadding,
+                    child: Button(
+                        isTransparent: true,
+                        btnText: "KATEGORIE HINZUFÜGEN",
+                        onTap: isFormValid()
+                            ? () async {
+                                await _createCategory(
+                                  controllerCategoryName.text,
+                                  bgColor,
+                                  isWhite,
+                                  icon,
+                                );
 
-                            if (widget.lastPage == "ManualEntry") {
-                              Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                  builder: (context) => ManualEntry(),
-                                ),
-                              );
-                            } else {
-                              Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                  builder: (context) => const Categories(),
-                                ),
-                              ); // Navigate back to the previous screen
-                            }
-                          }
-                        : () {},
-                    theme: isFormValid()
-                        ? ButtonColorTheme.secondaryLight
-                        : ButtonColorTheme.disabled),
+                                if (widget.lastPage == "ManualEntry") {
+                                  Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                      builder: (context) => ManualEntry(),
+                                    ),
+                                  );
+                                } else {
+                                  Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                      builder: (context) => const Categories(),
+                                    ),
+                                  ); // Navigate back to the previous screen
+                                }
+                              }
+                            : () {},
+                        theme: isFormValid()
+                            ? ButtonColorTheme.secondaryLight
+                            : ButtonColorTheme.disabled),
+                  ),
+                ),
               ),
-            ),
-          ],
+            ],
+          ),
         ),
       ),
     );
