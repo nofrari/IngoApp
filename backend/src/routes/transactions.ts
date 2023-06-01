@@ -67,6 +67,20 @@ router.post('/transactions', (req, res) => {
   res.status(201).send('Hello world2');
 });
 
+router.get('/transactions/fetchpdf/:pdfname', async (req, res) => {
+  try {
+    res.status(201).send({
+      pdf: await fs.promises.readFile(
+        './src/uploads/' + req.params.pdfname,
+        { encoding: 'base64' }
+      ),
+    });
+  } catch (error) {
+    console.log(error);
+    res.status(400).send("Error while fetching pdf");
+  }
+});
+
 router.post('/transactions/input', async (req, res) => {
   const body = <InputSchema>req.body;
   const validationResult: any = inputSchema.safeParse(body);

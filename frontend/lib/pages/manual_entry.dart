@@ -1,5 +1,8 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_cache_manager/flutter_cache_manager.dart';
 import 'package:frontend/constants/colors.dart';
 import 'package:frontend/constants/fonts.dart';
 import 'package:frontend/constants/strings.dart';
@@ -141,6 +144,8 @@ class _ManualEntryState extends State<ManualEntry> {
   String? _initialFrequency;
   String? _initialFrequencySubtype;
   String? _loadedTransactionId;
+  String? _loadedPDFName;
+  late Future<String> _loadedPDFUrl;
 
   TransactionModel _currentTransaction = TransactionModel(
       transaction_id: "",
@@ -211,6 +216,7 @@ class _ManualEntryState extends State<ManualEntry> {
       controllerDate.text = loadedTransaction.date == DateTime(2000)
           ? ""
           : DateFormat("dd / MM / yyyy").format(loadedTransaction.date);
+      _loadedPDFName = loadedTransaction.bill_url;
 
       allTypes = context.read<InitialService>().getTransactionType();
       allAccounts = context.read<AccountsService>().getAccounts();
@@ -252,10 +258,37 @@ class _ManualEntryState extends State<ManualEntry> {
     });
   }
 
+  Future<String> loadPDF() async {
+    if (_loadedPDFName != null) {
+      try {
+        var response = await dio.get(
+            "${Values.serverURL}/transactions/fetchpdf/$_loadedPDFName",
+            options: Options(responseType: ResponseType.json));
+        debugPrint(response.toString());
+        //process pdf data from response
+        final pdfData = base64Decode(response.data['pdf']);
+        //get path to pdf
+        final pdfFile = await DefaultCacheManager()
+            .putFile(_loadedPDFName!, pdfData, fileExtension: 'pdf');
+        final cacheDir =
+            await DefaultCacheManager().getFileFromCache(_loadedPDFName!);
+        debugPrint(
+            "loaded url: ${cacheDir!.file.dirname}/${cacheDir.file.basename}");
+        return Future.value(
+            '${cacheDir!.file.dirname}/${cacheDir.file.basename}');
+      } catch (e) {
+        debugPrint(e.toString());
+        return Future.value("");
+      }
+    }
+    return Future.value("");
+  }
+
   @override
   void initState() {
     super.initState();
     loadTransaction();
+    _loadedPDFUrl = loadPDF();
     manualEntry = context.read<ManualEntryService>().getManualEntry();
     if (manualEntry.isNotEmpty) {
       controllerTitle.text = manualEntry['supplier_name'];
@@ -342,6 +375,7 @@ class _ManualEntryState extends State<ManualEntry> {
                                     try {
                                       await CustomCacheManager.clearCache(
                                           context, images);
+                                      await DefaultCacheManager().emptyCache();
                                       await context
                                           .read<ManualEntryService>()
                                           .forgetManualEntry();
@@ -606,10 +640,30 @@ class _ManualEntryState extends State<ManualEntry> {
                             maxLength: 250,
                             onFocusChanged: onTextFieldFocusChanged,
                           ),
-                          PdfPreview(
-                            pdfUrl: manualEntry['pdf_path'],
-                            pdfHeight: manualEntry['pdf_height'],
-                          ),
+                          manualEntry['pdf_path'] != null
+                              ? PdfPreview(
+                                  pdfUrl: manualEntry['pdf_path'],
+                                )
+                              : _currentTransaction.transaction_id == ""
+                                  ? PdfPreview()
+                                  : FutureBuilder(
+                                      future: _loadedPDFUrl,
+                                      builder: ((context, snapshot) {
+                                        if (snapshot.connectionState ==
+                                            ConnectionState.done) {
+                                          return PdfPreview(
+                                            pdfUrl: snapshot.data,
+                                          );
+                                        } else {
+                                          return Container(
+                                            height: 200,
+                                            child: Center(
+                                              child:
+                                                  CircularProgressIndicator(),
+                                            ),
+                                          );
+                                        }
+                                      })),
                           const SizedBox(
                             height: 100,
                           ),
@@ -640,6 +694,12 @@ class _ManualEntryState extends State<ManualEntry> {
                                       ? await deletePdfFile(
                                           manualEntry['pdf_name'])
                                       : null;
+                                  _currentTransaction.bill_url != null
+                                      ? await deletePdfFile(
+                                          _currentTransaction.bill_url!)
+                                      : null;
+                                  await DefaultCacheManager().emptyCache();
+
                                   Navigator.push(
                                     context,
                                     MaterialPageRoute(
@@ -667,6 +727,10 @@ class _ManualEntryState extends State<ManualEntry> {
                                       final date = datePicker.selectedDate;
 
                                       String? pdf_name = PdfFile.getName();
+                                      if (pdf_name != null) {
+                                        await savePDFToServer(
+                                            PdfFile.getPath()!);
+                                      }
 
                                       debugPrint(
                                           "is complete: ${_currentTransaction.isCompleted()}");
@@ -687,6 +751,7 @@ class _ManualEntryState extends State<ManualEntry> {
 
                                       await CustomCacheManager.clearCache(
                                           context, images);
+                                      await DefaultCacheManager().emptyCache();
 
                                       if (context.mounted) {
                                         await context

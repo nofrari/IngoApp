@@ -127,17 +127,18 @@ class _PdfPreviewState extends State<PdfPreview> {
     final bytes = await doc.save();
     await file.writeAsBytes(bytes);
 
+    final height = await getPDFSize(file.path);
     setState(() {
       _pdfFile = file;
+      containerHeight = height;
     });
 
-    getPDFSize(_pdfFile!.path);
     PdfFile.setName(fileName);
     PdfFile.setPath(_pdfFile!.path);
   }
 
   //get the pdf-size
-  Future<void> getPDFSize(String path) async {
+  Future<double> getPDFSize(String path) async {
     final file = File(path);
     final document = await PdfDocument.openFile(file.path);
 
@@ -159,18 +160,34 @@ class _PdfPreviewState extends State<PdfPreview> {
     // Apply scaling factor to the total height
     totalHeight *= scalingFactor;
 
-    setState(() {
-      containerHeight = totalHeight;
-    });
-
     await document.dispose();
+    return totalHeight;
+  }
+
+  void getLoadedPDFSize() async {
+    final double height = widget.pdfUrl != "" && widget.pdfUrl != null
+        ? await getPDFSize(widget.pdfUrl!)
+        : 0;
+    setState(() {
+      containerHeight = height;
+    });
+  }
+
+  @override
+  void initState() {
+    // TODO: implement initState
+    debugPrint("pdf preview pdfUrl: ${widget.pdfUrl}");
+    getLoadedPDFSize();
+    super.initState();
   }
 
   @override
   Widget build(BuildContext context) {
     return WillPopScope(
       onWillPop: () async => false,
-      child: (_pdfFile != null || widget.pdfUrl != null) && _showPdf
+      child: (_pdfFile != null ||
+                  (widget.pdfUrl != null && widget.pdfUrl != "")) &&
+              _showPdf
           ? Focus(
               child: Container(
                 height: 450,
