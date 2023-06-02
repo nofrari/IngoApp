@@ -89,8 +89,11 @@ class _TransactionItemState extends State<TransactionItem> {
                       Row(
                         children: [
                           Text(
-                            widget.transaction.transaction_name,
+                            widget.transaction.transaction_name.length > 20
+                                ? '${widget.transaction.transaction_name.substring(0, 20)}...'
+                                : widget.transaction.transaction_name,
                             style: Fonts.textTransactionName,
+                            overflow: TextOverflow.ellipsis,
                           ),
                         ],
                       )
