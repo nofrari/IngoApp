@@ -19,6 +19,7 @@ class AccountCard extends StatefulWidget {
       {this.initialHeading,
       this.initialBalance,
       this.ableToDelete,
+      this.isEditable,
       required this.accountId,
       required this.deleteCallback,
       required this.doneCallback,
@@ -28,6 +29,7 @@ class AccountCard extends StatefulWidget {
   final double? initialBalance;
   final String accountId;
   bool? ableToDelete = false;
+  bool? isEditable = true;
   final void Function() deleteCallback;
   final void Function() doneCallback;
 
@@ -41,6 +43,7 @@ class _AccountCardState extends State<AccountCard> {
   final _balanceController = TextEditingController();
   bool _isEditable = false;
   bool _canFinishCreating = false;
+
   ThreeDotMenuState _accountCardState = ThreeDotMenuState.collapsed;
   Dio dio = Dio();
 
@@ -155,7 +158,8 @@ class _AccountCardState extends State<AccountCard> {
                             ),
                           ),
                         ),
-                        _accountCardState != ThreeDotMenuState.create
+                        (widget.isEditable == true &&
+                                _accountCardState != ThreeDotMenuState.create)
                             ? Container(
                                 margin:
                                     const EdgeInsets.only(top: 10.0, right: 10),

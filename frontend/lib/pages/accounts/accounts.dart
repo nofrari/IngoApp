@@ -102,6 +102,7 @@ class _AccountsState extends State<Accounts> {
                       //return cards[index];
                       return AccountCard(
                           ableToDelete: accounts.length > 1,
+                          isEditable: _canAddCard != false,
                           accountId: accounts[index].id,
                           initialHeading: accounts[index].name,
                           initialBalance: accounts[index].amount,
