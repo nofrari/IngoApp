@@ -3,19 +3,20 @@ import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:frontend/constants/colors.dart';
 
 class CategoryIcon extends StatelessWidget {
-  CategoryIcon(
-      {required this.bgColor,
-      required this.isWhite,
-      this.icon,
-      this.border,
-      required this.isSmall,
-      super.key});
+  CategoryIcon({
+    required this.bgColor,
+    required this.isWhite,
+    this.icon,
+    this.border,
+    required this.isSmall,
+    Key? key,
+  }) : super(key: key);
 
-  IconData? icon;
+  final IconData? icon;
   final Color bgColor;
   final bool isWhite;
   final bool isSmall;
-  bool? border;
+  final bool? border;
 
   @override
   Widget build(BuildContext context) {
@@ -31,11 +32,12 @@ class CategoryIcon extends StatelessWidget {
             ? Border.all(color: AppColor.blueActive, width: 2)
             : null,
       ),
-      child: Center(
+      child: Align(
+        alignment: Alignment.center,
         child: FaIcon(
           icon,
           color: isWhite ? AppColor.neutral100 : AppColor.neutral600,
-          size: isSmall ? 15 : 80,
+          size: isSmall ? 13 : 75,
         ),
       ),
     );
