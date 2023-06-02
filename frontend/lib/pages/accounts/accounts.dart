@@ -101,6 +101,7 @@ class _AccountsState extends State<Accounts> {
                     itemBuilder: (context, index) {
                       //return cards[index];
                       return AccountCard(
+                          ableToDelete: accounts.length > 1,
                           accountId: accounts[index].id,
                           initialHeading: accounts[index].name,
                           initialBalance: accounts[index].amount,

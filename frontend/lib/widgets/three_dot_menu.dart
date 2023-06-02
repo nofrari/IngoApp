@@ -8,6 +8,7 @@ enum ThreeDotMenuState { collapsed, expanded, create, edit }
 class ThreeDotMenu extends StatefulWidget {
   ThreeDotMenu(
       {super.key,
+      this.ableToDelete,
       required this.onEdit,
       required this.onDelete,
       required this.onDone,
@@ -17,6 +18,7 @@ class ThreeDotMenu extends StatefulWidget {
   final void Function() onEdit;
   final void Function() onDelete;
   final void Function() onDone;
+  bool? ableToDelete;
   ThreeDotMenuState state;
   final ValueChanged<ThreeDotMenuState> onStateChange;
 
@@ -67,7 +69,8 @@ class _ThreeDotMenuState extends State<ThreeDotMenu> {
               )
             : Container(),
         //Delete Button
-        widget.state == ThreeDotMenuState.expanded &&
+        widget.ableToDelete == true &&
+                widget.state == ThreeDotMenuState.expanded &&
                 widget.state != ThreeDotMenuState.edit
             ? SizedBox(
                 width: Values.roundButtonSize,

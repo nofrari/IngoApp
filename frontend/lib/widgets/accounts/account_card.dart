@@ -15,9 +15,10 @@ import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 
 class AccountCard extends StatefulWidget {
-  const AccountCard(
+  AccountCard(
       {this.initialHeading,
       this.initialBalance,
+      this.ableToDelete,
       required this.accountId,
       required this.deleteCallback,
       required this.doneCallback,
@@ -26,6 +27,7 @@ class AccountCard extends StatefulWidget {
   final String? initialHeading;
   final double? initialBalance;
   final String accountId;
+  bool? ableToDelete = false;
   final void Function() deleteCallback;
   final void Function() doneCallback;
 
@@ -159,6 +161,7 @@ class _AccountCardState extends State<AccountCard> {
                                     const EdgeInsets.only(top: 10.0, right: 10),
                                 child: ThreeDotMenu(
                                   state: _accountCardState,
+                                  ableToDelete: widget.ableToDelete,
                                   onEdit: () {
                                     setState(() {
                                       _accountCardState =
