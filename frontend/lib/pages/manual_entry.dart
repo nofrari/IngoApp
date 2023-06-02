@@ -790,11 +790,16 @@ class _ManualEntryState extends State<ManualEntry> {
   }
 
   Future _sendData(String pdfName, TransactionModel transaction) async {
+    DateTime now = DateTime.now();
+    DateTime transactionDateTime = transaction.date.add(
+      Duration(hours: now.hour, minutes: now.minute, seconds: now.second),
+    );
+
     Map<String, dynamic> formData = {
       "transaction_id": transaction.transaction_id,
       "transaction_name": transaction.transaction_name,
       "transaction_amount": transaction.transaction_amount,
-      "date": transaction.date.toString(),
+      "date": transactionDateTime.toString(),
       "description": transaction.description,
       "bill_url": pdfName,
       "category_id": transaction.category_id,
@@ -807,6 +812,7 @@ class _ManualEntryState extends State<ManualEntry> {
     var response = await dio.post("${Values.serverURL}/transactions/input",
         data: formData);
     debugPrint("send data response: ${response.toString()}");
+    print(transactionDateTime);
   }
 
   Future savePDFToServer(String filePath) async {
