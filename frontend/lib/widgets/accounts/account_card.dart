@@ -239,7 +239,7 @@ class _AccountCardState extends State<AccountCard> {
                         child: TextFormField(
                           inputFormatters: [currencyFormatter],
                           controller: _balanceController,
-                          enabled: _isEditable,
+                          enabled: _isEditable && (widget.accountId == "new"),
                           style: Fonts.accountBalance,
                           textAlign: TextAlign.center,
                           keyboardType: TextInputType.number,
