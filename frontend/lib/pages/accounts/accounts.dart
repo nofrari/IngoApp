@@ -100,41 +100,52 @@ class _AccountsState extends State<Accounts> {
                     itemCount: accounts.length,
                     itemBuilder: (context, index) {
                       //return cards[index];
-                      return AccountCard(
-                          ableToDelete: accounts.length > 1,
-                          isEditable: _canAddCard != false,
-                          accountId: accounts[index].id,
-                          initialHeading: accounts[index].name,
-                          initialBalance: accounts[index].amount,
-                          deleteCallback: () async {
-                            debugPrint("delete callback");
-                            setState(() {
-                              accounts =
-                                  context.read<AccountsService>().getAccounts();
-                            });
+                      return Column(
+                        children: [
+                          AccountCard(
+                              ableToDelete: accounts.length > 1,
+                              isEditable: _canAddCard != false,
+                              accountId: accounts[index].id,
+                              initialHeading: accounts[index].name,
+                              initialBalance: accounts[index].amount,
+                              deleteCallback: () async {
+                                debugPrint("delete callback");
+                                setState(() {
+                                  accounts = context
+                                      .read<AccountsService>()
+                                      .getAccounts();
+                                });
 
-                            // setState(() {
-                            //   accounts.removeAt(index);
-                            // });
-                            // await context
-                            //     .read<AccountsService>()
-                            //     .setAccounts(accounts: accounts);
+                                // setState(() {
+                                //   accounts.removeAt(index);
+                                // });
+                                // await context
+                                //     .read<AccountsService>()
+                                //     .setAccounts(accounts: accounts);
 
-                            // setState(() {
-                            //   accounts =
-                            //       context.read<AccountsService>().getAccounts();
-                            // });
-                          },
-                          doneCallback: () {
-                            debugPrint("done callback");
-                            setState(() {
-                              _canAddCard = true;
-                              accounts =
-                                  context.read<AccountsService>().getAccounts();
-                            });
-                          }
-                          //add delete callback to reassign accounts list
-                          );
+                                // setState(() {
+                                //   accounts =
+                                //       context.read<AccountsService>().getAccounts();
+                                // });
+                              },
+                              doneCallback: () {
+                                debugPrint("done callback");
+                                setState(() {
+                                  _canAddCard = true;
+                                  accounts = context
+                                      .read<AccountsService>()
+                                      .getAccounts();
+                                });
+                              }
+                              //add delete callback to reassign accounts list
+                              ),
+                          accounts.length > 2 && index == accounts.length - 1
+                              ? const SizedBox(
+                                  height: 100,
+                                )
+                              : Container(),
+                        ],
+                      );
                     },
                   ),
                 ),
