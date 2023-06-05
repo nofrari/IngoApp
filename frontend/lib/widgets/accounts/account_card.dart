@@ -74,6 +74,41 @@ class _AccountCardState extends State<AccountCard> {
     }
   }
 
+  Future<bool> tryToFinish() async {
+    if (_canFinishCreating && _formKey.currentState!.validate()) {
+      //send data
+      Map<String, dynamic> formData = {
+        "account_name": _headingController.text,
+        "account_balance": currencyToDouble(_balanceController.text),
+        "user_id": context.read<ProfileService>().getUser().id,
+      };
+
+      dynamic response;
+
+      try {
+        response = await dio.post("${Values.serverURL}/accounts/input",
+            data: formData);
+        debugPrint(response.toString());
+      } catch (e) {
+        debugPrint(e.toString());
+      }
+
+      setState(() {
+        _accountCardState = ThreeDotMenuState.collapsed;
+        _isEditable = false;
+        _canFinishCreating = false;
+      });
+      await context.read<AccountsService>().deleteAccount(id: widget.accountId);
+      await context.read<AccountsService>().setAccount(
+          id: response.data["account_id"],
+          heading: _headingController.text,
+          balance: currencyToDouble(_balanceController.text));
+      widget.doneCallback();
+      return true;
+    }
+    return false;
+  }
+
   @override
   void dispose() {
     _headingController.dispose();
@@ -117,6 +152,7 @@ class _AccountCardState extends State<AccountCard> {
                           margin: const EdgeInsets.only(top: 15.0, left: 15),
                           child: SizedBox(
                             width: MediaQuery.of(context).size.width * 0.5,
+                            //Account name
                             child: TextFormField(
                               inputFormatters: [_letters],
                               controller: _headingController,
@@ -145,7 +181,21 @@ class _AccountCardState extends State<AccountCard> {
                                 }
                                 return null;
                               },
-                              onEditingComplete: () {
+                              onChanged: (value) {
+                                if (_balanceController.text != "" &&
+                                    _headingController.text != "") {
+                                  setState(() {
+                                    _canFinishCreating = true;
+                                  });
+                                } else if (_balanceController.text ==
+                                        "0,00 €" ||
+                                    _headingController.text == "") {
+                                  setState(() {
+                                    _canFinishCreating = false;
+                                  });
+                                }
+                              },
+                              onEditingComplete: () async {
                                 FocusScope.of(context).unfocus();
 
                                 if (_balanceController.text != "" &&
@@ -154,6 +204,7 @@ class _AccountCardState extends State<AccountCard> {
                                     _canFinishCreating = true;
                                   });
                                 }
+                                await tryToFinish();
                               },
                             ),
                           ),
@@ -236,6 +287,7 @@ class _AccountCardState extends State<AccountCard> {
                     Center(
                       child: SizedBox(
                         width: MediaQuery.of(context).size.width * 0.5,
+                        //Account amount
                         child: TextFormField(
                           inputFormatters: [currencyFormatter],
                           controller: _balanceController,
@@ -265,13 +317,30 @@ class _AccountCardState extends State<AccountCard> {
                             }
                             return null;
                           },
-                          onEditingComplete: () {
+                          onEditingComplete: () async {
                             FocusScope.of(context).unfocus();
 
                             if (_balanceController.text != "" &&
                                 _headingController.text != "") {
                               setState(() {
                                 _canFinishCreating = true;
+                              });
+                            }
+                            await tryToFinish();
+                          },
+                          onChanged: (value) {
+                            if (_balanceController.text != "" &&
+                                _headingController.text != "") {
+                              setState(() {
+                                _canFinishCreating = true;
+                              });
+                              // else if not working, but doesnt matter I guess
+                            } else if (_balanceController.text == "0,00 €" ||
+                                _headingController.text == "") {
+                              debugPrint("happened");
+
+                              setState(() {
+                                _canFinishCreating = false;
                               });
                             }
                           },
@@ -289,43 +358,8 @@ class _AccountCardState extends State<AccountCard> {
                     child: RoundButton(
                       borderWidth: 1.5,
                       onTap: () async {
-                        if (_canFinishCreating &&
-                            _formKey.currentState!.validate()) {
-                          //send data
-                          Map<String, dynamic> formData = {
-                            "account_name": _headingController.text,
-                            "account_balance":
-                                currencyToDouble(_balanceController.text),
-                            "user_id":
-                                context.read<ProfileService>().getUser().id,
-                          };
-
-                          dynamic response;
-
-                          try {
-                            response = await dio.post(
-                                "${Values.serverURL}/accounts/input",
-                                data: formData);
-                            debugPrint(response.toString());
-                          } catch (e) {
-                            debugPrint(e.toString());
-                          }
-
-                          setState(() {
-                            _accountCardState = ThreeDotMenuState.collapsed;
-                            _isEditable = false;
-                            _canFinishCreating = false;
-                          });
-                          await context
-                              .read<AccountsService>()
-                              .deleteAccount(id: widget.accountId);
-                          await context.read<AccountsService>().setAccount(
-                              id: response.data["account_id"],
-                              heading: _headingController.text,
-                              balance:
-                                  currencyToDouble(_balanceController.text));
-                          widget.doneCallback();
-                        } else {
+                        bool couldFinish = await tryToFinish();
+                        if (!couldFinish) {
                           widget.deleteCallback();
                           await context
                               .read<AccountsService>()
