@@ -282,12 +282,12 @@ class _AccountCardState extends State<AccountCard> {
                                         ),
                                       ).then((_) => widget.deleteCallback());
                                     } else {
-                                      await dio.delete(
-                                        "${Values.serverURL}/accounts/${widget.accountId}",
-                                      );
                                       await context
                                           .read<AccountsService>()
                                           .deleteAccount(id: widget.accountId);
+                                      await dio.delete(
+                                        "${Values.serverURL}/accounts/${widget.accountId}",
+                                      );
                                       widget.deleteCallback();
                                     }
                                   },
@@ -347,6 +347,8 @@ class _AccountCardState extends State<AccountCard> {
                                 _canFinishCreating = true;
                               });
                             }
+                            FocusScope.of(context).unfocus();
+                            widget.onFocusChanged(false);
                             await tryToFinish();
                           },
                           onChanged: (value) {
