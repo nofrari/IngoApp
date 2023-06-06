@@ -548,7 +548,7 @@ class _ManualEntryState extends State<ManualEntry> {
                               }
 
                               if (valueAccount1 == valueAccount2) {
-                                return 'Zeimal dasselbe Konto ausgewählt';
+                                return 'Zweimal dasselbe Konto ausgewählt';
                               }
                               return null;
                             },
@@ -742,21 +742,18 @@ class _ManualEntryState extends State<ManualEntry> {
                                             PdfFile.getPath()!);
                                       }
 
-                                      // debugPrint(
-                                      //     "is complete: ${_currentTransaction.isCompleted()}");
-                                      // if (_currentTransaction.isCompleted()) {
-                                      //   await _sendData(
-                                      //       manualEntry.isNotEmpty
-                                      //           ? manualEntry['pdf_name']
-                                      //           : pdf_name ?? " ",
-                                      //       _currentTransaction);
-                                      // } else {
-                                      //   debugPrint(
-                                      //       "current Transaction Id: ${_currentTransaction.transaction_id} name: ${_currentTransaction.transaction_name} amount: ${_currentTransaction.transaction_amount} date: ${_currentTransaction.date} description: ${_currentTransaction.description} category_id: ${_currentTransaction.category_id} type_id: ${_currentTransaction.type_id} interval_id: ${_currentTransaction.interval_id} interval_subtype_id: ${_currentTransaction.interval_subtype_id} account_id: ${_currentTransaction.account_id}");
-                                      // }
-
-                                      print(_currentTransaction
-                                          .transfer_account_id);
+                                      debugPrint(
+                                          "is complete: ${_currentTransaction.isCompleted()}");
+                                      if (_currentTransaction.isCompleted()) {
+                                        await _sendData(
+                                            manualEntry.isNotEmpty
+                                                ? manualEntry['pdf_name']
+                                                : pdf_name ?? " ",
+                                            _currentTransaction);
+                                      } else {
+                                        debugPrint(
+                                            "current Transaction Id: ${_currentTransaction.transaction_id} name: ${_currentTransaction.transaction_name} amount: ${_currentTransaction.transaction_amount} date: ${_currentTransaction.date} description: ${_currentTransaction.description} category_id: ${_currentTransaction.category_id} type_id: ${_currentTransaction.type_id} interval_id: ${_currentTransaction.interval_id} interval_subtype_id: ${_currentTransaction.interval_subtype_id} account_id: ${_currentTransaction.account_id}");
+                                      }
 
                                       List<String> images = context
                                           .read<ScannerService>()
@@ -814,8 +811,7 @@ class _ManualEntryState extends State<ManualEntry> {
       "type_id": transaction.type_id,
       "interval_id": transaction.interval_id,
       "interval_subtype_id": transaction.interval_subtype_id,
-      "account_id": transaction.account_id,
-      "transfer_account_id": transaction.transfer_account_id
+      "account_id": transaction.account_id
     };
 
     var response = await dio.post("${Values.serverURL}/transactions/input",
