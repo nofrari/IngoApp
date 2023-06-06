@@ -8,6 +8,7 @@ import 'package:frontend/constants/values.dart';
 import 'package:frontend/pages/accounts/accounts_delete.dart';
 import 'package:frontend/services/accounts_service.dart';
 import 'package:frontend/services/profile_service.dart';
+import 'package:frontend/start.dart';
 import 'package:frontend/widgets/input_fields/input_field.dart';
 import 'package:frontend/widgets/round_button.dart';
 import 'package:frontend/widgets/three_dot_menu.dart';
@@ -288,7 +289,16 @@ class _AccountCardState extends State<AccountCard> {
                                       await dio.delete(
                                         "${Values.serverURL}/accounts/${widget.accountId}",
                                       );
+
                                       widget.deleteCallback();
+                                      Navigator.push(
+                                        context,
+                                        MaterialPageRoute(
+                                          builder: (context) => Start(
+                                            pageId: 1,
+                                          ),
+                                        ),
+                                      );
                                     }
                                   },
                                   onStateChange: onStateChanged,

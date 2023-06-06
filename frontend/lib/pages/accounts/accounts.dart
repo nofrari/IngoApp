@@ -1,9 +1,11 @@
+import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:frontend/constants/colors.dart';
 import 'package:frontend/constants/fonts.dart';
 import 'package:frontend/constants/strings.dart';
 import 'package:frontend/constants/values.dart';
 import 'package:frontend/services/accounts_service.dart';
+import 'package:frontend/services/profile_service.dart';
 import 'package:frontend/widgets/accounts/account_card.dart';
 import 'package:frontend/widgets/button.dart';
 import 'package:frontend/widgets/button_transparent_container.dart';
@@ -11,6 +13,28 @@ import 'package:frontend/widgets/round_button.dart';
 import 'package:provider/provider.dart';
 
 import '../../models/account.dart';
+
+Future<List<Account>> getData(BuildContext context) async {
+  List<Account> _accounts = [];
+  try {
+    Response response = await Dio().get(
+        '${Values.serverURL}/accounts/list/${context.read<ProfileService>().getUser().id}');
+
+    for (var i = 0; i < response.data.length; i++) {
+      _accounts.add(Account(
+        id: response.data[i]['account_id'].toString(),
+        name: response.data[i]['account_name'].toString(),
+        amount: double.parse(response.data[i]['account_balance'].toString()),
+      ));
+    }
+
+    await context.read<AccountsService>().setAccounts(accounts: _accounts);
+    return _accounts;
+  } catch (e) {
+    print(e);
+    return _accounts;
+  }
+}
 
 class Accounts extends StatefulWidget {
   Accounts({super.key, this.onFocusChanged});
@@ -74,42 +98,61 @@ class _AccountsState extends State<Accounts> {
                       style: Fonts.textHeadingBold),
                 ),
                 Expanded(
-                  child: ListView.builder(
-                    padding:
-                        EdgeInsets.only(bottom: accounts.length >= 3 ? 100 : 0),
-                    itemCount: accounts.length,
-                    itemBuilder: (context, index) {
-                      return AccountCard(
-                          onFocusChanged: (value) {
-                            widget.onFocusChanged!(value);
+                  child: FutureBuilder<List<Account>>(
+                    future: getData(context),
+                    builder: (context, snapshot) {
+                      if (snapshot.hasData) {
+                        return ListView.builder(
+                          padding: EdgeInsets.only(
+                              bottom: accounts.length >= 3 ? 100 : 0),
+                          itemCount: accounts.length,
+                          itemBuilder: (context, index) {
+                            return AccountCard(
+                                onFocusChanged: (value) {
+                                  widget.onFocusChanged!(value);
+                                },
+                                ableToDelete: accounts.length > 1,
+                                isEditable: _canAddCard != false,
+                                accountId: accounts[index].id,
+                                initialHeading: accounts[index].name,
+                                initialBalance: accounts[index].amount,
+                                deleteCallback: () async {
+                                  debugPrint("delete callback");
+                                  await getData(context);
+                                  setState(() {
+                                    accounts = context
+                                        .read<AccountsService>()
+                                        .getAccounts();
+                                  });
+                                  for (var account in accounts) {
+                                    debugPrint(
+                                        "callback account: ${account.name}");
+                                    debugPrint(
+                                        "callback account amount: ${account.amount}");
+                                  }
+                                },
+                                doneCallback: () {
+                                  debugPrint("done callback");
+                                  setState(() {
+                                    _canAddCard = true;
+                                    accounts = context
+                                        .read<AccountsService>()
+                                        .getAccounts();
+                                  });
+                                }
+                                //add delete callback to reassign accounts list
+                                );
                           },
-                          ableToDelete: accounts.length > 1,
-                          isEditable: _canAddCard != false,
-                          accountId: accounts[index].id,
-                          initialHeading: accounts[index].name,
-                          initialBalance: accounts[index].amount,
-                          deleteCallback: () async {
-                            debugPrint("delete callback");
-                            setState(() {
-                              accounts =
-                                  context.read<AccountsService>().getAccounts();
-                            });
-                            for (var account in accounts) {
-                              debugPrint("callback account: ${account.name}");
-                              debugPrint(
-                                  "callback account amount: ${account.amount}");
-                            }
-                          },
-                          doneCallback: () {
-                            debugPrint("done callback");
-                            setState(() {
-                              _canAddCard = true;
-                              accounts =
-                                  context.read<AccountsService>().getAccounts();
-                            });
-                          }
-                          //add delete callback to reassign accounts list
-                          );
+                        );
+                      } else if (snapshot.hasError) {
+                        return Center(
+                          child: Text('Error: ${snapshot.error}'),
+                        );
+                      } else {
+                        return Center(
+                          child: CircularProgressIndicator(),
+                        );
+                      }
                     },
                   ),
                 ),
