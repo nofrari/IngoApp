@@ -160,6 +160,10 @@ class _AccountCardState extends State<AccountCard> {
                               style: Fonts.accountsHeading,
                               keyboardType: TextInputType.text,
                               decoration: InputDecoration(
+                                hintText: "Kontoname ...",
+                                hintStyle: TextStyle(
+                                  color: AppColor.neutral300,
+                                ),
                                 isDense: true,
                                 contentPadding: const EdgeInsets.symmetric(
                                     horizontal: 0, vertical: 0),
@@ -296,6 +300,12 @@ class _AccountCardState extends State<AccountCard> {
                           textAlign: TextAlign.center,
                           keyboardType: TextInputType.number,
                           decoration: InputDecoration(
+                            hintText: "Betrag ...",
+                            hintStyle: TextStyle(
+                              color: AppColor.neutral300,
+                              fontSize: 16,
+                              fontWeight: FontWeight.normal,
+                            ),
                             isDense: true,
                             contentPadding: const EdgeInsets.symmetric(
                                 horizontal: 0, vertical: 0),
@@ -311,6 +321,7 @@ class _AccountCardState extends State<AccountCard> {
                               borderSide: BorderSide.none,
                             ),
                           ),
+                          autovalidateMode: AutovalidateMode.onUserInteraction,
                           validator: (value) {
                             if (value == null || value.isEmpty) {
                               return 'Bitte gib einen Betrag ein';
