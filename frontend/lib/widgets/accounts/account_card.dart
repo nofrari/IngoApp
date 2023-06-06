@@ -23,7 +23,8 @@ class AccountCard extends StatefulWidget {
       required this.accountId,
       required this.deleteCallback,
       required this.doneCallback,
-      super.key});
+      super.key,
+      required this.onFocusChanged});
 
   final String? initialHeading;
   final double? initialBalance;
@@ -32,6 +33,7 @@ class AccountCard extends StatefulWidget {
   bool? isEditable = true;
   final void Function() deleteCallback;
   final void Function() doneCallback;
+  final ValueChanged<bool> onFocusChanged;
 
   @override
   State<AccountCard> createState() => _AccountCardState();
@@ -154,6 +156,7 @@ class _AccountCardState extends State<AccountCard> {
                             width: MediaQuery.of(context).size.width * 0.5,
                             //Account name
                             child: TextFormField(
+                              onTap: () => widget.onFocusChanged(true),
                               inputFormatters: [_letters],
                               controller: _headingController,
                               enabled: _isEditable,
@@ -208,6 +211,9 @@ class _AccountCardState extends State<AccountCard> {
                                     _canFinishCreating = true;
                                   });
                                 }
+                                FocusScope.of(context).unfocus();
+                                widget.onFocusChanged(
+                                    false); // Tastatur schließen
                                 await tryToFinish();
                               },
                             ),
@@ -227,6 +233,9 @@ class _AccountCardState extends State<AccountCard> {
                                           ThreeDotMenuState.edit;
                                       _isEditable = true;
                                     });
+                                    FocusScope.of(context).unfocus();
+                                    widget.onFocusChanged(
+                                        false); // Tastatur schließen
                                   },
                                   onDone: () async {
                                     setState(() {
@@ -293,6 +302,7 @@ class _AccountCardState extends State<AccountCard> {
                         width: MediaQuery.of(context).size.width * 0.5,
                         //Account amount
                         child: TextFormField(
+                          onTap: () => widget.onFocusChanged(true),
                           inputFormatters: [currencyFormatter],
                           controller: _balanceController,
                           enabled: _isEditable && (widget.accountId == "new"),

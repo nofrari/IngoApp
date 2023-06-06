@@ -13,7 +13,9 @@ import 'package:provider/provider.dart';
 import '../../models/account.dart';
 
 class Accounts extends StatefulWidget {
-  const Accounts({super.key});
+  Accounts({super.key, this.onFocusChanged});
+
+  final ValueChanged<bool>? onFocusChanged;
 
   @override
   State<Accounts> createState() => _AccountsState();
@@ -103,6 +105,9 @@ class _AccountsState extends State<Accounts> {
                       return Column(
                         children: [
                           AccountCard(
+                              onFocusChanged: (value) {
+                                widget.onFocusChanged!(value);
+                              },
                               ableToDelete: accounts.length > 1,
                               isEditable: _canAddCard != false,
                               accountId: accounts[index].id,
