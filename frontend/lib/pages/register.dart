@@ -54,40 +54,6 @@ class _RegisterState extends State<Register> {
   TextEditingController controllerPassword = TextEditingController();
   TextEditingController controllerPasswordRepeat = TextEditingController();
 
-  void _getCategories() async {
-    try {
-      String val = context.read<ProfileService>().getUser().id;
-      print("ID $val");
-      Response response = await Dio().get(
-          '${Values.serverURL}/categories/${context.read<ProfileService>().getUser().id}');
-      List<CategoryModel> categories = [];
-
-      for (var i = 0; i < response.data["categories"].length; i++) {
-        var iconId = response.data["categories"][i]['icon_id'].toString();
-        var colorId = response.data["categories"][i]['color_id'].toString();
-
-        var icon = response.data["icons"]
-            .firstWhere((icon) => icon['icon_id'] == iconId);
-        var iconName = icon['icon_name'].toString();
-
-        var color = response.data["colors"]
-            .firstWhere((color) => color['color_id'] == colorId);
-        var colorName = color['color_name'].toString();
-
-        categories.add(CategoryModel(
-            category_id:
-                response.data["categories"][i]['category_id'].toString(),
-            bgColor: colorName,
-            isWhite: response.data["categories"][i]['is_white'],
-            icon: iconName,
-            label: response.data["categories"][i]['category_name'].toString()));
-      }
-      await context.read<InitialService>().setCategories(categories);
-    } catch (error) {
-      print(error);
-    }
-  }
-
   void _getIntervals() async {
     //Intervals
     try {
@@ -178,7 +144,6 @@ class _RegisterState extends State<Register> {
     // controllerPassword.text = "123selina";
     // controllerPasswordRepeat.text = "123selina";
 
-    _getCategories();
     _getIntervals();
     _getTypes();
   }

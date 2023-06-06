@@ -24,33 +24,6 @@ class _HomeState extends State<Home> {
   @override
   void initState() {
     super.initState();
-    getData(context);
-  }
-
-  List<ColorModel> colors = [];
-  List<IconModel> icons = [];
-
-  void getData(BuildContext context) async {
-    try {
-      var response = await dio.get(
-          "${Values.serverURL}/categories/${context.read<ProfileService>().getUser().id}");
-
-      if (response.data != null) {
-        for (var color in response.data['colors']) {
-          colors.add(ColorModel.fromJson(color));
-        }
-
-        for (var icon in response.data['icons']) {
-          icons.add(IconModel.fromJson(icon));
-        }
-
-        await context.read<InitialService>().setColors(colors);
-        await context.read<InitialService>().setIcons(icons);
-      }
-    } catch (e) {
-      debugPrint(e.toString());
-    }
-    //response listen zu categorie liste und in shared pref
   }
 
   @override

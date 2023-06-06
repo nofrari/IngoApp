@@ -3,8 +3,12 @@ import 'package:flutter/services.dart';
 import 'package:email_validator/email_validator.dart';
 import 'package:dio/dio.dart';
 import 'package:frontend/constants/values.dart';
+import 'package:frontend/models/category.dart';
+import 'package:frontend/models/color.dart';
+import 'package:frontend/models/icon.dart';
 import 'package:frontend/pages/accounts/startaccount.dart';
 import 'package:frontend/pages/password_reset.dart';
+import 'package:frontend/services/initial_service.dart';
 import 'package:frontend/services/profile_service.dart';
 import 'package:provider/provider.dart';
 import 'package:frontend/widgets/linkIntern.dart';
@@ -182,6 +186,58 @@ class _LoginState extends State<Login> {
     );
   }
 
+  void getData(BuildContext context) async {
+    List<ColorModel> colors = [];
+    List<IconModel> icons = [];
+    try {
+      var response = await dio.get(
+          "${Values.serverURL}/categories/${context.read<ProfileService>().getUser().id}");
+
+      if (response.data != null) {
+        for (var color in response.data['colors']) {
+          colors.add(ColorModel.fromJson(color));
+        }
+
+        for (var icon in response.data['icons']) {
+          icons.add(IconModel.fromJson(icon));
+        }
+
+        await context.read<InitialService>().setColors(colors);
+        await context.read<InitialService>().setIcons(icons);
+      }
+    } catch (e) {
+      debugPrint(e.toString());
+    }
+    try {
+      Response response = await Dio().get(
+          '${Values.serverURL}/categories/${context.read<ProfileService>().getUser().id}');
+      List<CategoryModel> categoryList = [];
+
+      if (response.data['categories'] != null) {
+        for (var category in response.data['categories']) {
+          IconModel desiredIcon =
+              icons.firstWhere((icon) => icon.icon_id == category['icon_id']);
+
+          ColorModel desiredColor = colors
+              .firstWhere((color) => color.color_id == category['color_id']);
+          categoryList.add(
+            CategoryModel(
+              category_id: category['category_id'],
+              bgColor: desiredColor.name,
+              isWhite: category['is_white'],
+              icon: desiredIcon.name,
+              label: category['category_name'],
+            ),
+          );
+        }
+        await context.read<InitialService>().setCategories(categoryList);
+      }
+    } catch (e) {
+      print(e);
+    }
+    //response listen zu categorie liste und in shared pref
+  }
+
   Future _sendData(String email, String password) async {
     Map<String, dynamic> formData = {
       "email": email,
@@ -197,6 +253,8 @@ class _LoginState extends State<Login> {
           firstname: response.data['user_name'].toString(),
           lastname: response.data['user_sirname'],
           email: response.data['email']);
+      getData(context);
+
       setState(() {
         userExists = true;
         emailVerified = true;
