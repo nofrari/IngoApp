@@ -347,6 +347,8 @@ class _AccountCardState extends State<AccountCard> {
                                 _canFinishCreating = true;
                               });
                             }
+                            FocusScope.of(context).unfocus();
+                            widget.onFocusChanged(false);
                             await tryToFinish();
                           },
                           onChanged: (value) {
