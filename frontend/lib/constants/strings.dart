@@ -4,7 +4,7 @@ class Strings {
   static const String menuHome = "Home";
   static const String menuCategories = "Kategorien";
   static const String menuFinance = "Finanzen";
-  static const String menuAccounts = "Accounts";
+  static const String menuAccounts = "Konten";
 
 //General
   static const String abort = "ABBRECHEN";
