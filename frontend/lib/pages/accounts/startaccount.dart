@@ -49,7 +49,9 @@ class _StartAccountState extends State<StartAccount> {
       onWillPop: () async => false,
       child: GestureDetector(
         onTap: () {
-          _isFocused = false;
+          setState(() {
+            _isFocused = false;
+          });
           FocusManager.instance.primaryFocus?.unfocus();
         },
         child: Scaffold(
