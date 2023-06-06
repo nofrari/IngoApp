@@ -31,11 +31,14 @@ class _HomeState extends State<Home> {
     return Container(
       margin: const EdgeInsets.fromLTRB(20, 20, 20, 0),
       child: SingleChildScrollView(
-        child: Column(
-          children: <Widget>[
-            TotalAmountCard(),
-            HomeOverviewCard(),
-          ],
+        child: Padding(
+          padding: const EdgeInsets.only(bottom: 20.0),
+          child: Column(
+            children: <Widget>[
+              TotalAmountCard(),
+              HomeOverviewCard(),
+            ],
+          ),
         ),
       ),
     );
