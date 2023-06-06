@@ -60,6 +60,9 @@ class _StartState extends State<Start> {
       switch (widget.pageId) {
         case 1:
           currentTab = 2;
+          currentScreen = Accounts(
+            onFocusChanged: onTextFieldFocusChanged,
+          );
           break;
         case 4:
           currentTab = 4;
@@ -125,7 +128,7 @@ class _StartState extends State<Start> {
   //list of all screens
   final List<Widget> screens = [
     const Home(),
-    const Accounts(),
+    Accounts(),
     const Categories(),
     Finances(),
     const Profile(),
@@ -290,7 +293,9 @@ class _StartState extends State<Start> {
                   onPressed: () {
                     setState(() {
                       currentTab = 2;
-                      currentScreen = const Accounts();
+                      currentScreen = Accounts(
+                        onFocusChanged: onTextFieldFocusChanged,
+                      );
                     });
                   },
                   child: Column(
