@@ -349,12 +349,12 @@ class _StartState extends State<Start> {
   showDialogBox() => showCupertinoDialog<String>(
         context: context,
         builder: (BuildContext context) => CupertinoAlertDialog(
-          title: const Text('No Connection'),
-          content: const Text('Please check your internet connectivity'),
+          title: const Text('Keine Internetverbindung'),
+          content: const Text('Bitte kontrolliere deine Internetverbindung'),
           actions: <Widget>[
             TextButton(
               onPressed: () async {
-                Navigator.pop(context, 'Cancel');
+                Navigator.pop(context, 'OK');
                 setState(() => isAlertSet = false);
                 isDeviceConnected =
                     await InternetConnectionChecker().hasConnection;
