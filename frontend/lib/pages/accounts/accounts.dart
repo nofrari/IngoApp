@@ -22,34 +22,12 @@ class Accounts extends StatefulWidget {
 }
 
 class _AccountsState extends State<Accounts> {
-  List<Widget> cards = [
-    // const AccountCard(
-    //   accountId: "1",
-    //   initialHeading: "Geldbörse",
-    //   initialBalance: 1000,
-    // ),
-    // const AccountCard(
-    //   accountId: "2",
-    //   initialHeading: "Bankomat",
-    //   initialBalance: 800,
-    // ),
-  ];
   bool _canAddCard = true;
 
   List<Account> accounts = [];
 
-  // void addCard() {
-  //   setState(() {
-  //     cards.add(const AccountCard());
-  //   });
-  // }
-
   void addCard() async {
     if (_canAddCard) {
-      // setState(() {
-      //   accounts.add(Account(id: "", name: "", amount: 0));
-      //   //cards.add(const AccountCard());
-      // });
       await context
           .read<AccountsService>()
           .setAccount(id: "new", heading: "", balance: 0);
@@ -101,7 +79,6 @@ class _AccountsState extends State<Accounts> {
                         EdgeInsets.only(bottom: accounts.length >= 4 ? 100 : 0),
                     itemCount: accounts.length,
                     itemBuilder: (context, index) {
-                      //return cards[index];
                       return Column(
                         children: [
                           AccountCard(
@@ -120,18 +97,12 @@ class _AccountsState extends State<Accounts> {
                                       .read<AccountsService>()
                                       .getAccounts();
                                 });
-
-                                // setState(() {
-                                //   accounts.removeAt(index);
-                                // });
-                                // await context
-                                //     .read<AccountsService>()
-                                //     .setAccounts(accounts: accounts);
-
-                                // setState(() {
-                                //   accounts =
-                                //       context.read<AccountsService>().getAccounts();
-                                // });
+                                for (var account in accounts) {
+                                  debugPrint(
+                                      "callback account: ${account.name}");
+                                  debugPrint(
+                                      "callback account amount: ${account.amount}");
+                                }
                               },
                               doneCallback: () {
                                 debugPrint("done callback");
