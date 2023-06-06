@@ -22,6 +22,63 @@ import '../models/transaction.dart';
 import '../models/account.dart';
 import '../services/initial_service.dart';
 
+Future<List<TransactionModel>> getTransactions(BuildContext context) async {
+  try {
+    Response response = await Dio().get(
+        '${Values.serverURL}/transactions/list/${context.read<ProfileService>().getUser().id}');
+
+    Response latestFiveTransactions = await Dio().get(
+        '${Values.serverURL}/transactions/fivelatest/${context.read<ProfileService>().getUser().id}');
+
+    List<TransactionModel> transactions = [];
+    List<TransactionModel> latestTransactions = [];
+
+    for (var transaction in response.data) {
+      transactions.add(
+        TransactionModel(
+          transaction_id: transaction['transaction_id'].toString(),
+          transaction_name: transaction['transaction_name'].toString(),
+          transaction_amount:
+              double.parse(transaction['transaction_amount'].toString()),
+          category_id: transaction['category_id'].toString(),
+          date: DateTime.parse(transaction['date']),
+          type_id: (transaction['type_id']).toString(),
+          description: transaction['description'].toString(),
+          interval_id: transaction['interval_id'].toString(),
+          interval_subtype_id: transaction['interval_subtype_id'].toString(),
+          account_id: transaction['account_id'].toString(),
+          bill_url: transaction['bill_url'].toString(),
+        ),
+      );
+    }
+    for (var latestTransaction in latestFiveTransactions.data) {
+      latestTransactions.add(
+        TransactionModel(
+          transaction_id: latestTransaction['transaction_id'].toString(),
+          transaction_name: latestTransaction['transaction_name'].toString(),
+          transaction_amount:
+              double.parse(latestTransaction['transaction_amount'].toString()),
+          category_id: latestTransaction['category_id'].toString(),
+          date: DateTime.parse(latestTransaction['date']),
+          type_id: (latestTransaction['type_id']).toString(),
+          description: latestTransaction['description'].toString(),
+          interval_id: latestTransaction['interval_id'].toString(),
+          interval_subtype_id:
+              latestTransaction['interval_subtype_id'].toString(),
+          account_id: latestTransaction['account_id'].toString(),
+          bill_url: latestTransaction['bill_url'].toString(),
+        ),
+      );
+    }
+    await context.read<TransactionService>().setTransactions(transactions);
+    return latestTransactions;
+  } catch (e) {
+    print("fehler");
+    print(e);
+    return [];
+  }
+}
+
 class HomeOverviewCard extends StatefulWidget {
   const HomeOverviewCard({super.key});
 
@@ -39,7 +96,11 @@ class _HomeOverviewCardState extends State<HomeOverviewCard> {
 
   Future<bool> _loadData() async {
     await _getCategories();
-    await _getTransactions();
+    List<TransactionModel> latestTransactionsTemp =
+        await getTransactions(context);
+    setState(() {
+      _latestTransactions = latestTransactionsTemp;
+    });
     await _getAccounts();
     return Future.value(true);
   }
@@ -47,64 +108,6 @@ class _HomeOverviewCardState extends State<HomeOverviewCard> {
   final List<Account> accounts = [];
   final List<TransactionInterval.IntervalModel> interval = [];
   List<TransactionModel> _latestTransactions = [];
-
-  Future<void> _getTransactions() async {
-    try {
-      Response response = await Dio().get(
-          '${Values.serverURL}/transactions/list/${context.read<ProfileService>().getUser().id}');
-
-      Response latestFiveTransactions = await Dio().get(
-          '${Values.serverURL}/transactions/fivelatest/${context.read<ProfileService>().getUser().id}');
-
-      List<TransactionModel> transactions = [];
-      List<TransactionModel> latestTransactions = [];
-
-      for (var transaction in response.data) {
-        transactions.add(
-          TransactionModel(
-            transaction_id: transaction['transaction_id'].toString(),
-            transaction_name: transaction['transaction_name'].toString(),
-            transaction_amount:
-                double.parse(transaction['transaction_amount'].toString()),
-            category_id: transaction['category_id'].toString(),
-            date: DateTime.parse(transaction['date']),
-            type_id: (transaction['type_id']).toString(),
-            description: transaction['description'].toString(),
-            interval_id: transaction['interval_id'].toString(),
-            interval_subtype_id: transaction['interval_subtype_id'].toString(),
-            account_id: transaction['account_id'].toString(),
-            bill_url: transaction['bill_url'].toString(),
-          ),
-        );
-      }
-      for (var latestTransaction in latestFiveTransactions.data) {
-        latestTransactions.add(
-          TransactionModel(
-            transaction_id: latestTransaction['transaction_id'].toString(),
-            transaction_name: latestTransaction['transaction_name'].toString(),
-            transaction_amount: double.parse(
-                latestTransaction['transaction_amount'].toString()),
-            category_id: latestTransaction['category_id'].toString(),
-            date: DateTime.parse(latestTransaction['date']),
-            type_id: (latestTransaction['type_id']).toString(),
-            description: latestTransaction['description'].toString(),
-            interval_id: latestTransaction['interval_id'].toString(),
-            interval_subtype_id:
-                latestTransaction['interval_subtype_id'].toString(),
-            account_id: latestTransaction['account_id'].toString(),
-            bill_url: latestTransaction['bill_url'].toString(),
-          ),
-        );
-      }
-      await context.read<TransactionService>().setTransactions(transactions);
-      setState(() {
-        _latestTransactions = latestTransactions;
-      });
-    } catch (e) {
-      print("fehler");
-      print(e);
-    }
-  }
 
   List<IconModel> icons = [];
   List<ColorModel> colors = [];
