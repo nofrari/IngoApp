@@ -76,52 +76,40 @@ class _AccountsState extends State<Accounts> {
                 Expanded(
                   child: ListView.builder(
                     padding:
-                        EdgeInsets.only(bottom: accounts.length >= 4 ? 100 : 0),
+                        EdgeInsets.only(bottom: accounts.length >= 3 ? 100 : 0),
                     itemCount: accounts.length,
                     itemBuilder: (context, index) {
-                      return Column(
-                        children: [
-                          AccountCard(
-                              onFocusChanged: (value) {
-                                widget.onFocusChanged!(value);
-                              },
-                              ableToDelete: accounts.length > 1,
-                              isEditable: _canAddCard != false,
-                              accountId: accounts[index].id,
-                              initialHeading: accounts[index].name,
-                              initialBalance: accounts[index].amount,
-                              deleteCallback: () async {
-                                debugPrint("delete callback");
-                                setState(() {
-                                  accounts = context
-                                      .read<AccountsService>()
-                                      .getAccounts();
-                                });
-                                for (var account in accounts) {
-                                  debugPrint(
-                                      "callback account: ${account.name}");
-                                  debugPrint(
-                                      "callback account amount: ${account.amount}");
-                                }
-                              },
-                              doneCallback: () {
-                                debugPrint("done callback");
-                                setState(() {
-                                  _canAddCard = true;
-                                  accounts = context
-                                      .read<AccountsService>()
-                                      .getAccounts();
-                                });
-                              }
-                              //add delete callback to reassign accounts list
-                              ),
-                          accounts.length > 2 && index == accounts.length - 1
-                              ? const SizedBox(
-                                  height: 100,
-                                )
-                              : Container(),
-                        ],
-                      );
+                      return AccountCard(
+                          onFocusChanged: (value) {
+                            widget.onFocusChanged!(value);
+                          },
+                          ableToDelete: accounts.length > 1,
+                          isEditable: _canAddCard != false,
+                          accountId: accounts[index].id,
+                          initialHeading: accounts[index].name,
+                          initialBalance: accounts[index].amount,
+                          deleteCallback: () async {
+                            debugPrint("delete callback");
+                            setState(() {
+                              accounts =
+                                  context.read<AccountsService>().getAccounts();
+                            });
+                            for (var account in accounts) {
+                              debugPrint("callback account: ${account.name}");
+                              debugPrint(
+                                  "callback account amount: ${account.amount}");
+                            }
+                          },
+                          doneCallback: () {
+                            debugPrint("done callback");
+                            setState(() {
+                              _canAddCard = true;
+                              accounts =
+                                  context.read<AccountsService>().getAccounts();
+                            });
+                          }
+                          //add delete callback to reassign accounts list
+                          );
                     },
                   ),
                 ),
