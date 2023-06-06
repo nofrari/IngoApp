@@ -7,6 +7,7 @@ import 'package:frontend/widgets/button.dart';
 import 'package:frontend/widgets/button_transparent_container.dart';
 import 'package:frontend/widgets/header.dart';
 import 'package:dio/dio.dart';
+import 'package:frontend/widgets/home_overview_card.dart';
 import 'package:provider/provider.dart';
 import '../../models/category.dart';
 import '../../services/initial_service.dart';
@@ -155,12 +156,12 @@ class _CategoryDeleteState extends State<CategoryDelete> {
                       btnText: "SPEICHERN",
                       onTap: isFormValid()
                           ? () async {
-                              _deleteCategory(
+                              await _deleteCategory(
                                 widget.category_id,
                                 selectedCategoryId!,
                                 widget.numberTransactions!,
                               );
-                              await Navigator.push(
+                              Navigator.push(
                                 context,
                                 MaterialPageRoute(
                                   builder: (context) => const Categories(),
@@ -193,6 +194,8 @@ class _CategoryDeleteState extends State<CategoryDelete> {
     var response = await dio.delete(
         "${Values.serverURL}/categories/${current_category_id}",
         data: formData);
+
+    await getTransactions(context);
 
     debugPrint(response.toString());
   }
