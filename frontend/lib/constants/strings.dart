@@ -1,7 +1,7 @@
 class Strings {
   // Strings._() = private constructor --> prevents Class from being instantiated
   Strings._();
-  static const String menuHome = "Home";
+  static const String menuHome = "Start";
   static const String menuCategories = "Kategorien";
   static const String menuFinance = "Finanzen";
   static const String menuAccounts = "Konten";
