@@ -24,7 +24,9 @@ import 'package:provider/provider.dart';
 
 import '../../models/color.dart';
 import '../../models/icon.dart';
+import '../../models/transaction.dart';
 import '../../services/initial_service.dart';
+import '../../services/transaction_service.dart';
 import '../../widgets/text_google.dart';
 
 class CategoryAdd extends StatefulWidget {
@@ -233,11 +235,22 @@ class _CategoryAddState extends State<CategoryAdd> {
       "${Values.serverURL}/categories/input",
       data: formData,
     );
-    await context.read<InitialService>().setCategory(CategoryModel(
-        category_id: response.data["category_id"],
-        bgColor: colorName,
-        isWhite: is_white,
-        icon: iconName,
-        label: label));
+    await context.read<InitialService>().setCategory(
+          CategoryModel(
+              category_id: response.data["category_id"],
+              bgColor: colorName,
+              isWhite: is_white,
+              icon: iconName,
+              label: label),
+        );
+
+    TransactionModel? loadedTransaction =
+        context.read<TransactionService>().getTransaction();
+
+    if (loadedTransaction != null) {
+      debugPrint("Hellooo");
+      loadedTransaction.category_id = response.data["category_id"];
+      context.read<TransactionService>().setTransaction(loadedTransaction);
+    }
   }
 }
