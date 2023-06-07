@@ -3,19 +3,19 @@ import 'package:intl/intl.dart';
 final dateFormatter = DateFormat('dd / MM / yyyy');
 
 class TransactionModel {
-  TransactionModel({
-    required this.transaction_id,
-    required this.transaction_name,
-    required this.transaction_amount,
-    required this.date,
-    this.description,
-    this.bill_url,
-    required this.category_id,
-    required this.type_id,
-    required this.interval_id,
-    this.interval_subtype_id,
-    required this.account_id,
-  });
+  TransactionModel(
+      {required this.transaction_id,
+      required this.transaction_name,
+      required this.transaction_amount,
+      required this.date,
+      this.description,
+      this.bill_url,
+      required this.category_id,
+      required this.type_id,
+      required this.interval_id,
+      this.interval_subtype_id,
+      required this.account_id,
+      this.transfer_account_id});
 
   String transaction_id;
   String transaction_name;
@@ -28,6 +28,7 @@ class TransactionModel {
   String interval_id;
   String? interval_subtype_id;
   String account_id;
+  String? transfer_account_id;
 
   Map<String, dynamic> toJson() => {
         'transaction_id': transaction_id,
@@ -41,22 +42,23 @@ class TransactionModel {
         'interval_id': interval_id,
         'interval_subtype_id': interval_subtype_id,
         'account_id': account_id,
+        'transfer_account_id': transfer_account_id
       };
 
   factory TransactionModel.fromJson(Map<String, dynamic> json) =>
       TransactionModel(
-        transaction_id: json["transaction_id"],
-        transaction_name: json["transaction_name"],
-        transaction_amount: json["transaction_amount"],
-        date: DateTime.parse(json["date"]),
-        description: json["description"],
-        bill_url: json['bill_url'],
-        category_id: json['category_id'],
-        type_id: json['type_id'],
-        interval_id: json['interval_id'],
-        interval_subtype_id: json['interval_subtype_id'],
-        account_id: json['account_id'],
-      );
+          transaction_id: json["transaction_id"],
+          transaction_name: json["transaction_name"],
+          transaction_amount: json["transaction_amount"],
+          date: DateTime.parse(json["date"]),
+          description: json["description"],
+          bill_url: json['bill_url'],
+          category_id: json['category_id'],
+          type_id: json['type_id'],
+          interval_id: json['interval_id'],
+          interval_subtype_id: json['interval_subtype_id'],
+          account_id: json['account_id'],
+          transfer_account_id: json['transfer_account_id']);
 
   String get formattedDate {
     return dateFormatter.format(date);

@@ -39,6 +39,7 @@ const inputSchema = z.object({
   interval_id: z.string(),
   interval_subtype_id: z.string().optional(),
   account_id: z.string(),
+  transfer_account_id: z.string().optional()
 });
 type InputSchema = z.infer<typeof inputSchema>;
 
@@ -54,6 +55,7 @@ const editSchema = z.object({
   interval_id: z.string().optional(),
   interval_subtype_id: z.string().optional(),
   account_id: z.string().optional(),
+  transfer_account_id: z.string().optional()
 });
 type EditSchema = z.infer<typeof editSchema>;
 
@@ -116,6 +118,7 @@ router.post('/transactions/input', async (req, res) => {
         interval_id: body.interval_id,
         interval_subtype_id: body.interval_subtype_id == "" ? null : body.interval_subtype_id,
         account_id: body.account_id,
+        transfer_account_id: body.transfer_account_id == "" ? null : body.transfer_account_id,
       },
     });
 
@@ -137,6 +140,7 @@ router.post('/transactions/input', async (req, res) => {
         interval_id: body.interval_id,
         interval_subtype_id: body.interval_subtype_id == "" ? null : body.interval_subtype_id,
         account_id: body.account_id,
+        transfer_account_id: body.transfer_account_id == "" ? null : body.transfer_account_id,
       },
     });
   }
@@ -201,6 +205,7 @@ router.post('/transactions/input', async (req, res) => {
     interval_id: (oldTransaction ? updatedTransaction! : newTransaction!).interval_id,
     interval_subtype_id: (oldTransaction ? updatedTransaction! : newTransaction!).interval_subtype_id,
     account_id: (oldTransaction ? updatedTransaction! : newTransaction!).account_id,
+    transfer_account_id: (oldTransaction ? updatedTransaction! : newTransaction!).transfer_account_id,
   });
 });
 
@@ -242,6 +247,7 @@ router.post('/transactions/edit', async (req, res) => {
         interval_id: body.interval_id,
         interval_subtype_id: body.interval_subtype_id,
         account_id: body.account_id,
+        transfer_account_id: body.transfer_account_id
       },
     });
 
