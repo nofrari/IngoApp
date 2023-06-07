@@ -5,6 +5,7 @@ class Strings {
   static const String menuCategories = "Kategorien";
   static const String menuFinance = "Finanzen";
   static const String menuAccounts = "Konten";
+  static const String menuBudget = "Budget";
 
 //General
   static const String abort = "ABBRECHEN";
@@ -55,6 +56,11 @@ class Strings {
   static const String accountsHeading = "KONTENÜBERSICHT";
   static const String accountsButton = "KONTO HINZUFÜGEN";
   static const String accountsDelete = "KONTO LÖSCHEN";
+
+  //Budget
+  static const String budgetHeading = "BUDGETÜBERSICHT";
+  static const String budgetButton = "BUDGET HINZUFÜGEN";
+  // static const String accountsDelete = "KONTO LÖSCHEN";
 
   //Profile
   static const String profileAccount = "KONTO";

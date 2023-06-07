@@ -106,4 +106,21 @@ class Fonts {
 
   static TextStyle userIconBig = GoogleFonts.josefinSans(
       color: AppColor.neutral600, fontSize: 40, fontWeight: FontWeight.normal);
+
+  //Budget
+  static TextStyle budgetName = GoogleFonts.josefinSans(
+    color: AppColor.blueActive,
+    fontSize: 18,
+    fontWeight: FontWeight.normal,
+  );
+  static TextStyle budgetLimits = GoogleFonts.josefinSans(
+    color: AppColor.neutral100,
+    fontSize: 15,
+    fontWeight: FontWeight.normal,
+  );
+  static TextStyle budgetTags = GoogleFonts.josefinSans(
+    color: AppColor.neutral100,
+    fontSize: 12,
+    fontWeight: FontWeight.normal,
+  );
 }
