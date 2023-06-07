@@ -87,7 +87,14 @@ class _DatepickerFieldState extends State<DatepickerField> {
                   color: Colors.white,
                 )
               : IconButton(
-                  onPressed: widget.controller.clear,
+                  onPressed: () {
+                    setState(() {
+                      widget.controller.clear();
+                      if (widget.onChanged != null) {
+                        widget.onChanged!('');
+                      }
+                    });
+                  },
                   icon: const Icon(Icons.clear),
                   color: AppColor.blueActive),
           border: DecoratedInputBorder(
