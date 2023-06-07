@@ -4,6 +4,7 @@
   "main": "index.js",
   "scripts": {
     "start": "ts-node --transpile-only src/index.ts",
+    "unconfirmed": "ts-node --transpile-only src/deleteUnconfirmedUsers.ts",
     "dev": "ts-node-dev src/index.ts",
     "test": "mocha -r ts-node/register src/tests/*.test.ts"
   },
