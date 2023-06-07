@@ -365,8 +365,66 @@ router.get('/transactions/list/:user_id', async (req, res) => {
     orderBy: { date: 'desc' },
   });
 
+  console.log(transactions, "transactions");
+
+  var newTransactions: Transaction[] = [];
+  const now = Date.now();
+  /*
+  1 Nie
+  2 Wöchentlich
+  3 Monatlich
+  4 Quartalsweise
+  5 Halbjährlich
+  6 Jährlich
+  */
+
+
+  console.log(transactions.length, "transactions length");
+  for (let i = 0; i < transactions.length; i++) {
+    console.log(transactions.length, "for loop started");
+    const transaction = transactions[i];
+    switch (transaction.interval_id) {
+      case "1":
+        break;
+      case "2":
+        //goes through all dates that occured since the first transaction and adds the transaction to newTransactions
+        var date: Date = new Date(JSON.parse(JSON.stringify(transaction.date)));
+        while (date.getTime() < now) {
+          console.log(date, "while date");
+          var newTransaction = JSON.parse(JSON.stringify(transaction));
+          var newDate = date;
+          newTransaction.date = newDate;
+          var deepTransaction: Transaction = JSON.parse(JSON.stringify(newTransaction));
+          deepTransaction.date = new Date(JSON.parse(JSON.stringify(newDate)));
+          newTransactions.push(deepTransaction);
+          date.setDate(date.getDate() + 7);
+        }
+        break;
+      case "3":
+        break;
+      case "4":
+        break;
+      case "5":
+        break;
+      case "6":
+    }
+  }
+
+  //remove first transactions from newTransactions, because its the same is the first transaction in transactions
+  newTransactions.shift();
+
+  //add all transactions from newTransactions to transactions
+  transactions.push(...newTransactions);
+
+  //sort new transactions by date descending
+  transactions.sort((a, b) => {
+    return b.date.getTime() - a.date.getTime();
+  }
+  );
+  console.log("---------------------------------------------------------------");
   res.send(transactions);
-});
+}
+);
 
 router.get('/transactions/fivelatest/:user_id', async (req, res) => {
   const user_id = req.params.user_id;
