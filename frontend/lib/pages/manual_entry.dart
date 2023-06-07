@@ -68,6 +68,7 @@ class _ManualEntryState extends State<ManualEntry> {
   final _formKey = GlobalKey<FormState>();
 
   Account? selectedAccount; // = Account(id: "", name: "", amount: 0);
+  Account? selectedTransferAccount; // = Account(id: "", name: "", amount: 0);
   CategoryModel?
       selectedCategory; //= CategoryModel(category_id: "", bgColor: "", isWhite: false, icon: icon, label: label);
   transaction_interval.IntervalModel? selectedInterval;
@@ -94,7 +95,8 @@ class _ManualEntryState extends State<ManualEntry> {
         selectedCategory != null ||
         selectedInterval != null ||
         selectedIntervalSubtype != null ||
-        selectedType != null) {
+        selectedType != null ||
+        selectedTransferAccount != null) {
       return true;
     }
     return false;
@@ -109,6 +111,7 @@ class _ManualEntryState extends State<ManualEntry> {
   String? _initialType;
   String? _initialCategory;
   String? _initialAccount;
+  String? _initialTransferAccount;
   String? _initialFrequency;
   String? _initialFrequencySubtype;
   String? _loadedTransactionId;
@@ -191,6 +194,9 @@ class _ManualEntryState extends State<ManualEntry> {
               ? DateFormat("dd / MM / yyyy").parse(controllerDate.text)
               : DateTime(2000),
           account_id: selectedAccount != null ? selectedAccount!.id : "",
+          transfer_account_id: selectedTransferAccount != null
+              ? selectedTransferAccount!.id
+              : "",
           category_id:
               selectedCategory != null ? selectedCategory!.category_id : "",
           interval_id:
@@ -247,6 +253,12 @@ class _ManualEntryState extends State<ManualEntry> {
             (account) => account.id == loadedTransaction.account_id);
         _initialAccount = selectedAccount!.name;
       }
+      if (loadedTransaction.account_id != "") {
+        selectedTransferAccount = allAccounts.firstWhere(
+            (account) => account.id == loadedTransaction.account_id);
+        _initialTransferAccount = selectedTransferAccount!.name;
+      }
+
       if (loadedTransaction.interval_id != "") {
         selectedInterval = allIntervals.firstWhere((interval) =>
             interval.interval_id == loadedTransaction.interval_id);
@@ -818,13 +830,13 @@ class _ManualEntryState extends State<ManualEntry> {
       "type_id": transaction.type_id,
       "interval_id": transaction.interval_id,
       "interval_subtype_id": transaction.interval_subtype_id,
-      "account_id": transaction.account_id
+      "account_id": transaction.account_id,
+      "transfer_account_id": transaction.transfer_account_id
     };
 
     var response = await dio.post("${Values.serverURL}/transactions/input",
         data: formData);
     debugPrint("send data response: ${response.toString()}");
-    print(transactionDateTime);
   }
 
   Future savePDFToServer(String filePath) async {

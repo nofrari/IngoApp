@@ -118,7 +118,8 @@ router.post('/transactions/input', async (req, res) => {
         interval_id: body.interval_id,
         interval_subtype_id: body.interval_subtype_id == "" ? null : body.interval_subtype_id,
         account_id: body.account_id,
-        transfer_account_id: body.transfer_account_id == "" ? null : body.transfer_account_id,
+        // transfer_account_id: body.transfer_account_id == "" ? null : body.transfer_account_id,
+        transfer_account_id: "Transfer"
       },
     });
 
