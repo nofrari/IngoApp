@@ -79,33 +79,51 @@ class _AccountCardState extends State<AccountCard> {
 
   Future<bool> tryToFinish() async {
     if (_canFinishCreating && _formKey.currentState!.validate()) {
+      Map<String, dynamic> formData = {};
       //send data
-      Map<String, dynamic> formData = {
-        "account_name": _headingController.text,
-        "account_balance": currencyToDouble(_balanceController.text),
-        "user_id": context.read<ProfileService>().getUser().id,
-      };
+      if (_accountCardState == ThreeDotMenuState.edit) {
+        formData = {
+          "account_id": widget.accountId,
+          "account_name": _headingController.text,
+          "account_balance": currencyToDouble(_balanceController.text),
+          "user_id": context.read<ProfileService>().getUser().id,
+        };
+
+        var response =
+            await dio.post("${Values.serverURL}/accounts/edit", data: formData);
+      } else {
+        formData = {
+          "account_name": _headingController.text,
+          "account_balance": currencyToDouble(_balanceController.text),
+          "user_id": context.read<ProfileService>().getUser().id,
+        };
+      }
 
       dynamic response;
 
       try {
-        response = await dio.post("${Values.serverURL}/accounts/input",
+        response = await dio.post(
+            "${Values.serverURL}/accounts/${(_accountCardState == ThreeDotMenuState.edit) ? "edit" : "input"}",
             data: formData);
         debugPrint(response.toString());
       } catch (e) {
         debugPrint(e.toString());
       }
 
+      if (_accountCardState != ThreeDotMenuState.edit) {
+        await context
+            .read<AccountsService>()
+            .deleteAccount(id: widget.accountId);
+        await context.read<AccountsService>().setAccount(
+            id: response.data["account_id"],
+            heading: _headingController.text,
+            balance: currencyToDouble(_balanceController.text));
+      }
       setState(() {
         _accountCardState = ThreeDotMenuState.collapsed;
         _isEditable = false;
         _canFinishCreating = false;
       });
-      await context.read<AccountsService>().deleteAccount(id: widget.accountId);
-      await context.read<AccountsService>().setAccount(
-          id: response.data["account_id"],
-          heading: _headingController.text,
-          balance: currencyToDouble(_balanceController.text));
       widget.doneCallback();
       return true;
     }
