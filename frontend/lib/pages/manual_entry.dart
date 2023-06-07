@@ -34,45 +34,6 @@ import 'package:frontend/widgets/round_button.dart';
 import 'package:provider/provider.dart';
 import 'package:intl/intl.dart';
 
-int getWeekdayCount() {
-  DateTime now = DateTime.now();
-  DateTime firstDayOfMonth = DateTime(now.year, now.month, 1);
-  int weekday = firstDayOfMonth.weekday;
-  int currentWeekday = now.weekday;
-
-  int weeks = ((now.day - weekday) / 7).floor();
-  int extraDays = (now.day - weekday) % 7;
-
-  if (currentWeekday < weekday) {
-    return weeks + 1;
-  } else if (currentWeekday >= weekday && extraDays >= currentWeekday) {
-    return weeks + 2;
-  } else {
-    return weeks + 1;
-  }
-}
-
-String getWeekDay() {
-  switch (DateTime.now().weekday) {
-    case 1:
-      return "Montag";
-    case 2:
-      return "Dienstag";
-    case 3:
-      return "Mittwoch";
-    case 4:
-      return "Donnerstag";
-    case 5:
-      return "Freitag";
-    case 6:
-      return "Samstag";
-    case 7:
-      return "Sonntag";
-    default:
-      return "";
-  }
-}
-
 class ManualEntry extends StatefulWidget {
   ManualEntry({super.key, this.isEditMode = false, this.returnToStart = true});
   bool isEditMode;
@@ -164,12 +125,56 @@ class _ManualEntryState extends State<ManualEntry> {
       interval_id: "",
       account_id: "");
 
+  int getWeekdayCount() {
+    DateTime now = controllerDate.text != ""
+        ? DateFormat("dd / MM / yyyy").parse(controllerDate.text)
+        : DateTime.now();
+    DateTime firstDayOfMonth = DateTime(now.year, now.month, 1);
+    int weekday = firstDayOfMonth.weekday;
+    int currentWeekday = now.weekday;
+
+    int weeks = ((now.day - weekday) / 7).floor();
+    int extraDays = (now.day - weekday) % 7;
+
+    if (currentWeekday < weekday) {
+      return weeks + 1;
+    } else if (currentWeekday >= weekday && extraDays >= currentWeekday) {
+      return weeks + 2;
+    } else {
+      return weeks + 1;
+    }
+  }
+
+  String getWeekDay() {
+    switch (controllerDate.text != ""
+        ? DateFormat("dd / MM / yyyy").parse(controllerDate.text).weekday
+        : DateTime.now().weekday) {
+      case 1:
+        return "Montag";
+      case 2:
+        return "Dienstag";
+      case 3:
+        return "Mittwoch";
+      case 4:
+        return "Donnerstag";
+      case 5:
+        return "Freitag";
+      case 6:
+        return "Samstag";
+      case 7:
+        return "Sonntag";
+      default:
+        return "";
+    }
+  }
+
   List<String> allIntervalSubtypesNames() {
     //montalich, quartalsweise, halbjärhlich, jährlich
     List<String> names = [];
     if (selectedInterval != null && selectedInterval!.name == "Monatlich") {
       names.clear();
-      names.add("${DateTime.now().day}. des Monats");
+      names.add(
+          "${controllerDate.text != "" ? DateFormat("dd / MM / yyyy").parse(controllerDate.text).day : DateTime.now().day}. des Monats");
       names.add("${getWeekdayCount()}. ${getWeekDay()} des Monats");
     }
     return names;
