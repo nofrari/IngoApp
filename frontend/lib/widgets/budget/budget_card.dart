@@ -8,14 +8,15 @@ import 'package:frontend/models/category.dart';
 import '../tag.dart';
 
 class BudgetCard extends StatefulWidget {
-  BudgetCard(
-      {required this.name,
-      required this.startDate,
-      required this.endDate,
-      required this.categories,
-      required this.limit,
-      required this.currAmount,
-      super.key});
+  BudgetCard({
+    required this.name,
+    required this.startDate,
+    required this.endDate,
+    required this.categories,
+    required this.limit,
+    required this.currAmount,
+    super.key,
+  });
 
   final String name;
   final DateTime startDate;
@@ -71,19 +72,22 @@ class _BudgetCardState extends State<BudgetCard> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(widget.name, style: Fonts.accountBalance),
+          Text(widget.name, style: Fonts.budgetName),
           const SizedBox(
             height: 3,
           ),
           Text(
               "von ${formatDateString(widget.startDate)} bis ${formatDateString(widget.endDate)}",
-              style: Fonts.accountDeleteInfo),
+              style: Fonts.budgetLimits),
           const SizedBox(
-            height: 10,
+            height: 20,
           ),
           Text(
             "${formatCurrency(widget.currAmount)} von ${formatCurrency(widget.limit)} ausgegeben",
-            style: Fonts.disabledButton,
+            style: Fonts.budgetLimits,
+          ),
+          const SizedBox(
+            height: 5,
           ),
           ClipRRect(
             borderRadius: BorderRadius.circular(6.0),
@@ -95,14 +99,14 @@ class _BudgetCardState extends State<BudgetCard> {
             ),
           ),
           const SizedBox(
-            height: 10,
+            height: 15,
           ),
           Wrap(
             spacing: 8,
             children: versuch.map((String item) {
               return Tag(
-                // noIcon: true,
-                // isSmall: true,
+                noIcon: true,
+                isSmall: true,
                 btnText: item,
                 onTap: () {
                   // Perform any action when the tag is tapped
