@@ -35,6 +35,7 @@ class _BudgetState extends State<Budget> {
     // ),
   ];
 
+  //umändern auf budgets
   List<Account> accounts = [];
 
   @override
@@ -55,8 +56,10 @@ class _BudgetState extends State<Budget> {
               children: [
                 Container(
                   margin: const EdgeInsets.only(bottom: 5),
-                  child: Text(Strings.accountsHeading,
-                      style: Fonts.textHeadingBold),
+                  child: Text(
+                    Strings.budgetHeading,
+                    style: Fonts.textHeadingBold,
+                  ),
                 ),
                 Expanded(
                   child: ListView.builder(
@@ -81,7 +84,7 @@ class _BudgetState extends State<Budget> {
               margin: Values.buttonPadding,
               child: Button(
                   isTransparent: true,
-                  btnText: Strings.accountsButton,
+                  btnText: Strings.budgetButton,
                   onTap: () async {
                     await Navigator.push(
                       context,
