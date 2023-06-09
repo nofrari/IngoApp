@@ -89,7 +89,7 @@ class _BudgetState extends State<Budget> {
                     await Navigator.push(
                       context,
                       MaterialPageRoute(
-                        builder: (context) => const BudgetAdd(),
+                        builder: (context) => BudgetAdd(),
                       ),
                     );
                   },

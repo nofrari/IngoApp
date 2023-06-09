@@ -21,20 +21,29 @@ class BudgetService extends ChangeNotifier {
     }
   }
 
-  List<BudgetModel> getBudgets() {
-    List<String> budgetsString = _prefs.getStringList('budgets') ?? [];
-
-    List<BudgetModel> budgets = budgetsString
-        .map((budgetString) => BudgetModel.fromJson(jsonDecode(budgetString)))
-        .toList();
-
-    return budgets;
+  Map<String, dynamic> getBudgetEntry() {
+    try {
+      Map<String, dynamic> budgetsEntryMap =
+          jsonDecode(_prefs.getString('budgets') ?? '{}');
+      return budgetsEntryMap;
+    } catch (e) {
+      debugPrint(e.toString());
+      return {};
+    }
   }
 
   Future<void> setBudget(BudgetModel budget) async {
     try {
       String budgetString = jsonEncode(budget.toJson());
       _prefs.setString('budget', budgetString);
+    } catch (e) {
+      debugPrint(e.toString());
+    }
+  }
+
+  Future<void> clearBudget() async {
+    try {
+      _prefs.remove('budget');
     } catch (e) {
       debugPrint(e.toString());
     }

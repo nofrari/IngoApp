@@ -3,9 +3,9 @@ class Strings {
   Strings._();
   static const String menuHome = "Start";
   static const String menuCategories = "Kategorien";
+  static const String menuBudget = "Budget";
   static const String menuFinance = "Finanzen";
   static const String menuAccounts = "Konten";
-  static const String menuBudget = "Budget";
 
 //General
   static const String abort = "ABBRECHEN";
@@ -60,6 +60,8 @@ class Strings {
   //Budget
   static const String budgetHeading = "BUDGETÜBERSICHT";
   static const String budgetButton = "BUDGET HINZUFÜGEN";
+  static const String budgetStart = "Beginn";
+  static const String budgetCategory = "Budget für";
   // static const String accountsDelete = "KONTO LÖSCHEN";
 
   //Profile

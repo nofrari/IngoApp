@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:frontend/models/user.dart';
 import 'package:frontend/services/accounts_service.dart';
+import 'package:frontend/services/budget_service.dart';
 import 'package:frontend/services/initial_service.dart';
 import 'package:frontend/services/manualentry_service.dart';
 import 'package:frontend/services/profile_service.dart';
@@ -19,6 +20,7 @@ void main() async {
   await AccountsService.init();
   await InitialService.init();
   await ProfileService.init();
+  await BudgetService.init();
   await TransactionService.init();
   runApp(MultiProvider(
     providers: [
@@ -36,6 +38,9 @@ void main() async {
       ),
       ChangeNotifierProvider(
         create: (BuildContext context) => ProfileService(),
+      ),
+      ChangeNotifierProvider(
+        create: (BuildContext context) => BudgetService(),
       ),
       ChangeNotifierProvider(
         create: (BuildContext context) => TransactionService(),
