@@ -584,7 +584,7 @@ class _ManualEntryState extends State<ManualEntry> {
                           ),
                           (selectedType != null &&
                                   //muss geändert werden
-                                  selectedType!.name == 'Transaktion')
+                                  selectedType!.name == 'Transfer')
                               ? Dropdown(
                                   label: Strings.dropdownAccount2,
                                   dropdownItems: accountNames,
