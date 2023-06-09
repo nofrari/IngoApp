@@ -118,8 +118,8 @@ router.post('/transactions/input', async (req, res) => {
         interval_id: body.interval_id,
         interval_subtype_id: body.interval_subtype_id == "" ? null : body.interval_subtype_id,
         account_id: body.account_id,
-        // transfer_account_id: body.transfer_account_id == "" ? null : body.transfer_account_id,
-        transfer_account_id: "Transfer"
+        transfer_account_id: body.transfer_account_id == "" ? null : body.transfer_account_id,
+
       },
     });
 
@@ -184,7 +184,29 @@ router.post('/transactions/input', async (req, res) => {
       });
       break;
     case 'Transfer':
-      //TODO: Add transfer code
+      await prisma.account.updateMany({
+        where: {
+          account_id: body.account_id
+        },
+        data: {
+          account_balance: {
+            decrement: body.transaction_amount
+          },
+        },
+      });
+
+
+
+      await prisma.account.updateMany({
+        where: {
+          account_id: body.transfer_account_id
+        },
+        data: {
+          account_balance: {
+            increment: body.transaction_amount
+          },
+        },
+      });
       break;
   }
 
@@ -331,6 +353,29 @@ router.delete('/transactions/delete/:id', async (req, res) => {
       break;
     case 'Transfer':
       //TODO: Add transfer code
+      await prisma.account.updateMany({
+        where: {
+          account_id: transaction.account_id
+        },
+        data: {
+          account_balance: {
+            increment: transaction.transaction_amount
+          },
+        },
+      });
+
+
+
+      await prisma.account.updateMany({
+        where: {
+          account_id: transaction.transfer_account_id as string
+        },
+        data: {
+          account_balance: {
+            decrement: transaction.transaction_amount
+          },
+        },
+      });
       break;
   }
 

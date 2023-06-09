@@ -36,38 +36,39 @@ Future<List<TransactionModel>> getTransactions(BuildContext context) async {
     for (var transaction in response.data) {
       transactions.add(
         TransactionModel(
-          transaction_id: transaction['transaction_id'].toString(),
-          transaction_name: transaction['transaction_name'].toString(),
-          transaction_amount:
-              double.parse(transaction['transaction_amount'].toString()),
-          category_id: transaction['category_id'].toString(),
-          date: DateTime.parse(transaction['date']),
-          type_id: (transaction['type_id']).toString(),
-          description: transaction['description'].toString(),
-          interval_id: transaction['interval_id'].toString(),
-          interval_subtype_id: transaction['interval_subtype_id'].toString(),
-          account_id: transaction['account_id'].toString(),
-          bill_url: transaction['bill_url'].toString(),
-        ),
+            transaction_id: transaction['transaction_id'].toString(),
+            transaction_name: transaction['transaction_name'].toString(),
+            transaction_amount:
+                double.parse(transaction['transaction_amount'].toString()),
+            category_id: transaction['category_id'].toString(),
+            date: DateTime.parse(transaction['date']),
+            type_id: (transaction['type_id']).toString(),
+            description: transaction['description'].toString(),
+            interval_id: transaction['interval_id'].toString(),
+            interval_subtype_id: transaction['interval_subtype_id'].toString(),
+            account_id: transaction['account_id'].toString(),
+            bill_url: transaction['bill_url'].toString(),
+            transfer_account_id: transaction['transfer_account_id'].toString()),
       );
     }
     for (var latestTransaction in latestFiveTransactions.data) {
       latestTransactions.add(
         TransactionModel(
-          transaction_id: latestTransaction['transaction_id'].toString(),
-          transaction_name: latestTransaction['transaction_name'].toString(),
-          transaction_amount:
-              double.parse(latestTransaction['transaction_amount'].toString()),
-          category_id: latestTransaction['category_id'].toString(),
-          date: DateTime.parse(latestTransaction['date']),
-          type_id: (latestTransaction['type_id']).toString(),
-          description: latestTransaction['description'].toString(),
-          interval_id: latestTransaction['interval_id'].toString(),
-          interval_subtype_id:
-              latestTransaction['interval_subtype_id'].toString(),
-          account_id: latestTransaction['account_id'].toString(),
-          bill_url: latestTransaction['bill_url'].toString(),
-        ),
+            transaction_id: latestTransaction['transaction_id'].toString(),
+            transaction_name: latestTransaction['transaction_name'].toString(),
+            transaction_amount: double.parse(
+                latestTransaction['transaction_amount'].toString()),
+            category_id: latestTransaction['category_id'].toString(),
+            date: DateTime.parse(latestTransaction['date']),
+            type_id: (latestTransaction['type_id']).toString(),
+            description: latestTransaction['description'].toString(),
+            interval_id: latestTransaction['interval_id'].toString(),
+            interval_subtype_id:
+                latestTransaction['interval_subtype_id'].toString(),
+            account_id: latestTransaction['account_id'].toString(),
+            bill_url: latestTransaction['bill_url'].toString(),
+            transfer_account_id:
+                latestTransaction['transfer_account_id'].toString()),
       );
     }
     await context.read<TransactionService>().setTransactions(transactions);
