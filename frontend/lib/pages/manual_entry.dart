@@ -253,9 +253,12 @@ class _ManualEntryState extends State<ManualEntry> {
             (account) => account.id == loadedTransaction.account_id);
         _initialAccount = selectedAccount!.name;
       }
-      if (loadedTransaction.account_id != "") {
+
+      if (loadedTransaction.transfer_account_id != "" &&
+          loadedTransaction.transfer_account_id != "null" &&
+          loadedTransaction.transfer_account_id != null) {
         selectedTransferAccount = allAccounts.firstWhere(
-            (account) => account.id == loadedTransaction.account_id);
+            (account) => account.id == loadedTransaction.transfer_account_id);
         _initialTransferAccount = selectedTransferAccount!.name;
       }
 
@@ -580,11 +583,13 @@ class _ManualEntryState extends State<ManualEntry> {
                             },
                           ),
                           (selectedType != null &&
-                                  selectedType!.name == 'Transfer')
+                                  //muss geändert werden
+                                  selectedType!.name == 'Transaktion')
                               ? Dropdown(
                                   label: Strings.dropdownAccount2,
                                   dropdownItems: accountNames,
                                   needsNewCategoryButton: false,
+                                  initialValue: _initialTransferAccount,
                                   validator: (value) {
                                     valueAccount2 = value;
                                     if (value == null || value.isEmpty) {
@@ -597,6 +602,11 @@ class _ManualEntryState extends State<ManualEntry> {
                                     return null;
                                   },
                                   setValue: (value) {
+                                    setState(() {
+                                      selectedTransferAccount =
+                                          allAccounts.firstWhere((account) =>
+                                              account.name == value);
+                                    });
                                     updateCurrentTransaction();
                                   },
                                 )
