@@ -129,23 +129,24 @@ class _ManualEntryState extends State<ManualEntry> {
       account_id: "");
 
   int getWeekdayCount() {
-    DateTime now = controllerDate.text != ""
+    DateTime now = controllerDate.text.isNotEmpty
         ? DateFormat("dd / MM / yyyy").parse(controllerDate.text)
         : DateTime.now();
     DateTime firstDayOfMonth = DateTime(now.year, now.month, 1);
-    int weekday = firstDayOfMonth.weekday;
     int currentWeekday = now.weekday;
 
-    int weeks = ((now.day - weekday) / 7).floor();
-    int extraDays = (now.day - weekday) % 7;
-
-    if (currentWeekday < weekday) {
-      return weeks + 1;
-    } else if (currentWeekday >= weekday && extraDays >= currentWeekday) {
-      return weeks + 2;
-    } else {
-      return weeks + 1;
+    int count = 0;
+    for (int day = 1; day <= 31; day++) {
+      DateTime date = DateTime(now.year, now.month, day);
+      if (date.weekday == currentWeekday) {
+        count++;
+        if (date.day == now.day) {
+          break;
+        }
+      }
     }
+
+    return count;
   }
 
   String getWeekDay() {
@@ -621,7 +622,12 @@ class _ManualEntryState extends State<ManualEntry> {
                               }
                               return null;
                             },
-                            //TODO: Add callback to call updateCurrentTransaction
+                            onChanged: (value) {
+                              updateCurrentTransaction();
+                              setState(() {
+                                _initialFrequency = null;
+                              });
+                            },
                           ),
                           Dropdown(
                             dropdownItems: intervalNames,

@@ -410,7 +410,8 @@ router.get('/transactions/list/:user_id', async (req, res) => {
     orderBy: { date: 'desc' },
   });
 
-  console.log(transactions, "transactions");
+  //add all transactions from newTransactions to transactions
+  transactions.push(...getRecurringTransactions(transactions));
 
   var duplicatedTransactions: Transaction[] = [];
 
@@ -444,8 +445,20 @@ router.get('/transactions/list/:user_id', async (req, res) => {
 
   transactions.push(...duplicatedTransactions);
 
+  //sort new transactions by date descending
+  transactions.sort((a, b) => {
+    return b.date.getTime() - a.date.getTime();
+  }
+  );
+  console.log("---------------------------------------------------------------");
+  res.send(transactions);
+}
+);
+
+function getRecurringTransactions(transactions: Transaction[]) {
   var newTransactions: Transaction[] = [];
   const now = Date.now();
+  const now2 = new Date();
   /*
   1 Nie
   2 Wöchentlich
@@ -453,6 +466,12 @@ router.get('/transactions/list/:user_id', async (req, res) => {
   4 Quartalsweise
   5 Halbjährlich
   6 Jährlich
+  */
+
+  /* 
+  Subtypes
+  1 Tag
+  2 Wochentag
   */
 
 
@@ -466,47 +485,125 @@ router.get('/transactions/list/:user_id', async (req, res) => {
       case "2":
         //goes through all dates that occured since the first transaction and adds the transaction to newTransactions
         var date: Date = new Date(JSON.parse(JSON.stringify(transaction.date)));
+        date.setDate(date.getDate() + 7);
         while (date.getTime() < now) {
-          console.log(date, "while date");
-          var newTransaction = JSON.parse(JSON.stringify(transaction));
-          var newDate = date;
-          newTransaction.date = newDate;
-          var deepTransaction: Transaction = JSON.parse(JSON.stringify(newTransaction));
-          deepTransaction.date = new Date(JSON.parse(JSON.stringify(newDate)));
-          newTransactions.push(deepTransaction);
+          newTransactions.push(getNewTransaction(transaction, date));
           date.setDate(date.getDate() + 7);
         }
         break;
       case "3":
+        if (transaction.interval_subtype_id == "1") {
+          var date: Date = new Date(JSON.parse(JSON.stringify(transaction.date)));
+          while (date.getTime() < now) {
+            newTransactions.push(getNewTransaction(transaction, date));
+            //increase date by one months
+            date.setMonth(date.getMonth() + 1);
+          }
+          break;
+
+        } else if (transaction.interval_subtype_id == "2") {
+          function getWeekOfMonth(date: Date): number {
+            const firstDayOfMonth = new Date(date.getFullYear(), date.getMonth(), 1);
+            const dayOfWeek = firstDayOfMonth.getDay();
+            const adjustedDate = date.getDate() + dayOfWeek - 1;
+            return Math.ceil(adjustedDate / 7);
+          }
+
+          var date: Date = new Date(JSON.parse(JSON.stringify(transaction.date)));
+          date.setMonth(date.getMonth() + 1);
+          date.setDate(1); // Setze den Tag auf den 1. des Monats
+
+          // Wochentag im Bezug auf das Monat
+          var targetDay = transaction.date.getDay();
+          console.log(targetDay, "targetDay");
+
+          // Gewünschtes Wochentag-Vorkommen im Monat
+          var targetWeek = getWeekOfMonth(transaction.date);
+          console.log(targetWeek, "targetWeek");
+
+          // Finde das gewünschte Wochentag-Vorkommen im Monat
+          var dayCount = 0;
+          while (date.getMonth() <= now2.getMonth() && date.getFullYear() <= now2.getFullYear()) {
+            console.log(date.getDay(), "date.getDay()");
+            if (date.getDay() === targetDay) {
+              console.log("targetDay found");
+              dayCount++;
+              if (dayCount === targetWeek) { // Gewünschtes Vorkommen des Wochentags gefunden
+                console.log("targetWeek found");
+                newTransactions.push(getNewTransaction(transaction, date));
+                break; // Beende die Schleife nach Hinzufügen der Transaktion
+              }
+            }
+            date.setDate(date.getDate() + 1); // Erhöhe das Datum um einen Tag
+          }
+
+          // Inkrementiere das Datum um einen Monat
+          date.setMonth(date.getMonth() + 1);
+        }
+        console.log(newTransactions);
         break;
       case "4":
+        var date: Date = new Date(JSON.parse(JSON.stringify(transaction.date)));
+        date.setMonth(date.getMonth() + 3);
+        while (date.getTime() < now) {
+          newTransactions.push(getNewTransaction(transaction, date));
+          //increase date by three months
+          date.setMonth(date.getMonth() + 3);
+        }
         break;
       case "5":
+        var date: Date = new Date(JSON.parse(JSON.stringify(transaction.date)));
+        date.setMonth(date.getMonth() + 6);
+        while (date.getTime() < now) {
+          newTransactions.push(getNewTransaction(transaction, date));
+          //increase date by six months
+          date.setMonth(date.getMonth() + 6);
+        }
         break;
       case "6":
+        var date: Date = new Date(JSON.parse(JSON.stringify(transaction.date)));
+        date.setFullYear(date.getFullYear() + 1);
+        while (date.getTime() < now) {
+          newTransactions.push(getNewTransaction(transaction, date));
+          //increase date by one year
+          date.setFullYear(date.getFullYear() + 1);
+        }
+        break;
     }
   }
 
+  return newTransactions;
+
   //remove first transactions from newTransactions, because its the same is the first transaction in transactions
-  newTransactions.shift();
-
-  //add all transactions from newTransactions to transactions
-  transactions.push(...newTransactions);
-
-  //sort new transactions by date descending
-  // transactions.sort((a, b) => {
-  //   return b.date.getTime() - a.date.getTime();
-  // }
-  // );
-  transactions.sort((a, b) => {
-    const dateA = new Date(a.date);
-    const dateB = new Date(b.date);
-    return dateB.getTime() - dateA.getTime();
-  });
-  console.log("---------------------------------------------------------------");
-  res.send(transactions);
+  //newTransactions.shift();
 }
-);
+
+function getNewTransaction(transaction: Transaction, date: Date) {
+  console.log("date", date);
+  var newTransaction = JSON.parse(JSON.stringify(transaction));
+  var newDate = date;
+  newTransaction.date = newDate;
+  var deepTransaction: Transaction = JSON.parse(JSON.stringify(newTransaction));
+  deepTransaction.date = new Date(JSON.parse(JSON.stringify(newDate)));
+  return deepTransaction;
+}
+
+// function getWeekdayCount(date: Date) {
+//   const firstDayOfMonth = new Date(date.getFullYear(), date.getMonth(), 1);
+//   const weekday = firstDayOfMonth.getDay();
+//   const currentWeekday = date.getDay();
+
+//   const weeks = ((date.get - weekday) / 7).floor();
+//   int extraDays = (now.day - weekday) % 7;
+
+//   if (currentWeekday < weekday) {
+//     return weeks + 1;
+//   } else if (currentWeekday >= weekday && extraDays >= currentWeekday) {
+//     return weeks + 2;
+//   } else {
+//     return weeks + 1;
+//   }
+// }
 
 router.get('/transactions/fivelatest/:user_id', async (req, res) => {
   const user_id = req.params.user_id;

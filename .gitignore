@@ -237,9 +237,6 @@ dist
 # Unser zeugs
 *.jpg
 *.pdf
-backend/package-lock.json
-backend/package-lock.json
-backend/package.json
 frontend/ios/Podfile
 frontend/ios/Podfile.lock
 *.pbxproj
