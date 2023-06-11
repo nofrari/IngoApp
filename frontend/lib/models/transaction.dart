@@ -66,10 +66,10 @@ class TransactionModel {
   }
 
   String formattedAmount(double? amount, String? action) {
-    if (action == "2") {
-      return "- ${amount?.toStringAsFixed(2)} € ";
+    if (action == "2" || amount! < 0) {
+      return "- ${amount?.abs().toStringAsFixed(2)} € ";
     } else {
-      return " ${amount?.toStringAsFixed(2)} € ";
+      return " ${amount.toStringAsFixed(2)} € ";
     }
   }
 

@@ -425,8 +425,9 @@ router.get('/transactions/list/:user_id', async (req, res) => {
         var tempAccountId = duplicateTransaction.account_id;
         duplicateTransaction.account_id = duplicateTransaction.transfer_account_id;
         duplicateTransaction.transfer_account_id = tempAccountId;
-        transaction.type_id = "2";
-        duplicateTransaction.type_id = "1";
+        // transaction.type_id = "2";
+        // duplicateTransaction.type_id = "1";
+        transaction.transaction_amount = -transaction.transaction_amount;
 
         duplicatedTransactions.push(duplicateTransaction);
       }
