@@ -3,19 +3,20 @@ import 'package:intl/intl.dart';
 final dateFormatter = DateFormat('dd / MM / yyyy');
 
 class TransactionModel {
-  TransactionModel(
-      {required this.transaction_id,
-      required this.transaction_name,
-      required this.transaction_amount,
-      required this.date,
-      this.description,
-      this.bill_url,
-      required this.category_id,
-      required this.type_id,
-      required this.interval_id,
-      this.interval_subtype_id,
-      required this.account_id,
-      this.transfer_account_id});
+  TransactionModel({
+    required this.transaction_id,
+    required this.transaction_name,
+    required this.transaction_amount,
+    required this.date,
+    this.description,
+    this.bill_url,
+    required this.category_id,
+    required this.type_id,
+    required this.interval_id,
+    this.interval_subtype_id,
+    required this.account_id,
+    this.transfer_account_id,
+  });
 
   String transaction_id;
   String transaction_name;

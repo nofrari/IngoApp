@@ -412,6 +412,37 @@ router.get('/transactions/list/:user_id', async (req, res) => {
 
   console.log(transactions, "transactions");
 
+  var duplicatedTransactions: Transaction[] = [];
+
+  if (transactions.length !== 0) {
+    for (let i = 0; i < transactions.length; i++) {
+      const transaction = transactions[i];
+      if (transaction.type_id === "3") {
+
+        var duplicateTransaction = JSON.parse(JSON.stringify(transaction));
+
+
+        var tempAccountId = duplicateTransaction.account_id;
+        duplicateTransaction.account_id = duplicateTransaction.transfer_account_id;
+        duplicateTransaction.transfer_account_id = tempAccountId;
+        transaction.type_id = "2";
+        duplicateTransaction.type_id = "1";
+
+        duplicatedTransactions.push(duplicateTransaction);
+      }
+
+    }
+
+  }
+
+  duplicatedTransactions.sort((a, b) => {
+    const dateA = new Date(a.date);
+    const dateB = new Date(b.date);
+    return dateB.getTime() - dateA.getTime();
+  });
+
+  transactions.push(...duplicatedTransactions);
+
   var newTransactions: Transaction[] = [];
   const now = Date.now();
   /*
@@ -462,10 +493,15 @@ router.get('/transactions/list/:user_id', async (req, res) => {
   transactions.push(...newTransactions);
 
   //sort new transactions by date descending
+  // transactions.sort((a, b) => {
+  //   return b.date.getTime() - a.date.getTime();
+  // }
+  // );
   transactions.sort((a, b) => {
-    return b.date.getTime() - a.date.getTime();
-  }
-  );
+    const dateA = new Date(a.date);
+    const dateB = new Date(b.date);
+    return dateB.getTime() - dateA.getTime();
+  });
   console.log("---------------------------------------------------------------");
   res.send(transactions);
 }
