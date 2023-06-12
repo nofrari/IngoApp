@@ -284,8 +284,6 @@ class _ManualEntryState extends State<ManualEntry> {
         _initialCategory = selectedCategory!.label;
       }
     });
-    debugPrint(_currentTransaction.toJson().toString());
-    ;
   }
 
   Future<String> loadPDF() async {
@@ -619,7 +617,12 @@ class _ManualEntryState extends State<ManualEntry> {
                             serverDate: manualEntry['date'],
                             errorMsgBgColor: AppColor.neutral500,
                             isDisabled: widget.isEditMode &&
-                                _currentTransaction.interval_subtype_id != null,
+                                (_currentTransaction.interval_subtype_id !=
+                                        "" &&
+                                    _currentTransaction.interval_subtype_id !=
+                                        "null" &&
+                                    _currentTransaction.interval_subtype_id !=
+                                        null),
                             validator: (value) {
                               if (value == null || value.isEmpty) {
                                 return 'Das Feld darf nicht leer sein';

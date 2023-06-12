@@ -73,7 +73,7 @@ class _DatepickerFieldState extends State<DatepickerField> {
         controller: widget.controller,
         autovalidateMode: AutovalidateMode.onUserInteraction,
         validator: widget.validator,
-        style: Fonts.text300,
+        style: widget.isDisabled ? Fonts.disabledDate : Fonts.text300,
         cursorColor: Colors.white, //editing controller of this TextField
         decoration: InputDecoration(
           contentPadding:
@@ -85,9 +85,9 @@ class _DatepickerFieldState extends State<DatepickerField> {
           fillColor: AppColor.neutral400,
           errorStyle: Fonts.errorMessage,
           suffixIcon: showCalendarIcon
-              ? const Icon(
+              ? Icon(
                   Icons.calendar_month,
-                  color: Colors.white,
+                  color: widget.isDisabled ? AppColor.neutral300 : Colors.white,
                 )
               : IconButton(
                   onPressed: () {

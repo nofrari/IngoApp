@@ -106,4 +106,8 @@ class Fonts {
 
   static TextStyle userIconBig = GoogleFonts.josefinSans(
       color: AppColor.neutral600, fontSize: 40, fontWeight: FontWeight.normal);
+
+  //MANUAL ENTRY
+  static TextStyle disabledDate = GoogleFonts.josefinSans(
+      color: AppColor.neutral300, fontSize: 18, fontWeight: FontWeight.normal);
 }
