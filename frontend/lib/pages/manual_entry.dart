@@ -507,7 +507,7 @@ class _ManualEntryState extends State<ManualEntry> {
                           ),
                           InputField(
                             lblText: "Betrag in €",
-                            reqFormatter: currencyFormatter,
+                            reqFormatter: currencyFormatterNoNegative,
                             keyboardType: numeric,
                             controller: controllerAmount,
                             maxLines: 1,

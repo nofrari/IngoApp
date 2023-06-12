@@ -7,13 +7,37 @@ import '../../constants/values.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:control_style/control_style.dart';
 
-TextInputFormatter currencyFormatter =
+TextInputFormatter currencyFormatterNoNegative =
     TextInputFormatter.withFunction((oldValue, newValue) {
   String cleanText = newValue.text.replaceAll(RegExp(r'[^\d]'), '');
   int value = int.tryParse(cleanText) ?? 0;
   final formatter =
       NumberFormat.currency(locale: 'de', name: "EUR", symbol: '€');
+
   String newText = formatter.format(value / 100);
+  int cursorPos = newText.length;
+  if (newValue.selection.baseOffset == newValue.selection.extentOffset) {
+    cursorPos = formatter.format(value / 100).length - 2;
+  }
+  return TextEditingValue(
+    text: newText,
+    selection: TextSelection.collapsed(offset: cursorPos),
+  );
+});
+
+TextInputFormatter currencyFormatter =
+    TextInputFormatter.withFunction((oldValue, newValue) {
+  String cleanText = newValue.text.replaceAll(RegExp(r'[^-\d]'), '');
+  bool isNegative = cleanText.startsWith('-');
+  int value = int.tryParse(cleanText.replaceAll('-', '')) ?? 0;
+  final formatter =
+      NumberFormat.currency(locale: 'de', name: "EUR", symbol: '€');
+
+  String newText = formatter.format(value / 100);
+  if (isNegative) {
+    newText = '-' + newText;
+  }
+
   int cursorPos = newText.length;
   if (newValue.selection.baseOffset == newValue.selection.extentOffset) {
     cursorPos = formatter.format(value / 100).length - 2;
