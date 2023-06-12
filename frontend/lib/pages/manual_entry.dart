@@ -726,7 +726,7 @@ class _ManualEntryState extends State<ManualEntry> {
                               child: Button(
                                   isTransparent: true,
                                   btnText: widget.isEditMode
-                                      ? "ÄDERUNGEN SPEICHERN"
+                                      ? "ÄNDERUNGEN SPEICHERN"
                                       : "SPEICHERN",
                                   onTap: () async {
                                     updateCurrentTransaction();
