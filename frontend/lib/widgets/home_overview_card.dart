@@ -27,9 +27,6 @@ Future<List<TransactionModel>> getTransactions(BuildContext context) async {
     Response response = await Dio().get(
         '${Values.serverURL}/transactions/list/${context.read<ProfileService>().getUser().id}');
 
-    Response latestFiveTransactions = await Dio().get(
-        '${Values.serverURL}/transactions/fivelatest/${context.read<ProfileService>().getUser().id}');
-
     List<TransactionModel> transactions = [];
     List<TransactionModel> latestTransactions = [];
 
@@ -51,25 +48,9 @@ Future<List<TransactionModel>> getTransactions(BuildContext context) async {
             transfer_account_id: transaction['transfer_account_id'].toString()),
       );
     }
-    for (var latestTransaction in latestFiveTransactions.data) {
-      latestTransactions.add(
-        TransactionModel(
-            transaction_id: latestTransaction['transaction_id'].toString(),
-            transaction_name: latestTransaction['transaction_name'].toString(),
-            transaction_amount: double.parse(
-                latestTransaction['transaction_amount'].toString()),
-            category_id: latestTransaction['category_id'].toString(),
-            date: DateTime.parse(latestTransaction['date']),
-            type_id: (latestTransaction['type_id']).toString(),
-            description: latestTransaction['description'].toString(),
-            interval_id: latestTransaction['interval_id'].toString(),
-            interval_subtype_id:
-                latestTransaction['interval_subtype_id'].toString(),
-            account_id: latestTransaction['account_id'].toString(),
-            bill_url: latestTransaction['bill_url'].toString(),
-            transfer_account_id:
-                latestTransaction['transfer_account_id'].toString()),
-      );
+    //add the top five transactions from transaction list to latestTransactions
+    for (var i = 0; i < 5; i++) {
+      latestTransactions.add(transactions[i]);
     }
     await context.read<TransactionService>().setTransactions(transactions);
     return latestTransactions;

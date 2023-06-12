@@ -600,24 +600,6 @@ function getNewTransaction(transaction: Transaction, date: Date) {
 //   }
 // }
 
-router.get('/transactions/fivelatest/:user_id', async (req, res) => {
-  const user_id = req.params.user_id;
-
-  const transactions = await prisma.transaction.findMany({
-    where: {
-      category: {
-        user: {
-          user_id: user_id,
-        },
-      },
-    },
-    orderBy: { date: 'desc' },
-    take: 5,
-  });
-
-  res.send(transactions);
-});
-
 router.get('/transactions/account/:id', async (req, res) => {
   console.log('called');
   const id = req.params.id;
