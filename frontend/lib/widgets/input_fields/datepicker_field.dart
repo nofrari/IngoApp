@@ -16,6 +16,7 @@ class DatepickerField extends StatefulWidget {
       this.onChanged,
       this.validator,
       this.autovalidateMode,
+      this.isDisabled = false,
       required this.errorMsgBgColor});
 
   final TextEditingController controller;
@@ -25,6 +26,7 @@ class DatepickerField extends StatefulWidget {
   final ValueChanged<String>? onChanged;
   final FormFieldValidator<String>? validator;
   final Color errorMsgBgColor;
+  bool isDisabled;
 
   final AutovalidateMode? autovalidateMode;
 
@@ -67,6 +69,7 @@ class _DatepickerFieldState extends State<DatepickerField> {
       margin: const EdgeInsets.only(top: 10, bottom: 15),
       color: widget.errorMsgBgColor,
       child: TextFormField(
+        enabled: !widget.isDisabled,
         controller: widget.controller,
         autovalidateMode: AutovalidateMode.onUserInteraction,
         validator: widget.validator,
