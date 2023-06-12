@@ -455,7 +455,7 @@ router.get('/transactions/list/:user_id', async (req, res) => {
 }
 );
 
-function getRecurringTransactions(transactions: Transaction[]) {
+export function getRecurringTransactions(transactions: Transaction[]) {
   var newTransactions: Transaction[] = [];
   const now = Date.now();
   const now2 = new Date();
@@ -474,10 +474,7 @@ function getRecurringTransactions(transactions: Transaction[]) {
   2 Wochentag
   */
 
-
-  console.log(transactions.length, "transactions length");
   for (let i = 0; i < transactions.length; i++) {
-    console.log(transactions.length, "for loop started");
     const transaction = transactions[i];
     switch (transaction.interval_id) {
       case "1":

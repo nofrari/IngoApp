@@ -1,6 +1,7 @@
 import express from 'express';
-import { PrismaClient } from '@prisma/client';
+import { Account, PrismaClient } from '@prisma/client';
 import { z } from 'zod';
+import { getRecurringTransactions } from './transactions';
 
 const prisma = new PrismaClient();
 const router = express.Router();
@@ -101,7 +102,8 @@ router.get('/accounts/totalAmount/:user_id', async (req, res) => {
     const user_id = req.params.user_id;
 
     const accounts = await prisma.account.findMany({ where: { user_id: user_id } });
-    const totalAmount = accounts.reduce((acc, account) => {
+    const accountsWithAmount = await getAccountsWithAmount(accounts);
+    const totalAmount = accountsWithAmount.reduce((acc, account) => {
         return acc + account.account_balance;
     }, 0);
 
@@ -131,7 +133,46 @@ router.get('/accounts/list/:user_id', async (req, res) => {
         return res.status(406).json({ message: 'Accounts nicht gefunden' });
     }
 
-    res.send(accounts);
+    const accountsWithAmount = await getAccountsWithAmount(accounts);
+
+    res.send(accountsWithAmount);
 });
+
+async function getAccountsWithAmount(accounts: Account[]) {
+    var accountsWithAmount: Account[] = [];
+    for (const account of accounts) {
+        const transactions = await prisma.transaction.findMany({
+            where: { account_id: account.account_id },
+        });
+
+        var negative = 0;
+        var positive = 0;
+
+        const recurringTransactions = getRecurringTransactions(transactions);
+        for (const recurringTransaction of recurringTransactions) {
+            switch (recurringTransaction.type_id) {
+                case "1":
+                    positive += recurringTransaction.transaction_amount;
+                    break;
+                case "2":
+                    negative += recurringTransaction.transaction_amount;
+                    break;
+                case "3": //TODO: Nora fragen
+
+                    break;
+                default:
+                    break;
+            }
+        }
+
+        accountsWithAmount.push({
+            account_id: account.account_id,
+            account_name: account.account_name,
+            account_balance: account.account_balance + positive - negative,
+            user_id: account.user_id,
+        });
+    }
+    return accountsWithAmount;
+}
 
 export default router;
