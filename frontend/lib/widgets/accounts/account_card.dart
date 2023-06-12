@@ -279,6 +279,8 @@ class _AccountCardState extends State<AccountCard> {
                                         "${Values.serverURL}/accounts/edit",
                                         data: formData);
                                     debugPrint(response.toString());
+                                    FocusScope.of(context).unfocus();
+                                    widget.onFocusChanged(false);
                                   },
                                   onDelete: () async {
                                     dynamic response;
@@ -416,6 +418,8 @@ class _AccountCardState extends State<AccountCard> {
                               .read<AccountsService>()
                               .deleteAccount(id: widget.accountId);
                         }
+                        FocusScope.of(context).unfocus();
+                        widget.onFocusChanged(false);
                       },
                       icon: (_canFinishCreating)
                           ? Icons.done_rounded
