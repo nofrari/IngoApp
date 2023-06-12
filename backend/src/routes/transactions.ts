@@ -515,32 +515,30 @@ function getRecurringTransactions(transactions: Transaction[]) {
 
           // Wochentag im Bezug auf das Monat
           var targetDay = transaction.date.getDay();
-          console.log(targetDay, "targetDay");
 
           // Gewünschtes Wochentag-Vorkommen im Monat
           var targetWeek = getWeekOfMonth(transaction.date);
-          console.log(targetWeek, "targetWeek");
 
           // Finde das gewünschte Wochentag-Vorkommen im Monat
           var dayCount = 0;
-          while (date.getMonth() <= now2.getMonth() && date.getFullYear() <= now2.getFullYear()) {
-            console.log(date.getDay(), "date.getDay()");
-            if (date.getDay() === targetDay) {
-              console.log("targetDay found");
-              dayCount++;
-              if (dayCount === targetWeek) { // Gewünschtes Vorkommen des Wochentags gefunden
-                console.log("targetWeek found");
-                newTransactions.push(getNewTransaction(transaction, date));
-                break; // Beende die Schleife nach Hinzufügen der Transaktion
+          //so ganz macht das glaub ich keinen sinn, aber solangs funktioniert passts
+          while (date.getTime() < now) {
+            while (date.getMonth() <= now2.getMonth() && date.getFullYear() <= now2.getFullYear()) {
+              if (date.getDay() === targetDay) {
+                dayCount++;
+                if (dayCount === targetWeek) { // Gewünschtes Vorkommen des Wochentags gefunden
+                  newTransactions.push(getNewTransaction(transaction, date));
+                  break; // Beende die Schleife nach Hinzufügen der Transaktion
+                }
               }
+              date.setDate(date.getDate() + 1); // Erhöhe das Datum um einen Tag
             }
-            date.setDate(date.getDate() + 1); // Erhöhe das Datum um einen Tag
+            // Inkrementiere das Datum um einen Monat
+            date.setMonth(date.getMonth() + 1);
+            date.setDate(1); // Setze den Tag auf den 1. des Monats
+            dayCount = 0; // Setze den Zähler für das Wochentag-Vorkommen zurück
           }
-
-          // Inkrementiere das Datum um einen Monat
-          date.setMonth(date.getMonth() + 1);
         }
-        console.log(newTransactions);
         break;
       case "4":
         var date: Date = new Date(JSON.parse(JSON.stringify(transaction.date)));
