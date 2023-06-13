@@ -70,7 +70,6 @@ class _ScannerCameraState extends State<ScannerCamera>
   Widget build(BuildContext context) {
     List<String> images = context.watch<ScannerService>().getImages();
     position = context.watch<ScannerService>().getPosition();
-    debugPrint("Position: $position, Images: ${images.isNotEmpty}");
 
     String headerText() {
       if (position != null) {

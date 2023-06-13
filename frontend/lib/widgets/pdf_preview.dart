@@ -66,10 +66,12 @@ class _PdfPreviewState extends State<PdfPreview> {
       await _takeImages();
     }
 
-    await _generatePdf();
-    setState(() {
-      _showPdf = true;
-    });
+    if (_selectedImages.isNotEmpty) {
+      await _generatePdf();
+      setState(() {
+        _showPdf = true;
+      });
+    }
   }
 
   //select the images from the gallery
