@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Danke für deine Registrierung!</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="Our first page">
+    <meta name="keywords" content="html tutorial template">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Josefin+Sans&display=swap" rel="stylesheet">
+    <style>
+        h1 {
+            font-family: 'Josefin Sans', sans-serif;
+            color: #48babf;
+            font-size: 35px;
+            font-weight: bold;
+            text-align: center;
+        }
+
+        .button {
+            font-family: 'Josefin Sans', sans-serif;
+            color: #fff!important;
+            font-size: 16px;
+            text-transform: uppercase;
+            font-style: bold;
+            border-color: #48babf;
+            border-width: 2px;
+            border-radius: 30px;
+            background-color: #48babf;
+            display: block;
+            margin: 20px auto;
+            padding: 10px 20px;
+            text-align: center;
+            text-decoration: none;
+            width: fit-content;
+        }
+
+        .greeting {
+            font-family: 'Josefin Sans', sans-serif;
+            color: #fff;
+            font-size: 20px;
+            font-weight: bold;
+            text-transform: uppercase;
+            text-align: center;
+        }
+
+        .password {
+            font-family: 'Josefin Sans', sans-serif;
+            color: #fff;
+            font-weight: bold;
+            font-size: 18px;
+            text-align: center;
+        }
+
+        p {
+            font-family: 'Josefin Sans', sans-serif;
+            color: #fff;
+            font-size: 18px;
+            text-align: center;
+            margin: 20px 0;
+        }
+
+    </style>
+</head>
+<body style="background-color: #3B3B3B; padding: 50px 10vw;">
+    <h1>Passwort zurückgesetzt</h1>
+    <p class="greeting">Hallo {{user}}!</p>
+    <p>Gratuliere, du hast erfolgreich dein Passwort zurückgesetzt! <br>Damit du sofort weiterscannen und deine Finanzen sortieren kannst, haben wir dir auch gleich ein neues Passwort erstellt, und zwar dieses hier:</p>
+    <h2 class="password"> {{newPassword}}</h2>
+    <p>Damit kannst du dich wieder in der INGO-App anmelden. Bitte ändere es jedoch so schnell wie möglich. Die Option dazu findest du in deinen Profileinstellungen</p>
+</body>
+</html>

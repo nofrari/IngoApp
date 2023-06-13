@@ -4,7 +4,7 @@ import { z } from 'zod';
 import jwt from 'jsonwebtoken';
 import bcrypt from 'bcrypt';
 import nodemailer from 'nodemailer';
-import { us } from 'mindee';
+
 const process = require('process');
 
 const prisma = new PrismaClient();
@@ -150,7 +150,7 @@ router.post('/users/register', async (req, res) => {
       exp: Math.floor(Date.now() / 1000) + (60 * 1)
     }, process.env.JWT_SECRET);
 
-    sendConfirmationEmail(user.email, confirmationToken);   
+    sendConfirmationEmail(user.email, confirmationToken, user.user_name);   
  
     res.status(200).send({
     message: 'Registration successful. Please check your email for confirmation.',
@@ -329,7 +329,7 @@ router.get('/users/confirm-email/:confirmationToken', async (req, res) => {
     });
   
     // Send the new password to the user's email
-    sendPasswordResetEmail(body.email, newPassword); // Implement your logic to send the email
+    sendPasswordResetEmail(body.email, newPassword, user.user_name); // Implement your logic to send the email
   
     res.status(200).send("Password reset successfully");
   });
@@ -398,15 +398,35 @@ router.get('/users/confirm-email/:confirmationToken', async (req, res) => {
     },
   });
 
-  function sendConfirmationEmail(email: any, confirmationToken: string | number) {
-    const confirmationLink = `https://data.ingoapp.at/users/confirm-email/${confirmationToken}`; 
-    //`https://157.90.249.232:5432/users/confirm-email/${confirmationToken}`;
+  const hbs = require('nodemailer-express-handlebars');
+  const path = require('path');
+  
+  const handlebarsOptions = {
+      viewEngine: {
+        extName: '.handlebars',
+        partialsDir: path.resolve('./views'),
+        defaultLayout: false,
+      },
+      // go into the views folder and use the layout file
+      viewPath: path.resolve('./views'),
+      extName: '.handlebars',
+    };
+
+  transporter.use('compile', hbs(handlebarsOptions));
+
+  function sendConfirmationEmail(email: any, confirmationToken: string | number, user_name: any) {
+    const confirmationLink = //`https://157.90.249.232:5432/users/confirm-email/${confirmationToken}`;
+    `https://data.ingoapp.at/users/confirm-email/${confirmationToken}`; 
   
     const mailOptions = {
       from: 'office@ingoapp.at',
       to: email, 
       subject: 'Email bestätigen',
-      text: `Hi! \n\nDanke für deine Registrierung! Als letzten Schritt klicke bitte auf folgenden Link, um deine Email zu bestätigen: ${confirmationLink}\n\nDieser Link ist für 10 Minuten gültig. \n\nSolltest du dich nicht registriert haben, ignoriere diese Email bitte.`
+      template: 'registermail',
+      context: {
+        confirmationLink: confirmationLink,
+        user: user_name,
+      },
     };
   
     transporter.sendMail(mailOptions, (error, info) => {
@@ -432,19 +452,24 @@ router.get('/users/confirm-email/:confirmationToken', async (req, res) => {
     return newPassword;
   }
   
-  function sendPasswordResetEmail(email: any, newPassword: string) {
+  function sendPasswordResetEmail(email: any, newPassword: string, user_name: any) {
     const mailOptions = {
       from: 'office@ingoapp.at',
       to: email, 
       subject: 'Passwort erfolgreich zurückgesetzt',
-      text: `Hi! \n Du hast erfolgreich dein Passwort zurückgesetzt. Dein neues Passwort lautet ${newPassword}. \n Du kannst dieses Passwort jederzeit in deinen Profileinstellungen wieder ändern`,
+      //text: `Hi! \n Du hast erfolgreich dein Passwort zurückgesetzt. Dein neues Passwort lautet ${newPassword}. \n Du kannst dieses Passwort jederzeit in deinen Profileinstellungen wieder ändern`,
+      template: 'resetmail',
+      context: {
+        newPassword: newPassword,
+        user: user_name,
+      },
     };
   
     transporter.sendMail(mailOptions, (error, info) => {
       if (error) {
         console.error('Error sending email:', error);
       } else {
-        console.log('Email sent:', info.response);
+        console.log('Reset-Email sent:', info.response);
       }
     });
   }
