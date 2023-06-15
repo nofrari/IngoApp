@@ -55,11 +55,7 @@ class BudgetModel {
       );
 
   bool isCompleted() {
-    if (budget_name != "" &&
-        budget_amount != 0 &&
-        categoryIds.isNotEmpty &&
-        startdate != DateTime(2000) &&
-        enddate != DateTime(2000)) {
+    if (budget_name != "" && budget_amount != 0 && categoryIds.isNotEmpty) {
       return true;
     } else {
       return false;
