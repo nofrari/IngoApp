@@ -40,7 +40,7 @@ class _LoginState extends State<Login> {
   TextInputFormatter mail = FilteringTextInputFormatter.allow(
       RegExp(r"[a-zA-Z0-9ÄÖÜäöüß@#+:'()&/^\-{2}|\s\.]"));
   TextInputFormatter password = FilteringTextInputFormatter.allow(
-      RegExp(r"[a-zA-Z0-9ÄÖÜäöüß#+:'()&/^\-{2}|\s\.]"));
+      RegExp(r"[a-zA-Z0-9ÄÖÜäöüß#+:'()&/^\-{2}|\s@.?%*$!]"));
   TextInputType numeric = TextInputType.number;
   TextInputType text = TextInputType.text;
 
@@ -111,6 +111,11 @@ class _LoginState extends State<Login> {
                           return Strings.alertMail;
                         }
                         return null;
+                      },
+                      onChanged: (value) {
+                        controllerMail.value = TextEditingValue(
+                            text: value.toLowerCase(),
+                            selection: controllerMail.selection);
                       },
                     ),
                     InputField(

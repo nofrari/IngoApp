@@ -223,7 +223,6 @@ class _RegisterState extends State<Register> {
                           }
                           return null;
                         },
-                        textCapitalization: TextCapitalization.none,
                         onChanged: (value) {
                           controllerMail.value = TextEditingValue(
                               text: value.toLowerCase(),
@@ -257,9 +256,11 @@ class _RegisterState extends State<Register> {
                               .contains(RegExp(r'[!-@#$%^&*(),.?":{}|]'))) {
                             return "Dein Passwort muss ein Sonderzeichen beinhalten.";
                           }
+
                           if (!valuePW.contains(RegExp(r'[a-z]'))) {
                             return "Dein Passwort muss mindestens einen \nKleinbuchstaben beinhalten.";
                           }
+
                           if (!valuePW.contains(RegExp(r'[A-Z]'))) {
                             return "Dein Passwort muss mindestens einen \nGroßbuchstaben beinhalten.";
                           }
