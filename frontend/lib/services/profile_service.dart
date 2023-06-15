@@ -16,6 +16,7 @@ class ProfileService extends ChangeNotifier {
     required String firstname,
     required String lastname,
     required String email,
+    required String token,
   }) async {
     try {
       User user = User(
@@ -23,6 +24,7 @@ class ProfileService extends ChangeNotifier {
         firstName: firstname,
         lastName: lastname,
         email: email,
+        token: token,
       );
       _prefs.setString('user', jsonEncode(user.toJson()));
     } catch (e) {
@@ -38,7 +40,7 @@ class ProfileService extends ChangeNotifier {
       return user;
     } catch (e) {
       debugPrint(e.toString());
-      return User(id: "", firstName: "", lastName: "", email: "");
+      return User(id: "", firstName: "", lastName: "", email: "", token: "");
     }
   }
 }

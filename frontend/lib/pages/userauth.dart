@@ -1,4 +1,7 @@
+import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
+import 'package:frontend/services/profile_service.dart';
+import 'package:provider/provider.dart';
 
 import 'register.dart';
 import 'login.dart';
@@ -7,6 +10,27 @@ import '../constants/colors.dart';
 import '../constants/values.dart';
 
 import '../widgets/toggle_button_selina.dart';
+
+void logOut(DioError dioError, BuildContext context) async {
+  if (dioError.response != null && dioError.response!.statusCode == 403) {
+    debugPrint('error: 403 - Token invalid');
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(
+        content: Text(
+            'Aus Sicherheitsgründen wurdest du abgemeldet. Bitte melde dich erneut an.'),
+      ),
+    );
+    await context
+        .read<ProfileService>()
+        .setUser(id: "", firstname: "", lastname: "", email: "", token: "");
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => Auth(),
+      ),
+    );
+  }
+}
 
 class Auth extends StatefulWidget {
   Auth({this.showLogin, super.key});

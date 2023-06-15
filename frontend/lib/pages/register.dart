@@ -72,7 +72,7 @@ class _RegisterState extends State<Register> {
 
       await context.read<InitialService>().setInterval(interval);
     } catch (e) {
-      print(e);
+      debugPrint(e.toString());
     }
     //Subtypes
     try {
@@ -90,7 +90,7 @@ class _RegisterState extends State<Register> {
 
       await context.read<InitialService>().setIntervalSubtype(intervalSubtypes);
     } catch (e) {
-      print(e);
+      debugPrint(e.toString());
     }
   }
 
@@ -108,7 +108,7 @@ class _RegisterState extends State<Register> {
 
       await context.read<InitialService>().setTransactionType(type);
     } catch (e) {
-      print(e);
+      debugPrint(e.toString());
     }
   }
 

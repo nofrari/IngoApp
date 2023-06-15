@@ -9,6 +9,7 @@ import verifyToken from '../middleware/verifyToken';
 import bcrypt from 'bcrypt';
 import { request } from 'http';
 import path, { parse } from 'path';
+import { checkToken } from '..';
 
 const prisma = new PrismaClient();
 const router = express.Router();
@@ -396,8 +397,13 @@ router.get('/transactions/:id', async (req, res) => {
   res.send(transaction);
 });
 
-router.get('/transactions/list/:user_id', async (req, res) => {
-  const user_id = req.params.user_id;
+router.get('/transactions/list/:userId', async (req, res) => {
+  const user_id = req.params.userId;
+
+  if (await checkToken(req) == false) {
+    res.status(403).send();
+    return;
+  }
 
   const transactions = await prisma.transaction.findMany({
     where: {

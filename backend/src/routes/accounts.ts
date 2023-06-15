@@ -2,6 +2,7 @@ import express from 'express';
 import { Account, PrismaClient } from '@prisma/client';
 import { z } from 'zod';
 import { getRecurringTransactions } from './transactions';
+import { checkToken } from '..';
 
 const prisma = new PrismaClient();
 const router = express.Router();
@@ -98,8 +99,13 @@ router.delete('/accounts/:id', async (req, res) => {
     res.json({ message: 'Account erfolgreich gelöscht' });
 });
 
-router.get('/accounts/totalAmount/:user_id', async (req, res) => {
-    const user_id = req.params.user_id;
+router.get('/accounts/totalAmount/:userId', async (req, res) => {
+    const user_id = req.params.userId;
+
+    if (await checkToken(req) == false) {
+        res.status(403).send();
+        return;
+    }
 
     const accounts = await prisma.account.findMany({ where: { user_id: user_id } });
     const accountsWithAmount = await getAccountsWithAmount(accounts);
@@ -122,8 +128,12 @@ router.get('/accounts/:id', async (req, res) => {
     res.send(account);
 });
 
-router.get('/accounts/list/:user_id', async (req, res) => {
-    const user_id = req.params.user_id;
+router.get('/accounts/list/:userId', async (req, res) => {
+    const user_id = req.params.userId;
+    if (await checkToken(req) == false) {
+        res.status(403).send();
+        return;
+    }
 
     const accounts = await prisma.account.findMany({
         where: { user_id: user_id },

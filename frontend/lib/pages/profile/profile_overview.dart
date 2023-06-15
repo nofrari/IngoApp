@@ -24,7 +24,8 @@ class ProfileOverview extends StatefulWidget {
 }
 
 class _ProfileOverviewState extends State<ProfileOverview> {
-  User user = User(id: "", firstName: " ", lastName: " ", email: " ");
+  User user =
+      User(id: "", firstName: " ", lastName: " ", email: " ", token: "");
   TextInputFormatter letters = FilteringTextInputFormatter.allow(
       RegExp(r"[a-zA-Z0-9ÄÖÜäöüß#+:'()&/^\-{2}|\s\.]"));
 
@@ -358,7 +359,11 @@ class _ProfileOverviewState extends State<ProfileOverview> {
     var response =
         await dio.post("${Values.serverURL}/users/edit", data: formData);
     await context.read<ProfileService>().setUser(
-        id: user.id, firstname: firstName, lastname: lastName, email: email);
+        id: user.id,
+        firstname: firstName,
+        lastname: lastName,
+        email: email,
+        token: user.token);
     debugPrint(response.toString());
   }
 

@@ -2,6 +2,7 @@ import express from 'express';
 import { PrismaClient } from '@prisma/client';
 import { z } from 'zod';
 import { CarteVitaleV1 } from 'mindee/src/documents/fr';
+import { checkToken } from '..';
 
 const prisma = new PrismaClient();
 const router = express.Router();
@@ -153,8 +154,13 @@ router.get('/categories/single/:id', async (req, res) => {
   res.send(category);
 });
 
-router.get('/categories/:user_id', async (req, res) => {
-  const user_id = req.params.user_id;
+router.get('/categories/:userId', async (req, res) => {
+  const user_id = req.params.userId;
+
+  if (await checkToken(req) == false) {
+    res.status(403).send();
+    return;
+  }
 
   const categories = await prisma.category.findMany({
     where: { user_id: user_id },

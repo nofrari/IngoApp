@@ -3,15 +3,21 @@ class User {
       {required this.id,
       required this.firstName,
       required this.lastName,
+      required this.token,
       required this.email});
 
   final String id;
   String firstName;
   String lastName;
   String email;
+  String token;
 
   String get abreviationName {
-    return firstName[0] + lastName[0];
+    try {
+      return firstName[0] + lastName[0];
+    } catch (e) {
+      return "";
+    }
   }
 
   //convert model to json
@@ -20,6 +26,7 @@ class User {
         "user_name": firstName,
         "user_sirname": lastName,
         "email": email,
+        "token": token,
       };
 
   //convert json to model
@@ -28,5 +35,6 @@ class User {
         firstName: json["user_name"],
         lastName: json["user_sirname"],
         email: json["email"],
+        token: json["token"],
       );
 }
