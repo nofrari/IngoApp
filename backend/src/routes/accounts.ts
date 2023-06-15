@@ -157,8 +157,9 @@ async function getAccountsWithAmount(accounts: Account[]) {
                 case "2":
                     negative += recurringTransaction.transaction_amount;
                     break;
-                case "3": //TODO: Nora fragen
-
+                case "3":
+                    //for Ausgangskonto its always negative
+                    negative += recurringTransaction.transaction_amount;
                     break;
                 default:
                     break;
@@ -172,6 +173,23 @@ async function getAccountsWithAmount(accounts: Account[]) {
             user_id: account.user_id,
         });
     }
+
+    //now the accounts that are listed as target accounts of transfers need to be updated
+    const transfers = await prisma.transaction.findMany({
+        where: { type_id: "3" },
+    });
+
+    const recurringTransfers = getRecurringTransactions(transfers);
+    for (const transfer in recurringTransfers) {
+        // find transfer.transfer_account_id in accountsWithAmount and update the account_balance
+        const account = accountsWithAmount.find(
+            (account) => account.account_id === recurringTransfers[transfer].transfer_account_id
+        );
+        if (account) {
+            account.account_balance += recurringTransfers[transfer].transaction_amount;
+        }
+    }
+
     return accountsWithAmount;
 }
 

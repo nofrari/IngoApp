@@ -437,17 +437,19 @@ router.get('/transactions/list/:user_id', async (req, res) => {
 
   }
 
-  duplicatedTransactions.sort((a, b) => {
-    const dateA = new Date(a.date);
-    const dateB = new Date(b.date);
-    return dateB.getTime() - dateA.getTime();
-  });
+  // duplicatedTransactions.sort((a, b) => {
+  //   const dateA = new Date(a.date);
+  //   const dateB = new Date(b.date);
+  //   return dateB.getTime() - dateA.getTime();
+  // });
 
   transactions.push(...duplicatedTransactions);
 
   //sort new transactions by date descending
   transactions.sort((a, b) => {
-    return b.date.getTime() - a.date.getTime();
+    const dateA = new Date(a.date);
+    const dateB = new Date(b.date);
+    return dateB.getTime() - dateA.getTime();
   }
   );
   console.log("---------------------------------------------------------------");
@@ -574,7 +576,6 @@ export function getRecurringTransactions(transactions: Transaction[]) {
 }
 
 function getNewTransaction(transaction: Transaction, date: Date) {
-  console.log("date", date);
   var newTransaction = JSON.parse(JSON.stringify(transaction));
   var newDate = date;
   newTransaction.date = newDate;

@@ -27,6 +27,8 @@ Future<List<TransactionModel>> getTransactions(BuildContext context) async {
     Response response = await Dio().get(
         '${Values.serverURL}/transactions/list/${context.read<ProfileService>().getUser().id}');
 
+    debugPrint(response.data.toString());
+
     List<TransactionModel> transactions = [];
     List<TransactionModel> latestTransactions = [];
 
@@ -49,8 +51,13 @@ Future<List<TransactionModel>> getTransactions(BuildContext context) async {
       );
     }
     //add the top five transactions from transaction list to latestTransactions
-    for (var i = 0; i < 5; i++) {
+    var count = 0;
+    for (var i = 0; i < transactions.length; i++) {
       latestTransactions.add(transactions[i]);
+      count++;
+      if (count == 5) {
+        break;
+      }
     }
     await context.read<TransactionService>().setTransactions(transactions);
     return latestTransactions;
