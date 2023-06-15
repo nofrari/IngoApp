@@ -33,14 +33,6 @@ class Register extends StatefulWidget {
   });
   bool? focus = false;
 
-  // bool get firstRegister => _registerState.firstRegister;
-
-  // set firstRegister(bool value) {
-  //   _registerState.firstRegister = value;
-  // }
-
-  // late final _RegisterState _registerState = _RegisterState();
-
   @override
   State<Register> createState() => _RegisterState();
 }
@@ -348,9 +340,6 @@ class _RegisterState extends State<Register> {
                           builder: (context) => Auth(showLogin: true),
                         ),
                       );
-                      // setState(() {
-                      //   widget.firstRegister = true;
-                      // });
                     },
                     theme: ButtonColorTheme.secondaryLight,
                   )),
