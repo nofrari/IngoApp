@@ -23,7 +23,8 @@ class DeleteProfile extends StatefulWidget {
 }
 
 class _DeleteProfileState extends State<DeleteProfile> {
-  User user = User(id: "", firstName: " ", lastName: " ", email: " ");
+  User user =
+      User(id: "", firstName: " ", lastName: " ", email: " ", token: "");
 
   Dio dio = Dio();
 
@@ -102,7 +103,8 @@ class _DeleteProfileState extends State<DeleteProfile> {
                                     id: "",
                                     firstname: "",
                                     lastname: "",
-                                    email: "");
+                                    email: "",
+                                    token: "");
                                 Navigator.push(
                                   context,
                                   MaterialPageRoute(

@@ -11,32 +11,32 @@ const prisma = new PrismaClient();
 const router = express.Router();
 //is used to check the parameters of the request body
 const registerSchema = z.object({
-    user_name: z.string(),
-    user_sirname: z.string(),
-    email: z.string(),
-    password: z.string(),
-    email_confirmed: z.boolean().optional(),
+  user_name: z.string(),
+  user_sirname: z.string(),
+  email: z.string(),
+  password: z.string(),
+  email_confirmed: z.boolean().optional(),
 });
 type RegisterSchema = z.infer<typeof registerSchema>;
 
 const loginSchema = z.object({
-    email: z.string(),
-    password: z.string()
+  email: z.string(),
+  password: z.string()
 });
 type LoginSchema = z.infer<typeof loginSchema>;
 
 const editSchema = z.object({
-    user_id: z.string(),
-    user_name: z.string().optional(),
-    user_sirname: z.string().optional(),
-    email: z.string(),
-    old_password: z.string().optional(),
-    new_password: z.string().optional(),
+  user_id: z.string(),
+  user_name: z.string().optional(),
+  user_sirname: z.string().optional(),
+  email: z.string(),
+  old_password: z.string().optional(),
+  new_password: z.string().optional(),
 });
 type EditSchema = z.infer<typeof editSchema>;
 
 const resetPasswordSchema = z.object({
-    email: z.string(),
+  email: z.string(),
 });
 type ResetPasswordSchema = z.infer<typeof resetPasswordSchema>;
 
@@ -48,137 +48,138 @@ type ResetPasswordSchema = z.infer<typeof resetPasswordSchema>;
 
 //edit user
 router.post('/users/edit', async (req, res) => {
-    const body = <EditSchema>req.body;
-    const validationResult = editSchema.safeParse(body);
+  const body = <EditSchema>req.body;
+  const validationResult = editSchema.safeParse(body);
 
-    if (!validationResult.success) {
-        res.status(400).send();
-        return;
+  if (!validationResult.success) {
+    res.status(400).send();
+    return;
+  }
+
+  const user = await prisma.user.findUnique({
+    where: {
+      user_id: body.user_id
     }
+  });
 
-    const user = await prisma.user.findUnique({
-        where: {
-            user_id: body.user_id
-        }
+  if (!user) {
+    res.status(404).send();
+    return;
+  }
+
+  //if blocks to check which parameter is sent in the request body and then update the database
+  if (body.user_name && body.user_sirname && body.email) {
+    await prisma.user.update({
+      where: {
+        user_id: body.user_id
+      },
+      data: {
+        user_name: body.user_name,
+        user_sirname: body.user_sirname,
+        email: body.email
+      }
     });
 
-    if (!user) {
-        res.status(404).send();
-        return;
+    res.status(200).send();
+
+  } else if (body.old_password && body.new_password) {
+    const match = await bcrypt.compare(body.old_password, user.password);
+
+    if (!match) {
+      res.status(401).send();
+      return;
     }
 
-    //if blocks to check which parameter is sent in the request body and then update the database
-    if (body.user_name && body.user_sirname && body.email) {
-        await prisma.user.update({
-            where: {
-                user_id: body.user_id
-            },
-            data: {
-                user_name: body.user_name,
-                user_sirname: body.user_sirname,
-                email: body.email
-            }
-        });
+    const hash = await bcrypt.hash(body.new_password, 10);
 
-        res.status(200).send();
+    await prisma.user.update({
+      where: {
+        user_id: body.user_id
+      },
+      data: {
+        password: hash
+      }
+    });
 
-    } else if (body.old_password && body.new_password) {
-        const match = await bcrypt.compare(body.old_password, user.password);
+    res.status(200).send();
 
-        if (!match) {
-            res.status(401).send();
-            return;
-        }
-
-        const hash = await bcrypt.hash(body.new_password, 10);
-
-        await prisma.user.update({
-            where: {
-                user_id: body.user_id
-            },
-            data: {
-                password: hash
-            }
-        });
-
-        res.status(200).send();
-
-    } else {
-        res.status(406).send();
-        return;
-    }
+  } else {
+    res.status(406).send();
+    return;
+  }
 });
 
 //create new user (register)
 router.post('/users/register', async (req, res) => {
-    const body = <RegisterSchema>req.body;
-    const validationResult = registerSchema.safeParse(body);
+  const body = <RegisterSchema>req.body;
+  const validationResult = registerSchema.safeParse(body);
 
-    if (!validationResult.success) {
-        res.status(400).send();
-        return;
+  if (!validationResult.success) {
+    res.status(400).send();
+    return;
+  }
+
+  const existingUser = await prisma.user.findUnique({
+    where: {
+      email: body.email
     }
+  });
 
-    const existingUser = await prisma.user.findUnique({
-        where: {
-            email: body.email
-        }
-    });
+  if (existingUser) {
+    res.status(409).send();
+    console.log(existingUser);
+    return;
+  }
 
-    if (existingUser) {
-        res.status(409).send();
-        console.log(existingUser);
-        return;
+  const hash = await bcrypt.hash(body.password, 10);
+
+  const user = await prisma.user.create({
+    data: {
+      user_name: body.user_name,
+      user_sirname: body.user_sirname,
+      email: body.email,
+      password: hash,
+      email_confirmed: false,
     }
+  });
 
-    const hash = await bcrypt.hash(body.password, 10);
+  //create confirmation token and send email
+  const confirmationToken = jwt.sign({
+    //token expires after 10 minutes
+    userId: user.user_id,
+    exp: Math.floor(Date.now() / 1000) + (60 * 10)
+  }, process.env.JWT_SECRET);
 
-    const user = await prisma.user.create({
-      data: {
-        user_name: body.user_name,
-        user_sirname: body.user_sirname,
-        email: body.email,
-        password: hash,
-        email_confirmed: false,
-      }
-    });
+  sendConfirmationEmail(user.email, confirmationToken, user.user_name);
 
-    //create confirmation token and send email
-    const confirmationToken = jwt.sign({
-     //token expires after 10 minutes
-     userId: user.user_id,
-      exp: Math.floor(Date.now() / 1000) + (60 * 1)
-    }, process.env.JWT_SECRET);
-
-    sendConfirmationEmail(user.email, confirmationToken, user.user_name);   
- 
-    res.status(200).send({
+  res.status(200).send({
     message: 'Registration successful. Please check your email for confirmation.',
     user_id: user.user_id,
-        user_name: user.user_name,
-        user_sirname: user.user_sirname,
-        email: user.email
-    });
+    user_name: user.user_name,
+    user_sirname: user.user_sirname,
+    email: user.email
+  });
 });
 
 //get one user by id
 //for testing: copy token from login or register and paste it in the authorization header under Bearer token
 router.get('/users/:id', async (req, res) => {
-    const user = await prisma.user.findUnique({ where: { user_id: req.params.id } });
-    res.send(user);
+  const user = await prisma.user.findUnique({ where: { user_id: req.params.id } });
+  res.send(user);
 });
 
 router.get('/users/delete/:id', async (req, res) => {
-    try {
-        await prisma.user.delete({ where: { user_id: req.params.id } });
-        res.send(200);
-    } catch (error) {
-        res.send(error);
-    }});
+  try {
+    await prisma.user.delete({ where: { user_id: req.params.id } });
+    res.send(200);
+  } catch (error) {
+    res.send(error);
+  }
+});
 
 //confirm email
 router.get('/users/confirm-email/:confirmationToken', async (req, res) => {
-   try {
+  try {
     //decode token
     var decodedToken = await <any>jwt.decode(req.params.confirmationToken, process.env.JWT_SECRET);
     console.log('decodedToken', decodedToken);
@@ -188,7 +189,7 @@ router.get('/users/confirm-email/:confirmationToken', async (req, res) => {
       where: {
         user_id: decodedToken.userId,
       },
-    }); 
+    });
     console.log('user', user);
 
     if (!user) {
@@ -210,269 +211,278 @@ router.get('/users/confirm-email/:confirmationToken', async (req, res) => {
         },
       });
       console.log('updatedUser', updatedUser);
-      
+
       res.redirect('https://www.ingoapp.at/email-bestaetigt');
     } else {
       res.redirect('https://www.ingoapp.at/email-bestaetigt');
       return;
     }
 
-    } catch (error) {  
-      console.log('wir sind im catch');
-      // Retrieve the user from the database
-      var decodedToken = await <any>jwt.decode(req.params.confirmationToken, process.env.JWT_SECRET);
+  } catch (error) {
+    console.log('wir sind im catch');
+    // Retrieve the user from the database
+    var decodedToken = await <any>jwt.decode(req.params.confirmationToken, process.env.JWT_SECRET);
 
-      var user = await prisma.user.findUnique({
-        where: {
-          user_id: decodedToken.userId,
-        },
-      });
-
-      if (!user) {
-        return;
-      } else {
-        //if the user exists but the token is expired, delete the user
-        await prisma.user.delete({ where: { user_id: decodedToken.userId } });
-        res.redirect('https://www.ingoapp.at/token-abgelaufen');
-        return;
-      }   
-    }
-  });
-
-  //user login
-  router.post('/users/login', async (req, res) => {
-    const body = <LoginSchema>req.body;
-    const validationResult = loginSchema.safeParse(body);
-
-    if (!validationResult.success) {
-        res.status(400).send();
-        return;
-    }
-
-    const user = await prisma.user.findUnique({
-        where: {
-            email: body.email
-        }
-    });
-
-    if (!user) {
-        res.status(404).send();
-        return;
-    }
-
-    const match = await bcrypt.compare(body.password, user.password);
-
-    if (!match) {
-        res.status(401).send();
-        return;
-    }
-
-    const confirmed = user.email_confirmed;
-
-    if (!confirmed) { 
-        res.status(403).send();
-        return; 
-    }
-
-    //check how many accounts the user has
-    const accounts = await prisma.account.findMany({
-        where: {
-            user_id: user.user_id
-        }
-    });
-
-    res.status(200).send({
-        //accessToken: token,
-        user_id: user.user_id,
-        user_name: user.user_name,
-        user_sirname: user.user_sirname,
-        email: user.email,
-        pin: user.pin,
-        number_accounts: accounts.length
-    });
-  })
-
-  // Reset password / send mail
-  router.post('/users/reset-password', async (req, res) => {
-    const body = <ResetPasswordSchema>req.body;
-    const validationResult = resetPasswordSchema.safeParse(body);
-
-    if (!validationResult.success) {
-        res.status(400).send();
-        return;
-    }
-  
-    // Check if the user with the provided email exists
-    const user = await prisma.user.findUnique({
+    var user = await prisma.user.findUnique({
       where: {
-        email: body.email,
+        user_id: decodedToken.userId,
       },
     });
-  
+
     if (!user) {
-      res.status(404).send();
+      return;
+    } else {
+      //if the user exists but the token is expired, delete the user
+      await prisma.user.delete({ where: { user_id: decodedToken.userId } });
+      res.redirect('https://www.ingoapp.at/token-abgelaufen');
       return;
     }
-  
-    // Generate a new password
-    const newPassword = generateNewPassword(); // Implement your logic to generate a new password
-  
-    // Update the user's password in the database
-    const hash = await bcrypt.hash(newPassword, 10);
-    await prisma.user.update({
-      where: {
-        email: body.email,
-      },
-      data: {
-        password: hash,
-      },
-    });
-  
-    // Send the new password to the user's email
-    sendPasswordResetEmail(body.email, newPassword, user.user_name); // Implement your logic to send the email
-  
-    res.status(200).send("Password reset successfully");
-  });
+  }
+});
 
-  router.post('/users/init', async (req, res) => {
-    try {
-        // Hier kannst du deine vordefinierten Werte angeben
-        const predefinedInterval = [
-            { interval_name: 'Nie' },
-            { interval_name: 'Wöchentlich' },
-            { interval_name: 'Monatlich' },
-            { interval_name: 'Vierteljährlich' },
-            { interval_name: 'Halbjährlich' },
-            { interval_name: 'Jährlich' },
-        ];
+//user login
+router.post('/users/login', async (req, res) => {
+  const body = <LoginSchema>req.body;
+  const validationResult = loginSchema.safeParse(body);
 
-        const predefinedTypes = [
-            { type_name: 'Einnahmen' },
-            { type_name: 'Ausgaben' },
-            { type_name: 'Transaktion' },
-        ];
+  if (!validationResult.success) {
+    res.status(400).send();
+    return;
+  }
 
-        // Hier kannst du den Code zum Speichern der Werte in die Datenbank einfügen
-        await prisma.interval.createMany({
-            data: predefinedInterval,
-        });
-
-        await prisma.type.createMany({
-            data: predefinedTypes,
-        });
-
-        res.status(200).json({ message: 'Vordefinierte Werte erfolgreich in die Datenbank geschrieben.' });
-    } catch (error) {
-        console.error(error);
-        res.status(500).json({ message: 'Interner Serverfehler.' });
+  const user = await prisma.user.findUnique({
+    where: {
+      email: body.email
     }
   });
 
-  router.get('/types', async (req, res) => {
-      const types = await prisma.type.findMany();
-      res.send(types);
+  if (!user) {
+    res.status(404).send();
+    return;
+  }
+
+  const match = await bcrypt.compare(body.password, user.password);
+
+  if (!match) {
+    res.status(401).send();
+    return;
+  }
+
+  const confirmed = user.email_confirmed;
+
+  if (!confirmed) {
+    res.status(403).send();
+    return;
+  }
+
+  //check how many accounts the user has
+  const accounts = await prisma.account.findMany({
+    where: {
+      user_id: user.user_id
+    }
   });
 
-  router.get('/intervals', async (req, res) => {
+  //create confirmation token and send email
+  const confirmationToken = jwt.sign({
+    //token expires after 1 year
+    userId: user.user_id,
+    exp: Math.floor(Date.now() / 1000) + (60 * 60 * 24 * 365)
+  }, process.env.JWT_SECRET);
 
-      const intervals = await prisma.interval.findMany();
-      res.send(intervals);
+  res.status(200).send({
+    //accessToken: token,
+    user_id: user.user_id,
+    user_name: user.user_name,
+    user_sirname: user.user_sirname,
+    email: user.email,
+    pin: user.pin,
+    token: confirmationToken,
+    number_accounts: accounts.length
   });
+})
 
-  router.get('/intervalsubtypes', async (req, res) => {
+// Reset password / send mail
+router.post('/users/reset-password', async (req, res) => {
+  const body = <ResetPasswordSchema>req.body;
+  const validationResult = resetPasswordSchema.safeParse(body);
 
-      const intervalsubtypes = await prisma.intervalSubtype.findMany();
-      res.send(intervalsubtypes);
-  });
+  if (!validationResult.success) {
+    res.status(400).send();
+    return;
+  }
 
-  // --------------------------- Functions ---------------------------
-  
-  // Email confirmation
-  const transporter = nodemailer.createTransport({
-    host: 'smtp.world4you.com',
-    port: 587,
-    secure: false,
-    auth: {
-      user: 'office@ingoapp.at',
-      pass: 'IagnryNX!26_4go',
+  // Check if the user with the provided email exists
+  const user = await prisma.user.findUnique({
+    where: {
+      email: body.email,
     },
   });
 
-  const hbs = require('nodemailer-express-handlebars');
-  const path = require('path');
-  
-  const handlebarsOptions = {
-      viewEngine: {
-        extName: '.handlebars',
-        partialsDir: path.resolve('./views'),
-        defaultLayout: false,
-      },
-      // go into the views folder and use the layout file
-      viewPath: path.resolve('./views'),
-      extName: '.handlebars',
-    };
-
-  transporter.use('compile', hbs(handlebarsOptions));
-
-  function sendConfirmationEmail(email: any, confirmationToken: string | number, user_name: any) {
-    const confirmationLink = //`https://157.90.249.232:5432/users/confirm-email/${confirmationToken}`;
-    `https://data.ingoapp.at/users/confirm-email/${confirmationToken}`; 
-  
-    const mailOptions = {
-      from: 'office@ingoapp.at',
-      to: email, 
-      subject: 'Email bestätigen',
-      template: 'registermail',
-      context: {
-        confirmationLink: confirmationLink,
-        user: user_name,
-      },
-    };
-  
-    transporter.sendMail(mailOptions, (error, info) => {
-      if (error) {
-        console.error('Error sending email:', error);
-      } else {
-        console.log('Email sent:', info.response);
-      }
-  });}  
-
-   
-  // Password reset
-  function generateNewPassword() {
-    const length = 10; // Length of the new password
-    const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789'; // Characters to include in the new password
-    let newPassword = '';
-  
-    for (let i = 0; i < length; i++) {
-      const randomIndex = Math.floor(Math.random() * characters.length);
-      newPassword += characters[randomIndex];
-    }
-  
-    return newPassword;
+  if (!user) {
+    res.status(404).send();
+    return;
   }
-  
-  function sendPasswordResetEmail(email: any, newPassword: string, user_name: any) {
-    const mailOptions = {
-      from: 'office@ingoapp.at',
-      to: email, 
-      subject: 'Passwort erfolgreich zurückgesetzt',
-      //text: `Hi! \n Du hast erfolgreich dein Passwort zurückgesetzt. Dein neues Passwort lautet ${newPassword}. \n Du kannst dieses Passwort jederzeit in deinen Profileinstellungen wieder ändern`,
-      template: 'resetmail',
-      context: {
-        newPassword: newPassword,
-        user: user_name,
-      },
-    };
-  
-    transporter.sendMail(mailOptions, (error, info) => {
-      if (error) {
-        console.error('Error sending email:', error);
-      } else {
-        console.log('Reset-Email sent:', info.response);
-      }
+
+  // Generate a new password
+  const newPassword = generateNewPassword(); // Implement your logic to generate a new password
+
+  // Update the user's password in the database
+  const hash = await bcrypt.hash(newPassword, 10);
+  await prisma.user.update({
+    where: {
+      email: body.email,
+    },
+    data: {
+      password: hash,
+    },
+  });
+
+  // Send the new password to the user's email
+  sendPasswordResetEmail(body.email, newPassword, user.user_name); // Implement your logic to send the email
+
+  res.status(200).send("Password reset successfully");
+});
+
+router.post('/users/init', async (req, res) => {
+  try {
+    // Hier kannst du deine vordefinierten Werte angeben
+    const predefinedInterval = [
+      { interval_name: 'Nie' },
+      { interval_name: 'Wöchentlich' },
+      { interval_name: 'Monatlich' },
+      { interval_name: 'Vierteljährlich' },
+      { interval_name: 'Halbjährlich' },
+      { interval_name: 'Jährlich' },
+    ];
+
+    const predefinedTypes = [
+      { type_name: 'Einnahmen' },
+      { type_name: 'Ausgaben' },
+      { type_name: 'Transaktion' },
+    ];
+
+    // Hier kannst du den Code zum Speichern der Werte in die Datenbank einfügen
+    await prisma.interval.createMany({
+      data: predefinedInterval,
     });
+
+    await prisma.type.createMany({
+      data: predefinedTypes,
+    });
+
+    res.status(200).json({ message: 'Vordefinierte Werte erfolgreich in die Datenbank geschrieben.' });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: 'Interner Serverfehler.' });
   }
+});
+
+router.get('/types', async (req, res) => {
+  const types = await prisma.type.findMany();
+  res.send(types);
+});
+
+router.get('/intervals', async (req, res) => {
+
+  const intervals = await prisma.interval.findMany();
+  res.send(intervals);
+});
+
+router.get('/intervalsubtypes', async (req, res) => {
+
+  const intervalsubtypes = await prisma.intervalSubtype.findMany();
+  res.send(intervalsubtypes);
+});
+
+// --------------------------- Functions ---------------------------
+
+// Email confirmation
+const transporter = nodemailer.createTransport({
+  host: 'smtp.world4you.com',
+  port: 587,
+  secure: false,
+  auth: {
+    user: 'office@ingoapp.at',
+    pass: 'IagnryNX!26_4go',
+  },
+});
+
+const hbs = require('nodemailer-express-handlebars');
+const path = require('path');
+
+const handlebarsOptions = {
+  viewEngine: {
+    extName: '.handlebars',
+    partialsDir: path.resolve('./views'),
+    defaultLayout: false,
+  },
+  // go into the views folder and use the layout file
+  viewPath: path.resolve('./views'),
+  extName: '.handlebars',
+};
+
+transporter.use('compile', hbs(handlebarsOptions));
+
+function sendConfirmationEmail(email: any, confirmationToken: string | number, user_name: any) {
+  const confirmationLink = //`https://157.90.249.232:5432/users/confirm-email/${confirmationToken}`;
+    `https://data.ingoapp.at/users/confirm-email/${confirmationToken}`;
+
+  const mailOptions = {
+    from: 'office@ingoapp.at',
+    to: email,
+    subject: 'Email bestätigen',
+    template: 'registermail',
+    context: {
+      confirmationLink: confirmationLink,
+      user: user_name,
+    },
+  };
+
+  transporter.sendMail(mailOptions, (error, info) => {
+    if (error) {
+      console.error('Error sending email:', error);
+    } else {
+      console.log('Email sent:', info.response);
+    }
+  });
+}
+
+
+// Password reset
+function generateNewPassword() {
+  const length = 10; // Length of the new password
+  const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789'; // Characters to include in the new password
+  let newPassword = '';
+
+  for (let i = 0; i < length; i++) {
+    const randomIndex = Math.floor(Math.random() * characters.length);
+    newPassword += characters[randomIndex];
+  }
+
+  return newPassword;
+}
+
+function sendPasswordResetEmail(email: any, newPassword: string, user_name: any) {
+  const mailOptions = {
+    from: 'office@ingoapp.at',
+    to: email,
+    subject: 'Passwort erfolgreich zurückgesetzt',
+    //text: `Hi! \n Du hast erfolgreich dein Passwort zurückgesetzt. Dein neues Passwort lautet ${newPassword}. \n Du kannst dieses Passwort jederzeit in deinen Profileinstellungen wieder ändern`,
+    template: 'resetmail',
+    context: {
+      newPassword: newPassword,
+      user: user_name,
+    },
+  };
+
+  transporter.sendMail(mailOptions, (error, info) => {
+    if (error) {
+      console.error('Error sending email:', error);
+    } else {
+      console.log('Reset-Email sent:', info.response);
+    }
+  });
+}
 
 export default router;
 

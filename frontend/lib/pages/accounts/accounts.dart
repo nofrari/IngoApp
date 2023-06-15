@@ -31,7 +31,7 @@ Future<List<Account>> getData(BuildContext context) async {
     await context.read<AccountsService>().setAccounts(accounts: _accounts);
     return _accounts;
   } catch (e) {
-    print(e);
+    debugPrint(e.toString());
     return _accounts;
   }
 }

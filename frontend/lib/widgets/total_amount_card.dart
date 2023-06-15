@@ -1,5 +1,7 @@
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
+import 'package:frontend/models/user.dart';
+import 'package:frontend/pages/userauth.dart';
 import 'package:frontend/services/profile_service.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
@@ -9,7 +11,7 @@ import '../constants/values.dart';
 import '../constants/fonts.dart';
 
 class TotalAmountCard extends StatefulWidget {
-  TotalAmountCard({super.key});
+  const TotalAmountCard({super.key});
   @override
   State<TotalAmountCard> createState() => _TotalAmountCardState();
 }
@@ -19,13 +21,19 @@ class _TotalAmountCardState extends State<TotalAmountCard> {
   late Future<double> _totalAmount;
 
   Future<double> _getTotalAmount() async {
+    User user = context.read<ProfileService>().getUser();
+    dio.options.headers['authorization'] = 'Bearer ${user.token}';
     try {
-      Response response = await Dio().get(
-          '${Values.serverURL}/accounts/totalAmount/${context.read<ProfileService>().getUser().id}');
+      Response response =
+          await dio.get('${Values.serverURL}/accounts/totalAmount/${user.id}');
       return Future.value(
           double.parse(response.data['totalAmount'].toString()));
+    } on DioError catch (dioError) {
+      debugPrint(dioError.toString());
+      logOut(dioError, context);
+      return Future.value(0.0);
     } catch (e) {
-      print(e);
+      debugPrint(e.toString());
       return Future.value(0.0);
     }
   }

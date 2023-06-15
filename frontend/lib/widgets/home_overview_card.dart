@@ -1,7 +1,9 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:frontend/models/category.dart';
+import 'package:frontend/models/user.dart';
 import 'package:frontend/pages/categories/categories.dart';
+import 'package:frontend/pages/userauth.dart';
 import 'package:frontend/services/accounts_service.dart';
 import 'package:frontend/services/initial_service.dart';
 import 'package:frontend/services/manualentry_service.dart';
@@ -24,8 +26,11 @@ import '../services/initial_service.dart';
 
 Future<List<TransactionModel>> getTransactions(BuildContext context) async {
   try {
-    Response response = await Dio().get(
-        '${Values.serverURL}/transactions/list/${context.read<ProfileService>().getUser().id}');
+    Dio dio = Dio();
+    User user = context.read<ProfileService>().getUser();
+    dio.options.headers['authorization'] = 'Bearer ${user.token}';
+    Response response =
+        await dio.get('${Values.serverURL}/transactions/list/${user.id}');
 
     debugPrint(response.data.toString());
 
@@ -61,9 +66,13 @@ Future<List<TransactionModel>> getTransactions(BuildContext context) async {
     }
     await context.read<TransactionService>().setTransactions(transactions);
     return latestTransactions;
+  } on DioError catch (dioError) {
+    debugPrint(dioError.toString());
+    logOut(dioError, context);
+    return [];
   } catch (e) {
     print("fehler");
-    print(e);
+    debugPrint(e.toString());
     return [];
   }
 }
@@ -103,8 +112,11 @@ class _HomeOverviewCardState extends State<HomeOverviewCard> {
 
   Future<void> _getCategories() async {
     try {
-      Response response = await Dio().get(
-          '${Values.serverURL}/categories/${context.read<ProfileService>().getUser().id}');
+      Dio dio = Dio();
+      User user = context.read<ProfileService>().getUser();
+      dio.options.headers['authorization'] = 'Bearer ${user.token}';
+      Response response =
+          await dio.get('${Values.serverURL}/categories/${user.id}');
       List<CategoryModel> categoryList = [];
 
       if (response.data['categories'] != null) {
@@ -126,15 +138,21 @@ class _HomeOverviewCardState extends State<HomeOverviewCard> {
         }
         await context.read<InitialService>().setCategories(categoryList);
       }
+    } on DioError catch (dioError) {
+      debugPrint(dioError.toString());
+      logOut(dioError, context);
     } catch (e) {
-      print(e);
+      debugPrint(e.toString());
     }
   }
 
   Future<void> _getAccounts() async {
     try {
-      Response response = await Dio().get(
-          '${Values.serverURL}/accounts/list/${context.read<ProfileService>().getUser().id}');
+      Dio dio = Dio();
+      User user = context.read<ProfileService>().getUser();
+      dio.options.headers['authorization'] = 'Bearer ${user.token}';
+      Response response =
+          await dio.get('${Values.serverURL}/accounts/list/${user.id}');
 
       for (var i = 0; i < response.data.length; i++) {
         accounts.add(Account(
@@ -149,8 +167,11 @@ class _HomeOverviewCardState extends State<HomeOverviewCard> {
       setState(() {
         allAccounts = accounts;
       });
+    } on DioError catch (dioError) {
+      debugPrint(dioError.toString());
+      logOut(dioError, context);
     } catch (e) {
-      print(e);
+      debugPrint(e.toString());
     }
   }
 

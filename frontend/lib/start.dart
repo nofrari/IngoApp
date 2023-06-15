@@ -4,7 +4,6 @@ import 'dart:ffi';
 import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:dio/dio.dart';
 import 'package:frontend/pages/categories/categories.dart';
 import 'package:frontend/services/profile_service.dart';
 import 'package:internet_connection_checker/internet_connection_checker.dart';
@@ -78,8 +77,6 @@ class _StartState extends State<Start> {
           currentTab = 0;
       }
     }
-
-    fetchDataFromDatabase();
   }
 
   getConnectivity() =>
@@ -100,27 +97,8 @@ class _StartState extends State<Start> {
     super.dispose();
   }
 
-  User user = User(id: "", firstName: " ", lastName: " ", email: " ");
-
-//TODO: löschen falls nicht mehr gebraucht
-  void fetchDataFromDatabase() async {
-    try {
-      Response response = await Dio().get(
-          '${Values.serverURL}/users/${context.read<ProfileService>().getUser().id}');
-
-      setState(() {
-        user = User(
-          id: response.data['user_id'],
-          firstName: response.data['user_name'].toString(),
-          lastName: response.data['user_sirname'].toString(),
-          email: response.data['email'].toString(),
-        );
-      });
-    } catch (error, stackTrace) {
-      print('Error: $error');
-      print('Stacktrace: $stackTrace');
-    }
-  }
+  User user =
+      User(id: "", firstName: " ", lastName: " ", email: " ", token: "");
 
   //variable for current Tab
   int currentTab = 0;

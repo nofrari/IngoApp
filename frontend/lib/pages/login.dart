@@ -6,8 +6,10 @@ import 'package:frontend/constants/values.dart';
 import 'package:frontend/models/category.dart';
 import 'package:frontend/models/color.dart';
 import 'package:frontend/models/icon.dart';
+import 'package:frontend/models/user.dart';
 import 'package:frontend/pages/accounts/startaccount.dart';
 import 'package:frontend/pages/password_reset.dart';
+import 'package:frontend/pages/userauth.dart';
 import 'package:frontend/services/initial_service.dart';
 import 'package:frontend/services/profile_service.dart';
 import 'package:provider/provider.dart';
@@ -189,9 +191,10 @@ class _LoginState extends State<Login> {
   void getData(BuildContext context) async {
     List<ColorModel> colors = [];
     List<IconModel> icons = [];
+    User user = context.read<ProfileService>().getUser();
+    dio.options.headers['authorization'] = 'Bearer ${user.token}';
     try {
-      var response = await dio.get(
-          "${Values.serverURL}/categories/${context.read<ProfileService>().getUser().id}");
+      var response = await dio.get("${Values.serverURL}/categories/${user.id}");
 
       if (response.data != null) {
         for (var color in response.data['colors']) {
@@ -205,12 +208,6 @@ class _LoginState extends State<Login> {
         await context.read<InitialService>().setColors(colors);
         await context.read<InitialService>().setIcons(icons);
       }
-    } catch (e) {
-      debugPrint(e.toString());
-    }
-    try {
-      Response response = await Dio().get(
-          '${Values.serverURL}/categories/${context.read<ProfileService>().getUser().id}');
       List<CategoryModel> categoryList = [];
 
       if (response.data['categories'] != null) {
@@ -232,8 +229,11 @@ class _LoginState extends State<Login> {
         }
         await context.read<InitialService>().setCategories(categoryList);
       }
+    } on DioError catch (dioError) {
+      debugPrint(dioError.toString());
+      logOut(dioError, context);
     } catch (e) {
-      print(e);
+      debugPrint(e.toString());
     }
     //response listen zu categorie liste und in shared pref
   }
@@ -252,7 +252,8 @@ class _LoginState extends State<Login> {
           id: response.data['user_id'],
           firstname: response.data['user_name'].toString(),
           lastname: response.data['user_sirname'],
-          email: response.data['email']);
+          email: response.data['email'],
+          token: response.data['token']);
       getData(context);
 
       setState(() {

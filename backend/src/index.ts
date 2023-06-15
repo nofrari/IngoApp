@@ -11,6 +11,10 @@ import categoriesRouter from './routes/categories';
 import fs, { readFileSync } from 'fs';
 import PDFDocument, { options } from 'pdfkit';
 import sharp from 'sharp';
+import jwt from 'jsonwebtoken';
+
+
+const process = require('process');
 
 //const fs = require('fs');
 //const imgToPDF = require('image-to-pdf');
@@ -122,11 +126,11 @@ app.post('/scanner/upload', upload.array('image'), async (req, res) => {
   });
 
   //mindee parser
-  // const apiResponse = mindeeClient
-  //     .docFromPath("./src/uploads/" + files[0].filename)
-  //     .parse(mindee.ReceiptV4);
+  const apiResponse = mindeeClient
+    .docFromPath("./src/uploads/" + files[0].filename)
+    .parse(mindee.ReceiptV4);
 
-  testResponse
+  apiResponse
     .then((resp: any) => {
       console.log(resp);
       //Using Invoice
@@ -202,4 +206,20 @@ export function add(first: number, second: number) {
     throw new Error();
   }
   return first + second;
+}
+
+export async function checkToken(req: express.Request): Promise<boolean> {
+  try {
+    const bearerToken = req.headers.authorization?.split(' ')[1];
+    if (!bearerToken) {
+      return false;
+    }
+    var decodedToken = await <any>jwt.decode(bearerToken, process.env.JWT_SECRET);
+    if (!decodedToken || decodedToken.exp < Date.now() / 1000 || decodedToken.userId != req.params.userId) {
+      return false;
+    }
+    return true;
+  } catch (error) {
+    return false;
+  }
 }

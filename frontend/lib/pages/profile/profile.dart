@@ -23,7 +23,8 @@ class Profile extends StatefulWidget {
 }
 
 class _ProfileState extends State<Profile> {
-  User user = User(id: "", firstName: " ", lastName: " ", email: " ");
+  User user =
+      User(id: "", firstName: " ", lastName: " ", email: " ", token: "");
   @override
   Widget build(BuildContext context) {
     setState(() {
@@ -89,7 +90,11 @@ class _ProfileState extends State<Profile> {
                     btnText: Strings.profileLogout,
                     onTap: () async {
                       await context.read<ProfileService>().setUser(
-                          id: "", firstname: "", lastname: "", email: "");
+                          id: "",
+                          firstname: "",
+                          lastname: "",
+                          email: "",
+                          token: "");
                       Navigator.push(context,
                           MaterialPageRoute(builder: (context) => Auth()));
                     },
