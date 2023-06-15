@@ -128,3 +128,8 @@ model Color {
   color_name String
   category   Category[]
 }
+
+model ApiCalls {
+  api_calls_id String @id @unique @default(cuid())
+  count        Int    @default(0)
+}

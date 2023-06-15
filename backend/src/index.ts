@@ -12,15 +12,18 @@ import fs, { readFileSync } from 'fs';
 import PDFDocument, { options } from 'pdfkit';
 import sharp from 'sharp';
 import jwt from 'jsonwebtoken';
+import { PrismaClient } from '@prisma/client';
+import accountsRouter from './routes/accounts';
 
 
 const process = require('process');
+const prisma = new PrismaClient();
+
 
 //const fs = require('fs');
 //const imgToPDF = require('image-to-pdf');
 // const PDFDocument = require('pdfkit');
 // const sharp = require('sharp');
-import accountsRouter from './routes/accounts';
 
 const app = express();
 const mindeeClient = new mindee.Client({
@@ -114,23 +117,41 @@ app.post('/scanner/upload', upload.array('image'), async (req, res) => {
     category: '',
   };
 
+  var response: Promise<any>;
+
   const testResponse = new Promise((resolve, reject) => {
     resolve({
       document: {
-        totalAmount: { value: 100 },
-        date: { value: '2021-01-01' },
-        supplier: { value: 'Test' },
-        category: { value: 'Test' },
+        totalAmount: { value: null },
+        date: { value: null },
+        supplier: { value: null },
+        category: { value: null },
       },
     });
   });
 
-  //mindee parser
   const apiResponse = mindeeClient
     .docFromPath("./src/uploads/" + files[0].filename)
     .parse(mindee.ReceiptV4);
 
-  apiResponse
+  const counter = await prisma.apiCalls.findFirst();
+  if (!counter) {
+    return res.status(500).send('Server error');
+  }
+  const updatedCounter = await prisma.apiCalls.update({
+    where: { api_calls_id: counter.api_calls_id },
+    data: { count: counter.count + 1 },
+  });
+
+  if (updatedCounter.count > 240) {
+    response = testResponse;
+  } else {
+    response = apiResponse;
+  }
+
+  //mindee parser
+
+  response
     .then((resp: any) => {
       console.log(resp);
       //Using Invoice
