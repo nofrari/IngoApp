@@ -26,6 +26,7 @@ import 'package:multi_select_flutter/dialog/multi_select_dialog_field.dart';
 import 'package:provider/provider.dart';
 import 'package:intl/intl.dart';
 
+import '../../services/profile_service.dart';
 import '../../widgets/input_fields/dropdown_field_multi.dart';
 import '../../widgets/tag.dart';
 
@@ -51,6 +52,15 @@ class _BudgetAddState extends State<BudgetAdd> {
   TextEditingController controllerStartDate = TextEditingController();
   TextEditingController controllerEndDate = TextEditingController();
 
+  final DatepickerField startDatePicker = DatepickerField(
+    controller: TextEditingController(),
+    errorMsgBgColor: AppColor.neutral500,
+  );
+  final DatepickerField endDatePicker = DatepickerField(
+    controller: TextEditingController(),
+    errorMsgBgColor: AppColor.neutral500,
+  );
+
   String? Function(String?) required = (value) {
     if (value == null) {
       return 'Das Feld darf nicht leer sein';
@@ -60,20 +70,16 @@ class _BudgetAddState extends State<BudgetAdd> {
 
   final _formKey = GlobalKey<FormState>();
 
-//Selina's Pfusch
   List<String> versuch = ["kat1", "kat2", "kat3"];
   List<CategoryModel> categories = [];
   List<String> selectedCategoryTags = [];
   String? selectedCategory;
   CategoryModel? selectedCategoryModel;
   List<CategoryModel> allCategories = [];
+  List<CategoryModel> selectedCategories = [];
 
   Map<String, dynamic> BudgetAdd = {};
-  String? _initialType;
-  String? _initialCategory;
-  String? _initialAccount;
-  String? _initialFrequency;
-  String? _initialFrequencySubtype;
+  List<String>? _initialCategories;
   String? _loadedBudgetId;
 
   Dio dio = Dio();
@@ -93,6 +99,12 @@ class _BudgetAddState extends State<BudgetAdd> {
   }
 
   void handleCategoryTagsChanged(List<String> tags) {
+    setState(() {
+      selectedCategories = allCategories
+          .where((category) => tags.contains(category.label))
+          .toList();
+    });
+
     setState(() {
       selectedCategoryTags = tags;
     });
@@ -114,12 +126,10 @@ class _BudgetAddState extends State<BudgetAdd> {
   BudgetModel _currentBudget = BudgetModel(
     budget_id: "",
     budget_name: "",
-    budget_limit: 0,
-    budget_currAmount: 0,
-    budget_start: DateTime.now(),
-    budget_end: DateTime.now(),
-    category_id: "",
-    //interval_id: ""
+    budget_amount: 0,
+    startdate: DateTime.now(),
+    enddate: DateTime.now(),
+    categoryIds: [],
   );
 
   void updateCurrentBudget() async {
@@ -127,19 +137,18 @@ class _BudgetAddState extends State<BudgetAdd> {
       _currentBudget = BudgetModel(
         budget_id: _loadedBudgetId ?? "",
         budget_name: controllerTitle.text,
-        budget_limit: currencyToDouble(controllerLimit.text),
-        budget_currAmount: currencyToDouble(controllerCurrAmount.text),
-        budget_start: controllerStartDate.text != ""
+        budget_amount: currencyToDouble(controllerLimit.text),
+        startdate: controllerStartDate.text != ""
             ? DateFormat("dd / MM / yyyy").parse(controllerStartDate.text)
             : DateTime(2000),
-        budget_end: controllerEndDate.text != ""
+        enddate: controllerEndDate.text != ""
             ? DateFormat("dd / MM / yyyy").parse(controllerEndDate.text)
             : DateTime(2000),
-        category_id: selectedCategoryModel != null
-            ? selectedCategoryModel!.category_id
-            : "",
-        // interval_id:
-        //     selectedInterval != null ? selectedInterval!.interval_id : "1",
+        categoryIds: selectedCategories.isNotEmpty
+            ? selectedCategories
+                .map((selectedCategory) => selectedCategory.category_id)
+                .toList()
+            : [],
       );
     });
     await context.read<BudgetService>().setBudget(_currentBudget);
@@ -152,29 +161,25 @@ class _BudgetAddState extends State<BudgetAdd> {
       _currentBudget = loadedBudget;
       _loadedBudgetId = loadedBudget.budget_id;
       controllerTitle.text = loadedBudget.budget_name;
-      controllerCurrAmount.text = loadedBudget.budget_currAmount == 0
+
+      controllerStartDate.text = loadedBudget.startdate == DateTime(2000)
           ? ""
-          : NumberFormat.currency(locale: 'de', name: "EUR", symbol: '€')
-              .format(loadedBudget.budget_currAmount);
-      controllerStartDate.text = loadedBudget.budget_start == DateTime(2000)
+          : DateFormat("dd / MM / yyyy").format(loadedBudget.startdate);
+      controllerEndDate.text = loadedBudget.enddate == DateTime(2000)
           ? ""
-          : DateFormat("dd / MM / yyyy").format(loadedBudget.budget_start);
-      controllerEndDate.text = loadedBudget.budget_end == DateTime(2000)
-          ? ""
-          : DateFormat("dd / MM / yyyy").format(loadedBudget.budget_end);
-      //allIntervals = context.read<InitialService>().getInterval();
+          : DateFormat("dd / MM / yyyy").format(loadedBudget.enddate);
+
       allCategories = context.read<InitialService>().getCategories();
 
-      // if (loadedBudget.interval_id != "") {
-      //   selectedInterval = allIntervals.firstWhere(
-      //       (interval) => interval.interval_id == loadedBudget.interval_id);
-      //   _initialFrequency = selectedInterval!.name;
-      // }
+      if (loadedBudget.categoryIds.isNotEmpty) {
+        selectedCategories = allCategories
+            .where((category) =>
+                loadedBudget.categoryIds.contains(category.category_id))
+            .toList();
 
-      if (loadedBudget.category_id != "") {
-        selectedCategoryModel = allCategories.firstWhere(
-            (category) => category.category_id == loadedBudget.category_id);
-        _initialCategory = selectedCategoryModel!.label;
+        _initialCategories = selectedCategories
+            .map((selectedCategory) => selectedCategory.category_id)
+            .toList();
       }
     });
   }
@@ -207,11 +212,6 @@ class _BudgetAddState extends State<BudgetAdd> {
           ? NumberFormat.currency(locale: 'de', name: "EUR", symbol: '€')
               .format(BudgetAdd['budget_limit'])
           : "";
-
-      controllerCurrAmount.text = BudgetAdd['amount'] != null
-          ? NumberFormat.currency(locale: 'de', name: "EUR", symbol: '€')
-              .format(BudgetAdd['amount'])
-          : "";
       controllerStartDate.text = BudgetAdd['date'] != null
           ? DateFormat("dd / MM / yyyy")
               .format(DateFormat("yyyy-MM-dd").parse(BudgetAdd['date']))
@@ -222,11 +222,6 @@ class _BudgetAddState extends State<BudgetAdd> {
           : "";
     }
   }
-
-  final DatepickerField datePicker = DatepickerField(
-    controller: TextEditingController(),
-    errorMsgBgColor: AppColor.neutral500,
-  );
 
   @override
   void dispose() {
@@ -244,14 +239,6 @@ class _BudgetAddState extends State<BudgetAdd> {
     });
     List<String> categoryNames =
         allCategories.map((category) => category.label).toList();
-
-    //allIntervals = context.watch<InitialService>().getInterval();
-
-    // List<String> intervalNames =
-    //     allIntervals.map((interval) => interval.name).toList();
-
-    String? valueAccount1;
-    String? valueAccount2;
 
     return WillPopScope(
       onWillPop: () async => false,
@@ -410,38 +397,6 @@ class _BudgetAddState extends State<BudgetAdd> {
                             selectedTags: selectedCategoryTags,
                             onTagsChanged: handleCategoryTagsChanged,
                           ),
-                          // Dropdown(
-                          //   label: Strings.budgetCategory,
-                          //   dropdownItems: categoryNames,
-                          //   needsNewCategoryButton: true,
-                          //   initialValue: _initialCategory,
-                          //   validator: (value) {
-                          //     if (value == null || value.isEmpty) {
-                          //       return 'Das Feld darf nicht leer sein';
-                          //     }
-                          //     return null;
-                          //   },
-                          //   setValue: (value) {
-                          //     setState(() {
-                          //       selectedCategory = allCategories.firstWhere(
-                          //           (category) => category.label == value);
-                          //     });
-                          //     updateCurrentBudget();
-                          //   },
-                          // ),
-                          // Wrap(
-                          //   spacing: 8,
-                          //   children: versuch.map((String item) {
-                          //     return Tag(
-                          //       // noIcon: true,
-                          //       // isSmall: true,
-                          //       btnText: item,
-                          //       onTap: () {
-                          //         // Perform any action when the tag is tapped
-                          //       },
-                          //     );
-                          //   }).toList(),
-                          // ),
                           Align(
                             alignment: Alignment.topLeft,
                             child: Wrap(
@@ -454,27 +409,6 @@ class _BudgetAddState extends State<BudgetAdd> {
                             const SizedBox(
                               height: 15,
                             ),
-
-                          //Interval Dropdown
-                          // Dropdown(
-                          //   dropdownItems: intervalNames,
-                          //   label: Strings.dropdownFrequency,
-                          //   needsNewCategoryButton: false,
-                          //   initialValue: _initialFrequency ?? intervalNames[0],
-                          //   validator: (value) {
-                          //     if (value == null || value.isEmpty) {
-                          //       return 'Das Feld darf nicht leer sein';
-                          //     }
-                          //     return null;
-                          //   },
-                          //   setValue: (value) {
-                          //     setState(() {
-                          //       selectedInterval = allIntervals.firstWhere(
-                          //           (interval) => interval.name == value);
-                          //     });
-                          //     updateCurrentBudget();
-                          //   },
-                          // ),
                           DatepickerField(
                             label: Strings.budgetStart,
                             controller: controllerStartDate,
@@ -517,7 +451,7 @@ class _BudgetAddState extends State<BudgetAdd> {
                               RoundButton(
                                 onTap: () async {
                                   await dio.delete(
-                                      "${Values.serverURL}/Budgets/delete/${_currentBudget.budget_id}");
+                                      "${Values.serverURL}/budgets/delete/${_currentBudget.budget_id}");
                                   // await context
                                   //     .read<BudgetAddService>()
                                   //     .forgetBudgetAdd();
@@ -525,7 +459,7 @@ class _BudgetAddState extends State<BudgetAdd> {
                                       .read<BudgetService>()
                                       .clearBudget();
                                   await DefaultCacheManager().emptyCache();
-
+                                  //TODO: zurück zum Budget
                                   Navigator.push(
                                     context,
                                     MaterialPageRoute(
@@ -550,7 +484,10 @@ class _BudgetAddState extends State<BudgetAdd> {
                                       //       content:
                                       //           Text('Daten werden gespeichert')),
                                       // );
-                                      final date = datePicker.selectedDate;
+                                      final startdate =
+                                          startDatePicker.selectedDate;
+                                      final enddate =
+                                          endDatePicker.selectedDate;
 
                                       debugPrint(
                                           "is complete: ${_currentBudget.isCompleted()}");
@@ -560,7 +497,7 @@ class _BudgetAddState extends State<BudgetAdd> {
                                         );
                                       } else {
                                         debugPrint(
-                                            "current Budget Id: ${_currentBudget.budget_id} name: ${_currentBudget.budget_name} amount: ${_currentBudget.budget_limit} startdate: ${_currentBudget.budget_start} enddate: ${_currentBudget.budget_end} category_id: ${_currentBudget.category_id}");
+                                            "current Budget Id: ${_currentBudget.budget_id} name: ${_currentBudget.budget_name} amount: ${_currentBudget.budget_amount} startdate: ${_currentBudget.startdate} enddate: ${_currentBudget.enddate} category_id: ${_currentBudget.categoryIds}");
                                       }
                                       await DefaultCacheManager().emptyCache();
 
@@ -592,24 +529,26 @@ class _BudgetAddState extends State<BudgetAdd> {
 
   Future _sendData(BudgetModel Budget) async {
     DateTime now = DateTime.now();
-    DateTime BudgetStartDateTime = Budget.budget_start.add(
+    DateTime BudgetStartDateTime = Budget.startdate.add(
       Duration(hours: now.hour, minutes: now.minute, seconds: now.second),
     );
-    DateTime BudgetEndDateTime = Budget.budget_end.add(
+    DateTime BudgetEndDateTime = Budget.enddate.add(
       Duration(hours: now.hour, minutes: now.minute, seconds: now.second),
     );
 
     Map<String, dynamic> formData = {
       "budget_id": Budget.budget_id,
       "budget_name": Budget.budget_name,
-      "budget_limit": Budget.budget_limit,
-      "budget_start": BudgetStartDateTime.toString(),
-      "budget_end": BudgetEndDateTime.toString(),
-      "category_id": Budget.category_id,
+      "budget_amount": Budget.budget_amount,
+      "startdate": BudgetStartDateTime.toString(),
+      "enddate": BudgetEndDateTime.toString(),
+      "user_id": context.read<ProfileService>().getUser().id.toString(),
+      "category_ids": Budget.categoryIds.toList(),
     };
 
+    debugPrint(formData.entries.toList().toString());
     var response =
-        await dio.post("${Values.serverURL}/Budgets/input", data: formData);
+        await dio.post("${Values.serverURL}/budget/input", data: formData);
     debugPrint("send data response: ${response.toString()}");
     print(BudgetStartDateTime);
   }
