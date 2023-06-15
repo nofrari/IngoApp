@@ -1,33 +1,50 @@
+import 'dart:math';
+
 import 'package:flutter/material.dart';
+import 'package:frontend/pages/register.dart';
 
 import '../constants/colors.dart';
 import '../constants/fonts.dart';
+import '../pages/userauth.dart';
 
 class Toggle extends StatefulWidget {
-  const Toggle({super.key, required this.toggleView});
+  Toggle({super.key, required this.toggleView, this.forceLogin = false});
   final Function toggleView;
 
   //final List<Widget> selectedScreen;
+  final Register register = Register();
+
+  bool forceLogin;
 
   @override
   State<Toggle> createState() => _ToggleState();
 }
 
 const double height = 40.0;
-const double loginAlign = -1;
-const double signInAlign = 1;
+// const double loginAlign = -1;
+// const double signInAlign = 1;
 //Color selectedColor = AppColor.backgroundFullScreen;
 //Color normalColor = AppColor.backgroundFullScreen;
 
 class _ToggleState extends State<Toggle> {
-  double xAlign = loginAlign;
+  bool showLogIn = false;
+  //double xAlign = loginAlign;
   //Color loginColor = selectedColor;
   //Color signInColor = normalColor;
 
   @override
   void initState() {
     super.initState();
-    xAlign = loginAlign;
+    showLogIn = widget.forceLogin;
+    // if (widget.register.firstRegister) {
+    //   xAlign = signInAlign;
+    //   widget.register.firstRegister = false;
+    // } else {
+    //   xAlign = loginAlign;
+    // }
+
+    //xAlign = loginAlign;
+
     //loginColor = selectedColor;
     //signInColor = normalColor;
   }
@@ -50,7 +67,7 @@ class _ToggleState extends State<Toggle> {
         child: Stack(
           children: [
             AnimatedAlign(
-              alignment: Alignment(xAlign, 0),
+              alignment: Alignment(showLogIn ? 1 : -1, 0),
               duration: const Duration(milliseconds: 300),
               child: Container(
                 width: width * 0.5,
@@ -65,10 +82,10 @@ class _ToggleState extends State<Toggle> {
             ),
             GestureDetector(
               onTap: () {
-                if (xAlign != loginAlign) {
+                if (showLogIn) {
                   widget.toggleView();
                   setState(() {
-                    xAlign = loginAlign;
+                    showLogIn = false;
                   });
                 }
               },
@@ -87,10 +104,10 @@ class _ToggleState extends State<Toggle> {
             ),
             GestureDetector(
               onTap: () {
-                if (xAlign != signInAlign) {
+                if (!showLogIn) {
                   widget.toggleView();
                   setState(() {
-                    xAlign = signInAlign;
+                    showLogIn = true;
                   });
                 }
               },

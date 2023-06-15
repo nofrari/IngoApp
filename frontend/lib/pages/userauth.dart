@@ -9,12 +9,17 @@ import '../constants/values.dart';
 import '../widgets/toggle_button_selina.dart';
 
 class Auth extends StatefulWidget {
+  Auth({this.showLogin, super.key});
+
+  bool? showLogin;
+
   @override
   _AuthState createState() => _AuthState();
 }
 
 class _AuthState extends State<Auth> {
   bool showSignIn = true;
+
   void toggleView() {
     setState(() => showSignIn = !showSignIn);
   }
@@ -24,6 +29,14 @@ class _AuthState extends State<Auth> {
     setState(() {
       _isFocused = isFocused;
     });
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    if (widget.showLogin != null) {
+      showSignIn = false;
+    }
   }
 
   @override
@@ -65,7 +78,10 @@ class _AuthState extends State<Auth> {
                     // color: AppColor.blueActive,
                     child: Column(
                       children: [
-                        Toggle(toggleView: toggleView),
+                        Toggle(
+                          toggleView: toggleView,
+                          forceLogin: !showSignIn,
+                        ),
                         Expanded(
                           child: Container(
                             margin: const EdgeInsets.all(20),

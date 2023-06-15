@@ -32,6 +32,15 @@ class Register extends StatefulWidget {
     super.key,
   });
   bool? focus = false;
+
+  // bool get firstRegister => _registerState.firstRegister;
+
+  // set firstRegister(bool value) {
+  //   _registerState.firstRegister = value;
+  // }
+
+  // late final _RegisterState _registerState = _RegisterState();
+
   @override
   State<Register> createState() => _RegisterState();
 }
@@ -53,6 +62,8 @@ class _RegisterState extends State<Register> {
   TextEditingController controllerMail = TextEditingController();
   TextEditingController controllerPassword = TextEditingController();
   TextEditingController controllerPasswordRepeat = TextEditingController();
+
+  // bool firstRegister = false;
 
   void _getIntervals() async {
     //Intervals
@@ -334,9 +345,12 @@ class _RegisterState extends State<Register> {
                       Navigator.push(
                         context,
                         MaterialPageRoute(
-                          builder: (context) => Auth(),
+                          builder: (context) => Auth(showLogin: true),
                         ),
                       );
+                      // setState(() {
+                      //   widget.firstRegister = true;
+                      // });
                     },
                     theme: ButtonColorTheme.secondaryLight,
                   )),
