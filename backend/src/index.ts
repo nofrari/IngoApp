@@ -17,6 +17,7 @@ import sharp from 'sharp';
 // const PDFDocument = require('pdfkit');
 // const sharp = require('sharp');
 import accountsRouter from './routes/accounts';
+import budgetsRouter from './routes/budget';
 
 const app = express();
 const mindeeClient = new mindee.Client({
@@ -28,6 +29,7 @@ app.use(usersRouter);
 app.use(transactionsRouter);
 app.use(accountsRouter);
 app.use(categoriesRouter);
+app.use(budgetsRouter);
 
 var storage = multer.diskStorage({
   destination: function (req, file, cb) {
