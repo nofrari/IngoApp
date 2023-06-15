@@ -59,14 +59,12 @@ model Type {
 model Interval {
   interval_id   String        @id @unique @default(cuid())
   interval_name String
-  budgets       Budget[]
   transactions  Transaction[]
 }
 
 model IntervalSubtype {
   interval_subtype_id   String        @id @unique @default(cuid())
   interval_subtype_name String
-  budgets               Budget[]
   transactions          Transaction[]
 }
 
@@ -103,14 +101,9 @@ model Budget {
   startdate           DateTime
   enddate             DateTime
   user_id             String
-  interval_id         String
-  interval_subtype_id String?
-  interval_subtype    IntervalSubtype? @relation(fields: [interval_subtype_id], references: [interval_subtype_id], onDelete: Cascade)
-  interval            Interval         @relation(fields: [interval_id], references: [interval_id], onDelete: Cascade)
   user                User             @relation(fields: [user_id], references: [user_id], onDelete: Cascade)
   categories          Category[]       @relation("BudgetToCategory")
 
-  @@index([interval_id], map: "Budget_interval_id_fkey")
   @@index([user_id], map: "Budget_user_id_fkey")
 }
 
