@@ -36,7 +36,7 @@ router.post('/budget/input', async (req, res) => {
     return;
   }
 
-  //check if budget is new or is updated
+  // //check if budget is new or is updated
   const oldBuget = await prisma.budget.findUnique({
     where: {
       budget_id: body.budget_id,
@@ -69,26 +69,29 @@ router.post('/budget/input', async (req, res) => {
       return;
     }
   } else {
-    const newBudget = await prisma.budget.create({
+    newBudget = await prisma.budget.create({
       data: {
         budget_name: body.budget_name,
         budget_amount: body.budget_amount,
         startdate: new Date(body.startdate),
         enddate: new Date(body.enddate),
         user: { connect: { user_id: body.user_id } }, // Verknüpfung mit dem entsprechenden Benutzer
-        categories: {
-          connect: body.category_ids.map((categoryId) => ({
-            category_id: categoryId,
-          })),
-        }, // Verknüpfung mit den ausgewählten Kategorie-IDs
       },
     });
+    for (var i = 0; i < body.category_ids.length; i++) {
+      await prisma.budgetToCategory.create({
+        data: {
+          budget_id: newBudget.budget_id,
+          category_id: body.category_ids[i],
+        },
+      });
+    }
   }
 
-  if (!newBudget && !updatedBudget) {
-    res.status(400).send();
-    return;
-  }
+  // if (!newBudget && !updatedBudget) {
+  //   res.status(400).send();
+  //   return;
+  // }
   // res.send({
   //   budget_id: (oldBuget ? updatedBudget! : newBudget!).budget_id,
   //   budget_name: (oldBuget ? updatedBudget! : newBudget!).budget_name,
@@ -96,50 +99,50 @@ router.post('/budget/input', async (req, res) => {
   //   startdate: (oldBuget ? updatedBudget! : newBudget!).startdate,
   //   enddate: (oldBuget ? updatedBudget! : newBudget!).enddate,
   // });
-  res.send(oldBuget ? updatedBudget : newBudget);
+  res.send(oldBuget ? oldBuget : newBudget);
 });
 
-//Get one budget
-router.get('/budget/:id', async (req, res) => {
-  const id = req.params.id;
+// //Get one budget
+// router.get('/budget/:id', async (req, res) => {
+//   const id = req.params.id;
 
-  const budget = await prisma.budget.findUnique({
-    where: { budget_id: id },
-    include: {
-      categories: true,
-    },
-  });
-  res.send(budget);
-});
+//   const budget = await prisma.budget.findUnique({
+//     where: { budget_id: id },
+//     include: {
+//       categories: true,
+//     },
+//   });
+//   res.send(budget);
+// });
 
-//Get all budgets of user
-router.get('/budget/list/:user_id', async (req, res) => {
-  const user_id = req.params.user_id;
+// //Get all budgets of user
+// router.get('/budget/list/:user_id', async (req, res) => {
+//   const user_id = req.params.user_id;
 
-  const budgets = await prisma.budget.findMany({
-    where: {
-      user_id: user_id,
-    },
-    orderBy: { startdate: 'desc', enddate: 'desc' },
-    include: {
-      categories: true,
-    },
-  });
-  res.send(budgets);
-});
+//   const budgets = await prisma.budget.findMany({
+//     where: {
+//       user_id: user_id,
+//     },
+//     orderBy: { startdate: 'desc', enddate: 'desc' },
+//     include: {
+//       categories: true,
+//     },
+//   });
+//   res.send(budgets);
+// });
 
-//Delete a budget
-router.delete('/budget/delete/:id', async (req, res) => {
-  const budget = await prisma.budget.delete({
-    where: {
-      budget_id: req.params.id,
-    },
-  });
+// //Delete a budget
+// router.delete('/budgets/delete/:id', async (req, res) => {
+//   const budget = await prisma.budget.delete({
+//     where: {
+//       budget_id: req.params.id,
+//     },
+//   });
 
-  if (!budget) {
-    return res.status(404).json({ message: 'Budget nicht gefunden' });
-  }
-  res.json({ message: 'Transaction erfolgreich gelöscht' });
-});
+//   if (!budget) {
+//     return res.status(404).json({ message: 'Budget nicht gefunden' });
+//   }
+//   res.json({ message: 'Transaction erfolgreich gelöscht' });
+// });
 
 export default router;
