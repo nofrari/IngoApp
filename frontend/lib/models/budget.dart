@@ -1,22 +1,22 @@
 import 'package:intl/intl.dart';
 
 class BudgetModel {
-  BudgetModel(
-      {required this.budget_id,
-      required this.budget_name,
-      required this.budget_limit,
-      required this.category_id,
-      this.budget_currAmount,
-      required this.budget_start,
-      required this.interval_id});
+  BudgetModel({
+    required this.budget_id,
+    required this.budget_name,
+    required this.budget_amount,
+    required this.categoryIds, // Update to store category IDs
+    required this.startdate,
+    required this.enddate,
+  });
 
   final String budget_id;
   final String budget_name;
-  double budget_limit;
-  String category_id;
-  double? budget_currAmount;
-  final DateTime budget_start;
-  String interval_id;
+  double budget_amount;
+  List<String>
+      categoryIds; // Store category IDs instead of CategoryModel objects
+  final DateTime startdate;
+  final DateTime enddate;
 
   String formatedAmount(double amount) {
     var formatter = NumberFormat('#,##0.00', 'de_DE');
@@ -33,34 +33,33 @@ class BudgetModel {
     return '$day.$month.$year';
   }
 
-  //convert model to json
+  // Convert model to JSON
   Map<String, dynamic> toJson() => {
-        "id": budget_id,
-        "name": budget_name,
-        "limit": budget_limit,
-        'category_id': category_id,
-        "amount": budget_currAmount,
-        "start": budget_start,
-        'interval_id': interval_id,
+        "budget_id": budget_id,
+        "budget_name": budget_name,
+        "budget_amount": budget_amount,
+        'categoryIds': categoryIds,
+        "startdate": startdate,
+        "enddate": enddate,
       };
 
-  //convert json to model
+  // Convert JSON to model
   factory BudgetModel.fromJson(Map<String, dynamic> json) => BudgetModel(
-        budget_id: json["id"],
-        budget_name: json["name"],
-        budget_limit: json["limit"],
-        category_id: json["category_id"],
-        budget_currAmount: json["amount"],
-        budget_start: json["start"],
-        interval_id: json["interval_id"],
+        budget_id: json["budget_id"],
+        budget_name: json["budget_name"],
+        budget_amount: json["budget_amount"],
+        categoryIds:
+            List<String>.from(json["categoryIds"]), // Deserialize category IDs
+        startdate: json["startdate"],
+        enddate: json["enddate"],
       );
 
   bool isCompleted() {
     if (budget_name != "" &&
-        budget_limit != 0 &&
-        category_id != "" &&
-        budget_start != DateTime(2000) &&
-        interval_id != "") {
+        budget_amount != 0 &&
+        categoryIds.isNotEmpty &&
+        startdate != DateTime(2000) &&
+        enddate != DateTime(2000)) {
       return true;
     } else {
       return false;
