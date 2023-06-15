@@ -31,9 +31,9 @@ class _ProfileOverviewState extends State<ProfileOverview> {
   TextEditingController controllerFirstName = TextEditingController();
   TextEditingController controllerLastName = TextEditingController();
   TextEditingController controllerEmail = TextEditingController();
-  TextEditingController controllerPasswordOld = TextEditingController();
-  TextEditingController controllerPasswordNew = TextEditingController();
-  TextEditingController controllerPasswordNew2 = TextEditingController();
+  late TextEditingController controllerPasswordOld;
+  late TextEditingController controllerPasswordNew;
+  late TextEditingController controllerPasswordNew2;
 
   TextInputType text = TextInputType.text;
 
@@ -64,6 +64,94 @@ class _ProfileOverviewState extends State<ProfileOverview> {
       controllerLastName.text = user.lastName;
       controllerEmail.text = user.email;
     });
+  }
+
+  Future<void> _openPasswordPopup() async {
+    controllerPasswordOld = TextEditingController();
+    controllerPasswordNew = TextEditingController();
+    controllerPasswordNew2 = TextEditingController();
+
+    await showDialog(
+      context: context,
+      builder: (BuildContext context) => PopUp(
+        actions: [
+          Container(
+            margin: Values.buttonPadding,
+            width: MediaQuery.of(context).size.width * 0.8,
+            child: Column(
+              children: [
+                Form(
+                  key: _passwordFormKey,
+                  child: Column(
+                    children: [
+                      InputField(
+                        lblText: Strings.profileOldPassword,
+                        reqFormatter: letters,
+                        keyboardType: text,
+                        controller: controllerPasswordOld,
+                        maxLines: 1,
+                        maxLength: 50,
+                        onFocusChanged: onTextFieldFocusChanged,
+                        hidePassword: true,
+                      ),
+                      InputField(
+                        lblText: Strings.profileNewPassword,
+                        reqFormatter: letters,
+                        keyboardType: text,
+                        controller: controllerPasswordNew,
+                        maxLines: 1,
+                        maxLength: 50,
+                        onFocusChanged: onTextFieldFocusChanged,
+                        hidePassword: true,
+                      ),
+                      InputField(
+                        lblText: Strings.profileNewPassword2,
+                        reqFormatter: letters,
+                        keyboardType: text,
+                        controller: controllerPasswordNew2,
+                        maxLines: 1,
+                        maxLength: 50,
+                        onFocusChanged: onTextFieldFocusChanged,
+                        hidePassword: true,
+                        validator: (value) {
+                          if (value == null ||
+                              value.isEmpty ||
+                              value != _newPassword) {
+                            return "Passwörter stimmen nicht überein";
+                          }
+                          return null;
+                        },
+                      ),
+                      Button(
+                          btnText: Strings.profileSave.toUpperCase(),
+                          onTap: () async {
+                            if (_passwordFormKey.currentState!.validate() !=
+                                false) {
+                              await _sendPasswordData(
+                                  controllerPasswordOld.text,
+                                  controllerPasswordNew2.text);
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                const SnackBar(
+                                  behavior: SnackBarBehavior.floating,
+                                  content: Text('Daten gespeichert.'),
+                                ),
+                              );
+                              setState(() {
+                                _isFocused = false;
+                              });
+                              Navigator.pop(context);
+                            }
+                          },
+                          theme: ButtonColorTheme.secondaryLight),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+          )
+        ],
+      ),
+    );
   }
 
   @override
@@ -199,82 +287,10 @@ class _ProfileOverviewState extends State<ProfileOverview> {
                               child: Column(
                                 children: [
                                   Button(
-                                      btnText: Strings.profileEditPassword,
-                                      onTap: () {
-                                        showDialog(
-                                          context: context,
-                                          builder: (BuildContext context) =>
-                                              PopUp(
-                                            actions: [
-                                              Container(
-                                                margin: Values.buttonPadding,
-                                                width: MediaQuery.of(context)
-                                                        .size
-                                                        .width *
-                                                    0.8,
-                                                child: Column(
-                                                  children: [
-                                                    Form(
-                                                      key: _passwordFormKey,
-                                                      child: Column(children: [
-                                                        InputField(
-                                                          lblText: Strings
-                                                              .profileOldPassword,
-                                                          reqFormatter: letters,
-                                                          keyboardType: text,
-                                                          controller:
-                                                              controllerPasswordOld,
-                                                          maxLines: 1,
-                                                          maxLength: 50,
-                                                          onFocusChanged:
-                                                              onTextFieldFocusChanged,
-                                                          hidePassword: true,
-                                                        ),
-                                                        InputField(
-                                                          lblText: Strings
-                                                              .profileNewPassword,
-                                                          reqFormatter: letters,
-                                                          keyboardType: text,
-                                                          controller:
-                                                              controllerPasswordNew,
-                                                          maxLines: 1,
-                                                          maxLength: 50,
-                                                          onFocusChanged:
-                                                              onTextFieldFocusChanged,
-                                                          hidePassword: true,
-                                                        ),
-                                                        InputField(
-                                                          lblText: Strings
-                                                              .profileNewPassword2,
-                                                          reqFormatter: letters,
-                                                          keyboardType: text,
-                                                          controller:
-                                                              controllerPasswordNew2,
-                                                          maxLines: 1,
-                                                          maxLength: 50,
-                                                          onFocusChanged:
-                                                              onTextFieldFocusChanged,
-                                                          hidePassword: true,
-                                                          validator: (value) {
-                                                            if (value == null ||
-                                                                value.isEmpty ||
-                                                                value !=
-                                                                    _newPassword) {
-                                                              return "Passwörter stimmen nicht überein";
-                                                            }
-                                                            return null;
-                                                          },
-                                                        ),
-                                                      ]),
-                                                    ),
-                                                  ],
-                                                ),
-                                              )
-                                            ],
-                                          ),
-                                        );
-                                      },
-                                      theme: ButtonColorTheme.secondaryLight),
+                                    btnText: Strings.profileEditPassword,
+                                    onTap: _openPasswordPopup,
+                                    theme: ButtonColorTheme.secondaryLight,
+                                  ),
                                   Button(
                                       btnText:
                                           Strings.profileSave.toUpperCase(),
