@@ -45,7 +45,7 @@ class _RegisterState extends State<Register> {
   TextInputFormatter mail = FilteringTextInputFormatter.allow(
       RegExp(r"[a-zA-Z0-9ÄÖÜäöüß@#+:'()&/^\-{2}|\s@.]"));
   TextInputFormatter password = FilteringTextInputFormatter.allow(
-      RegExp(r"[a-zA-Z0-9ÄÖÜäöüß#+:'()&/^\-{2}|\s@.!?]"));
+      RegExp(r"[a-zA-Z0-9ÄÖÜäöüß#+:'()&/^\-{2}|\s@.?%*$!]"));
   TextInputType numeric = TextInputType.number;
   TextInputType text = TextInputType.text;
 
@@ -186,6 +186,7 @@ class _RegisterState extends State<Register> {
                           }
                           return null;
                         },
+                        textCapitalization: TextCapitalization.sentences,
                       ),
                       InputField(
                         lblText: Strings.registerLastName,
@@ -203,6 +204,7 @@ class _RegisterState extends State<Register> {
                           }
                           return null;
                         },
+                        textCapitalization: TextCapitalization.sentences,
                       ),
                       InputField(
                         lblText: Strings.registerMail,
@@ -221,10 +223,11 @@ class _RegisterState extends State<Register> {
                           }
                           return null;
                         },
+                        textCapitalization: TextCapitalization.none,
                       ),
                       InputField(
                         lblText: Strings.registerPassword,
-                        reqFormatter: letters,
+                        reqFormatter: password,
                         keyboardType: text,
                         controller: controllerPassword,
                         maxLength: 50,
@@ -236,12 +239,32 @@ class _RegisterState extends State<Register> {
                           if (valuePW == null || valuePW.isEmpty) {
                             return Strings.alertInputfieldEmpty;
                           }
+
+                          if (valuePW.length < 8) {
+                            return "Dein Passwort muss länger als 8 Zeichen lang \nsein.";
+                          }
+
+                          if (!valuePW.contains(RegExp(r'[0-9]'))) {
+                            return "Dein Passwort muss eine Zahl beinhalten.";
+                          }
+
+                          if (!valuePW
+                              .contains(RegExp(r'[!-@#$%^&*(),.?":{}|]'))) {
+                            return "Dein Passwort muss ein Sonderzeichen beinhalten.";
+                          }
+                          if (!valuePW.contains(RegExp(r'[a-z]'))) {
+                            return "Dein Passwort muss mindestens einen \nKleinbuchstaben beinhalten.";
+                          }
+                          if (!valuePW.contains(RegExp(r'[A-Z]'))) {
+                            return "Dein Passwort muss mindestens einen \nGroßbuchstaben beinhalten.";
+                          }
+
                           return null;
                         },
                       ),
                       InputField(
                         lblText: Strings.registerPasswordRepeat,
-                        reqFormatter: letters,
+                        reqFormatter: password,
                         keyboardType: text,
                         controller: controllerPasswordRepeat,
                         maxLength: 50,
