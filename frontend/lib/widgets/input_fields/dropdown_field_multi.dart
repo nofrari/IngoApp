@@ -8,17 +8,21 @@ import '../../constants/colors.dart';
 import 'package:control_style/control_style.dart';
 
 class DropdownMultiselect extends StatefulWidget {
-  const DropdownMultiselect({
+  DropdownMultiselect({
     super.key,
     required this.dropdownItems,
-    required this.label,
+    //this.label,
+    required this.hintText,
+    this.width,
     this.setValues,
     this.selectedTags = const [],
     this.onTagsChanged,
   });
 
   final List<String> dropdownItems;
-  final String label;
+  //final String? label;
+  final String hintText;
+  double? width;
   final ValueChanged<List<String>>? setValues;
   final List<String> selectedTags;
   final void Function(List<String> selectedTags)? onTagsChanged;
@@ -60,7 +64,7 @@ class _DropdownMultiselectState extends State<DropdownMultiselect> {
               autovalidateMode: AutovalidateMode.onUserInteraction,
               value: null,
               decoration: InputDecoration(
-                label: Text(widget.label, style: Fonts.text300),
+                label: Text(widget.hintText, style: Fonts.text300),
                 labelStyle: TextStyle(color: AppColor.neutral100),
                 border: DecoratedInputBorder(
                     child: OutlineInputBorder(
@@ -157,10 +161,7 @@ class _DropdownMultiselectState extends State<DropdownMultiselect> {
                 iconSize: 30,
               ),
               dropdownStyleData: DropdownStyleData(
-                width: (MediaQuery.of(context).size.width -
-                            Values.bigCardMargin.horizontal) /
-                        2 -
-                    5,
+                width: widget.width,
                 offset: const Offset(-10, -6),
                 maxHeight: 200,
                 decoration: BoxDecoration(

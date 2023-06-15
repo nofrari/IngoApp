@@ -61,6 +61,7 @@ class Strings {
   static const String budgetHeading = "BUDGETÜBERSICHT";
   static const String budgetButton = "BUDGET HINZUFÜGEN";
   static const String budgetStart = "Beginn";
+  static const String budgetEnd = "Ende";
   static const String budgetCategory = "Budget für";
   // static const String accountsDelete = "KONTO LÖSCHEN";
 
