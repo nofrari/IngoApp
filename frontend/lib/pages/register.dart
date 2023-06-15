@@ -224,6 +224,11 @@ class _RegisterState extends State<Register> {
                           return null;
                         },
                         textCapitalization: TextCapitalization.none,
+                        onChanged: (value) {
+                          controllerMail.value = TextEditingValue(
+                              text: value.toLowerCase(),
+                              selection: controllerMail.selection);
+                        },
                       ),
                       InputField(
                         lblText: Strings.registerPassword,

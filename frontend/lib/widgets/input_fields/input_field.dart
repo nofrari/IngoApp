@@ -60,21 +60,21 @@ double currencyToDouble(String currency) {
 }
 
 class InputField extends StatefulWidget {
-  const InputField({
-    super.key,
-    required this.lblText,
-    required this.reqFormatter,
-    required this.keyboardType,
-    required this.controller,
-    required this.maxLength,
-    required this.onFocusChanged,
-    required this.hidePassword,
-    this.maxLines,
-    this.alignLabelLeftCorner,
-    this.validator,
-    this.autovalidateMode,
-    this.onChanged,
-  });
+  InputField(
+      {super.key,
+      required this.lblText,
+      required this.reqFormatter,
+      required this.keyboardType,
+      required this.controller,
+      required this.maxLength,
+      required this.onFocusChanged,
+      required this.hidePassword,
+      this.maxLines,
+      this.alignLabelLeftCorner,
+      this.validator,
+      this.autovalidateMode,
+      this.onChanged,
+      this.textCapitalization});
 
   final String lblText;
   final TextInputFormatter reqFormatter;
@@ -88,6 +88,7 @@ class InputField extends StatefulWidget {
   final ValueChanged<bool> onFocusChanged;
   final ValueChanged<String>? onChanged;
   final bool hidePassword;
+  TextCapitalization? textCapitalization;
 
   @override
   State<InputField> createState() => _InputFieldState();
@@ -155,6 +156,9 @@ class _InputFieldState extends State<InputField> {
           counterText: "",
         ),
         inputFormatters: [widget.reqFormatter],
+        textCapitalization: widget.textCapitalization == null
+            ? TextCapitalization.none
+            : widget.textCapitalization!,
         keyboardType: widget.keyboardType,
         onTap: () => widget.onFocusChanged(true),
         onChanged: widget.onChanged != null
