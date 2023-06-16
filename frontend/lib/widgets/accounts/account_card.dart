@@ -181,6 +181,7 @@ class _AccountCardState extends State<AccountCard> {
                               enabled: _isEditable,
                               style: Fonts.accountsHeading,
                               keyboardType: TextInputType.text,
+                              textCapitalization: TextCapitalization.sentences,
                               decoration: InputDecoration(
                                 hintText: "Kontoname ...",
                                 hintStyle: TextStyle(

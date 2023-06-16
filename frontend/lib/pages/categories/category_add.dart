@@ -143,6 +143,7 @@ class _CategoryAddState extends State<CategoryAdd> {
                           controller: controllerCategoryName,
                           maxLength: 30,
                           hidePassword: false,
+                          textCapitalization: TextCapitalization.sentences,
                         ),
                         const SizedBox(
                           height: 20,

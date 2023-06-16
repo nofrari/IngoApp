@@ -504,6 +504,7 @@ class _ManualEntryState extends State<ManualEntry> {
                             },
                             maxLength: 50,
                             onFocusChanged: onTextFieldFocusChanged,
+                            textCapitalization: TextCapitalization.sentences,
                           ),
                           InputField(
                             lblText: "Betrag in €",
