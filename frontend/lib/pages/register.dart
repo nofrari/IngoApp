@@ -46,6 +46,7 @@ class _RegisterState extends State<Register> {
       RegExp(r"[a-zA-Z0-9ÄÖÜäöüß@#+:'()&/^\-{2}|\s@.]"));
   TextInputFormatter password = FilteringTextInputFormatter.allow(
       RegExp(r"[a-zA-Z0-9ÄÖÜäöüß#+:'()&/^\-{2}|\s@.?%*$!]"));
+
   TextInputType numeric = TextInputType.number;
   TextInputType text = TextInputType.text;
 
@@ -249,20 +250,20 @@ class _RegisterState extends State<Register> {
                           }
 
                           if (!valuePW.contains(RegExp(r'[0-9]'))) {
-                            return "Dein Passwort muss eine Zahl beinhalten.";
-                          }
-
-                          if (!valuePW
-                              .contains(RegExp(r'[!-@#$%^&*(),.?":{}|]'))) {
-                            return "Dein Passwort muss ein Sonderzeichen beinhalten.";
+                            return "Dein Passwort muss eine Zahl enthalten.";
                           }
 
                           if (!valuePW.contains(RegExp(r'[a-z]'))) {
-                            return "Dein Passwort muss mindestens einen \nKleinbuchstaben beinhalten.";
+                            return "Dein Passwort muss mindestens einen \nKleinbuchstaben enthalen.";
                           }
 
                           if (!valuePW.contains(RegExp(r'[A-Z]'))) {
-                            return "Dein Passwort muss mindestens einen \nGroßbuchstaben beinhalten.";
+                            return "Dein Passwort muss mindestens einen \nGroßbuchstaben enthalten.";
+                          }
+
+                          if (!valuePW.contains(
+                              RegExp(r"[ß#+:'()&/^\-{2}|\s@.?%*$!]"))) {
+                            return "Dein Passwort muss ein Sonderzeichen \nenthalten.";
                           }
 
                           return null;
