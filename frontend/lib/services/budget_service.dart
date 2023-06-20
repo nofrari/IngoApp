@@ -21,17 +21,6 @@ class BudgetService extends ChangeNotifier {
     }
   }
 
-  Map<String, dynamic> getBudgetEntry() {
-    try {
-      Map<String, dynamic> budgetsEntryMap =
-          jsonDecode(_prefs.getString('budgets') ?? '{}');
-      return budgetsEntryMap;
-    } catch (e) {
-      debugPrint(e.toString());
-      return {};
-    }
-  }
-
   Future<void> setBudget(BudgetModel budget) async {
     try {
       String budgetString = jsonEncode(budget.toJson());
@@ -59,5 +48,15 @@ class BudgetService extends ChangeNotifier {
       debugPrint(e.toString());
       return null;
     }
+  }
+
+  List<BudgetModel> getBudgets() {
+    List<String> budgetStrings = _prefs.getStringList('budgets') ?? [];
+
+    List<BudgetModel> budgets = budgetStrings
+        .map((budgetString) => BudgetModel.fromJson(jsonDecode(budgetString)))
+        .toList();
+
+    return budgets;
   }
 }
