@@ -5,11 +5,8 @@ import 'package:frontend/constants/colors.dart';
 import 'package:frontend/constants/fonts.dart';
 import 'package:frontend/constants/strings.dart';
 import 'package:frontend/constants/values.dart';
-import 'package:frontend/models/account.dart';
 import 'package:frontend/models/category.dart';
-import 'package:frontend/models/interval.dart' as budget_interval;
 import 'package:frontend/models/budget.dart';
-import 'package:frontend/pages/budget/budget.dart';
 import 'package:frontend/services/initial_service.dart';
 import 'package:frontend/services/budget_service.dart';
 import 'package:frontend/start.dart';
@@ -17,12 +14,10 @@ import 'package:frontend/widgets/button.dart';
 import 'package:frontend/widgets/button_transparent_container.dart';
 import 'package:frontend/widgets/header.dart';
 import 'package:frontend/widgets/input_fields/input_field.dart';
-import 'package:frontend/widgets/input_fields/dropdown_field.dart';
 import 'package:frontend/widgets/input_fields/datepicker_field.dart';
 import 'package:dio/dio.dart';
 import 'package:frontend/widgets/popup.dart';
 import 'package:frontend/widgets/round_button.dart';
-import 'package:multi_select_flutter/dialog/multi_select_dialog_field.dart';
 import 'package:provider/provider.dart';
 import 'package:intl/intl.dart';
 
@@ -31,9 +26,8 @@ import '../../widgets/input_fields/dropdown_field_multi.dart';
 import '../../widgets/tag.dart';
 
 class BudgetAdd extends StatefulWidget {
-  BudgetAdd({super.key, this.isEditMode = false, this.returnToStart = true});
+  BudgetAdd({super.key, this.isEditMode = false});
   bool isEditMode;
-  bool returnToStart;
 
   @override
   State<BudgetAdd> createState() => _BudgetAddState();
@@ -81,7 +75,7 @@ class _BudgetAddState extends State<BudgetAdd> {
   Map<String, dynamic> BudgetAdd = {};
   List<String>? _initialCategories;
   String? _loadedBudgetId;
-
+  bool optionChosen = true;
   Dio dio = Dio();
 
   bool _isFocused = false;
@@ -94,19 +88,34 @@ class _BudgetAddState extends State<BudgetAdd> {
 
   void onCategorySelected(List<String> values) {
     setState(() {
-      selectedCategory = values.join(", ");
+      for (var value in values) {
+        if (!selectedCategoryTags.contains(value)) {
+          selectedCategoryTags.add(value);
+        }
+      }
+      selectedCategories = allCategories
+          .where((category) => selectedCategoryTags.contains(category.label))
+          .toList();
     });
   }
 
   void handleCategoryTagsChanged(List<String> tags) {
     setState(() {
-      selectedCategories = allCategories
-          .where((category) => tags.contains(category.label))
-          .toList();
-    });
-
-    setState(() {
-      selectedCategoryTags = tags;
+      if (selectedCategoryTags.isNotEmpty) {
+        final List<String> newTags = List.from(selectedCategoryTags)
+          ..addAll(tags);
+        selectedCategories = allCategories
+            .where((category) => newTags.contains(category.label))
+            .toList();
+        selectedCategoryTags = newTags
+            .toSet()
+            .toList(); // Convert to set to remove duplicates, then convert back to list
+      } else {
+        selectedCategories = allCategories
+            .where((category) => tags.contains(category.label))
+            .toList();
+        selectedCategoryTags = tags;
+      }
     });
   }
 
@@ -161,13 +170,16 @@ class _BudgetAddState extends State<BudgetAdd> {
       _currentBudget = loadedBudget;
       _loadedBudgetId = loadedBudget.budget_id;
       controllerTitle.text = loadedBudget.budget_name;
-
-      controllerStartDate.text = loadedBudget.startdate == DateTime(2000)
-          ? ""
-          : DateFormat("dd / MM / yyyy").format(loadedBudget.startdate);
-      controllerEndDate.text = loadedBudget.enddate == DateTime(2000)
-          ? ""
-          : DateFormat("dd / MM / yyyy").format(loadedBudget.enddate);
+      controllerLimit.text = loadedBudget.budget_amount != null
+          ? NumberFormat.currency(locale: 'de', name: "EUR", symbol: '€')
+              .format(loadedBudget.budget_amount)
+          : "";
+      controllerStartDate.text = loadedBudget.startdate != null
+          ? DateFormat("dd / MM / yyyy").format(loadedBudget.startdate)
+          : "";
+      controllerEndDate.text = loadedBudget.enddate != null
+          ? DateFormat("dd / MM / yyyy").format(loadedBudget.enddate)
+          : "";
 
       allCategories = context.read<InitialService>().getCategories();
 
@@ -177,27 +189,38 @@ class _BudgetAddState extends State<BudgetAdd> {
                 loadedBudget.categoryIds.contains(category.category_id))
             .toList();
 
-        _initialCategories = selectedCategories
-            .map((selectedCategory) => selectedCategory.category_id)
-            .toList();
+        setState(() {
+          selectedCategoryTags = selectedCategories
+              .map((selectedCategory) => selectedCategory.label)
+              .toList();
+        });
       }
     });
   }
 
   List<Widget> generateTags() {
-    List<Widget> tags = [];
-    tags.addAll(selectedCategoryTags.map((String item) {
-      return Tag(
-        btnText: item,
-        isCategory: true,
-        onTap: () {
-          setState(() {
-            selectedCategoryTags.remove(item);
-          });
-          onCategorySelected(selectedCategoryTags);
-        },
-      );
-    }));
+    final List<String> uniqueTags = [];
+    final List<Widget> tags = [];
+    for (var selectedCategoryTag in selectedCategoryTags) {
+      if (!uniqueTags.contains(selectedCategoryTag)) {
+        uniqueTags.add(selectedCategoryTag);
+        tags.add(
+          Tag(
+            btnText: selectedCategoryTag,
+            isSmall: true,
+            noIcon: false,
+            onTap: () async {
+              setState(() {
+                selectedCategoryTags.remove(selectedCategoryTag);
+                handleCategoryTagsChanged(selectedCategoryTags);
+              });
+              await updateCurrentBudget;
+            },
+          ),
+        );
+      }
+    }
+
     return tags;
   }
 
@@ -205,22 +228,6 @@ class _BudgetAddState extends State<BudgetAdd> {
   void initState() {
     super.initState();
     loadBudget();
-    //BudgetAdd = context.read<BudgetAddService>().getBudgetAdd();
-    if (BudgetAdd.isNotEmpty) {
-      controllerTitle.text = BudgetAdd['budget_name'] ?? "";
-      controllerLimit.text = BudgetAdd['budget_limit'] != null
-          ? NumberFormat.currency(locale: 'de', name: "EUR", symbol: '€')
-              .format(BudgetAdd['budget_limit'])
-          : "";
-      controllerStartDate.text = BudgetAdd['date'] != null
-          ? DateFormat("dd / MM / yyyy")
-              .format(DateFormat("yyyy-MM-dd").parse(BudgetAdd['date']))
-          : "";
-      controllerEndDate.text = BudgetAdd['date'] != null
-          ? DateFormat("dd / MM / yyyy")
-              .format(DateFormat("yyyy-MM-dd").parse(BudgetAdd['date']))
-          : "";
-    }
   }
 
   @override
@@ -230,10 +237,7 @@ class _BudgetAddState extends State<BudgetAdd> {
 
   @override
   Widget build(BuildContext context) {
-    BudgetAdd = context.watch<BudgetService>().getBudgetEntry();
-
     List<Widget> tags = generateTags();
-
     setState(() {
       allCategories = context.watch<InitialService>().getCategories();
     });
@@ -277,9 +281,6 @@ class _BudgetAddState extends State<BudgetAdd> {
                                   if (context.mounted) {
                                     try {
                                       await DefaultCacheManager().emptyCache();
-                                      // await context
-                                      //     .read<BudgetAddService>()
-                                      //     .forgetBudgetAdd();
                                       await context
                                           .read<BudgetService>()
                                           .clearBudget();
@@ -292,17 +293,16 @@ class _BudgetAddState extends State<BudgetAdd> {
                                     Navigator.push(
                                       context,
                                       MaterialPageRoute(
-                                        builder: (context) =>
-                                            widget.returnToStart
-                                                ? Start()
-                                                : Start(pageId: 3),
+                                        builder: (context) => Start(pageId: 4),
                                       ),
                                     );
                                   } else {
                                     Navigator.push(
                                       context,
                                       MaterialPageRoute(
-                                        builder: (context) => const Budget(),
+                                        builder: (context) => Start(
+                                          pageId: 4,
+                                        ),
                                       ),
                                     );
                                   }
@@ -315,14 +315,12 @@ class _BudgetAddState extends State<BudgetAdd> {
                   ),
                 );
               } else {
-                //TODO: check if this causes problems
-                // Navigator.push(
-                //   context,
-                //   MaterialPageRoute(
-                //     builder: (context) => const Start(),
-                //   ),
-                // );
-                Navigator.pop(context);
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => Start(pageId: 4),
+                  ),
+                );
               }
             },
             element: Text(
@@ -386,17 +384,17 @@ class _BudgetAddState extends State<BudgetAdd> {
                             onFocusChanged: onTextFieldFocusChanged,
                           ),
                           DropdownMultiselect(
-                            dropdownItems: categoryNames,
-                            setValues: (value) {
-                              onCategorySelected(value);
-                            },
-                            hintText: Strings.budgetCategory,
-                            width: (MediaQuery.of(context).size.width -
-                                Values.bigCardMargin.horizontal -
-                                Values.bigCardPadding.horizontal),
-                            selectedTags: selectedCategoryTags,
-                            onTagsChanged: handleCategoryTagsChanged,
-                          ),
+                              dropdownItems: categoryNames,
+                              setValues: (value) {
+                                onCategorySelected(value);
+                              },
+                              hintText: Strings.budgetCategory,
+                              width: (MediaQuery.of(context).size.width -
+                                  Values.bigCardMargin.horizontal -
+                                  Values.bigCardPadding.horizontal),
+                              selectedTags: selectedCategoryTags,
+                              onTagsChanged: handleCategoryTagsChanged,
+                              error: optionChosen == true ? false : true),
                           Align(
                             alignment: Alignment.topLeft,
                             child: Wrap(
@@ -412,28 +410,74 @@ class _BudgetAddState extends State<BudgetAdd> {
                           DatepickerField(
                             label: Strings.budgetStart,
                             controller: controllerStartDate,
-                            //serverDate: manualEntry['date'],
+                            serverDate: controllerStartDate.text.isNotEmpty
+                                ? DateFormat("dd / MM / yyyy")
+                                    .parse(controllerStartDate.text)
+                                    .toIso8601String()
+                                : null,
                             errorMsgBgColor: AppColor.neutral500,
                             validator: (value) {
                               if (value == null || value.isEmpty) {
                                 return 'Das Feld darf nicht leer sein';
+                              } else if (controllerEndDate.text.isNotEmpty &&
+                                  value != "") {
+                                String startDateString =
+                                    DateFormat('yyyy-MM-dd').format(
+                                        DateFormat('dd / MM / yyyy')
+                                            .parse(value!));
+                                String endDateString = DateFormat('yyyy-MM-dd')
+                                    .format(DateFormat('dd / MM / yyyy')
+                                        .parse(controllerEndDate.text));
+
+                                DateTime startDate =
+                                    DateTime.parse(startDateString);
+                                DateTime endDate =
+                                    DateTime.parse(endDateString);
+
+                                if (endDate.isBefore(startDate)) {
+                                  return "Startdatum darf nicht nach \ndem Enddatum liegen";
+                                } else {
+                                  return null;
+                                }
                               }
                               return null;
                             },
-                            //TODO: Add callback to call updateCurrentTransaction
                           ),
                           DatepickerField(
                             label: Strings.budgetEnd,
                             controller: controllerEndDate,
-                            //serverDate: manualEntry['date'],
+                            serverDate: controllerEndDate.text.isNotEmpty
+                                ? DateFormat("dd / MM / yyyy")
+                                    .parse(controllerEndDate.text)
+                                    .toIso8601String()
+                                : null,
                             errorMsgBgColor: AppColor.neutral500,
                             validator: (value) {
                               if (value == null || value.isEmpty) {
                                 return 'Das Feld darf nicht leer sein';
+                              } else if (controllerStartDate.text.isNotEmpty &&
+                                  value != "") {
+                                String startDateString =
+                                    DateFormat('yyyy-MM-dd').format(
+                                        DateFormat('dd / MM / yyyy')
+                                            .parse(controllerStartDate.text));
+                                String endDateString = DateFormat('yyyy-MM-dd')
+                                    .format(DateFormat('dd / MM / yyyy')
+                                        .parse(value!));
+
+                                DateTime startDate =
+                                    DateTime.parse(startDateString);
+                                DateTime endDate =
+                                    DateTime.parse(endDateString);
+
+                                if (endDate.isBefore(startDate)) {
+                                  return "Enddatum darf nicht vor \ndem Startdatum liegen";
+                                } else {
+                                  return null;
+                                }
                               }
                               return null;
                             },
-                            //TODO: Add callback to call updateCurrentTransaction
                           ),
                         ],
                       ),
@@ -452,18 +496,18 @@ class _BudgetAddState extends State<BudgetAdd> {
                                 onTap: () async {
                                   await dio.delete(
                                       "${Values.serverURL}/budgets/delete/${_currentBudget.budget_id}");
-                                  // await context
-                                  //     .read<BudgetAddService>()
-                                  //     .forgetBudgetAdd();
+
                                   await context
                                       .read<BudgetService>()
                                       .clearBudget();
                                   await DefaultCacheManager().emptyCache();
                                   //TODO: zurück zum Budget
-                                  Navigator.push(
+                                  await Navigator.push(
                                     context,
                                     MaterialPageRoute(
-                                      builder: (context) => Start(),
+                                      builder: (context) => Start(
+                                        pageId: 4,
+                                      ),
                                     ),
                                   );
                                 },
@@ -477,20 +521,22 @@ class _BudgetAddState extends State<BudgetAdd> {
                                       ? "ÄDERUNGEN SPEICHERN"
                                       : "SPEICHERN",
                                   onTap: () async {
+                                    setState(() {
+                                      if (selectedCategoryTags.isEmpty) {
+                                        optionChosen = false;
+                                      } else if (selectedCategoryTags
+                                          .isNotEmpty) {
+                                        optionChosen = true;
+                                      }
+                                    });
                                     updateCurrentBudget();
-                                    if (_formKey.currentState!.validate()) {
-                                      // ScaffoldMessenger.of(context).showSnackBar(
-                                      //   const SnackBar(
-                                      //       content:
-                                      //           Text('Daten werden gespeichert')),
-                                      // );
+                                    if (_formKey.currentState!.validate() &&
+                                        optionChosen == true) {
                                       final startdate =
                                           startDatePicker.selectedDate;
                                       final enddate =
                                           endDatePicker.selectedDate;
 
-                                      debugPrint(
-                                          "is complete: ${_currentBudget.isCompleted()}");
                                       if (_currentBudget.isCompleted()) {
                                         await _sendData(
                                           _currentBudget,
@@ -502,15 +548,19 @@ class _BudgetAddState extends State<BudgetAdd> {
                                       await DefaultCacheManager().emptyCache();
 
                                       if (context.mounted) {
-                                        // await context
-                                        //     .read<BudgetAddService>()
-                                        //     .forgetBudgetAdd();
                                         await context
                                             .read<BudgetService>()
                                             .clearBudget();
                                       }
                                       // ignore: use_build_context_synchronously
-                                      Navigator.pop(context);
+                                      await Navigator.push(
+                                        context,
+                                        MaterialPageRoute(
+                                          builder: (context) => Start(
+                                            pageId: 4,
+                                          ),
+                                        ),
+                                      );
                                     }
                                   },
                                   theme: ButtonColorTheme.secondaryLight),
@@ -529,27 +579,23 @@ class _BudgetAddState extends State<BudgetAdd> {
 
   Future _sendData(BudgetModel Budget) async {
     DateTime now = DateTime.now();
-    DateTime BudgetStartDateTime = Budget.startdate.add(
-      Duration(hours: now.hour, minutes: now.minute, seconds: now.second),
+    DateTime StartDateTime = Budget.startdate.add(
+      Duration(hours: 0, minutes: 0, seconds: 0),
     );
-    DateTime BudgetEndDateTime = Budget.enddate.add(
-      Duration(hours: now.hour, minutes: now.minute, seconds: now.second),
+    DateTime EndDatetime = Budget.enddate.add(
+      Duration(hours: 0, minutes: 0, seconds: 0),
     );
 
     Map<String, dynamic> formData = {
       "budget_id": Budget.budget_id,
       "budget_name": Budget.budget_name,
       "budget_amount": Budget.budget_amount,
-      "startdate": BudgetStartDateTime.toString(),
-      "enddate": BudgetEndDateTime.toString(),
+      "startdate": StartDateTime.toString(),
+      "enddate": EndDatetime.toString(),
       "user_id": context.read<ProfileService>().getUser().id.toString(),
       "category_ids": Budget.categoryIds.toList(),
     };
-
-    debugPrint(formData.entries.toList().toString());
     var response =
         await dio.post("${Values.serverURL}/budget/input", data: formData);
-    debugPrint("send data response: ${response.toString()}");
-    print(BudgetStartDateTime);
   }
 }
