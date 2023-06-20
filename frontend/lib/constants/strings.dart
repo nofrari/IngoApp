@@ -63,7 +63,7 @@ class Strings {
   static const String budgetStart = "Beginn";
   static const String budgetEnd = "Ende";
   static const String budgetCategory = "Budget für";
-  // static const String accountsDelete = "KONTO LÖSCHEN";
+  static const String budgetTransactionsList = "Transaktionsliste";
 
   //Profile
   static const String profileAccount = "KONTO";
@@ -90,5 +90,5 @@ class Strings {
   //Transactions
   static const String transactionsReccuringHeading =
       "Wiederkehrende\nTransaktionen";
-  static const String transactionsAdd = "Transaktion hinzuügen";
+  static const String transactionsAdd = "Transaktion hinzufügen";
 }
