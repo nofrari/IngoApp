@@ -66,7 +66,8 @@ class _StartState extends State<Start> {
           );
           break;
         case 4:
-          currentTab = 4;
+          currentTab = 3;
+          currentScreen = Budget();
           break;
         case 3:
           currentTab = 1;
