@@ -36,25 +36,28 @@ class Tag extends StatelessWidget {
             borderRadius: BorderRadius.circular(15),
           ),
         ),
-        child: Row(
-          crossAxisAlignment: CrossAxisAlignment.center,
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Text(
-              btnText,
-              style: TextStyle(
-                fontWeight: FontWeight.normal,
-                color: AppColor.neutral600,
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 8.0),
+          child: Row(
+            crossAxisAlignment: CrossAxisAlignment.center,
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Text(
+                btnText,
+                style: TextStyle(
+                  fontWeight: FontWeight.normal,
+                  color: AppColor.neutral600,
+                ),
               ),
-            ),
-            noIcon != true
-                ? Icon(
-                    Icons.close,
-                    color: AppColor.neutral500,
-                    size: 18,
-                  )
-                : Container()
-          ],
+              noIcon != true
+                  ? Icon(
+                      Icons.close,
+                      color: AppColor.neutral500,
+                      size: 18,
+                    )
+                  : Container()
+            ],
+          ),
         ),
       ),
     );
