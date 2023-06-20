@@ -29,6 +29,12 @@ class Fonts {
     fontWeight: FontWeight.normal,
   );
 
+  static TextStyle textError = GoogleFonts.josefinSans(
+    color: AppColor.redLight,
+    fontSize: 10,
+    fontWeight: FontWeight.normal,
+  );
+
   static TextStyle textTransactionName = GoogleFonts.josefinSans(
     color: AppColor.neutral100,
     fontSize: 13,
@@ -118,6 +124,12 @@ class Fonts {
     fontSize: 15,
     fontWeight: FontWeight.normal,
   );
+  static TextStyle budgetLimitsOver = GoogleFonts.josefinSans(
+    color: AppColor.redLight,
+    fontSize: 15,
+    fontWeight: FontWeight.bold,
+  );
+
   static TextStyle budgetTags = GoogleFonts.josefinSans(
     color: AppColor.neutral100,
     fontSize: 12,
