@@ -9,6 +9,7 @@ import verifyToken from '../middleware/verifyToken';
 import bcrypt from 'bcrypt';
 import { request } from 'http';
 import path, { parse } from 'path';
+import { type } from 'os';
 
 const prisma = new PrismaClient();
 const router = express.Router();
@@ -70,14 +71,13 @@ router.post('/transactions', (req, res) => {
 router.get('/transactions/fetchpdf/:pdfname', async (req, res) => {
   try {
     res.status(201).send({
-      pdf: await fs.promises.readFile(
-        './src/uploads/' + req.params.pdfname,
-        { encoding: 'base64' }
-      ),
+      pdf: await fs.promises.readFile('./src/uploads/' + req.params.pdfname, {
+        encoding: 'base64',
+      }),
     });
   } catch (error) {
     console.log(error);
-    res.status(400).send("Error while fetching pdf");
+    res.status(400).send('Error while fetching pdf');
   }
 });
 
@@ -114,7 +114,8 @@ router.post('/transactions/input', async (req, res) => {
         category_id: body.category_id,
         type_id: body.type_id,
         interval_id: body.interval_id,
-        interval_subtype_id: body.interval_subtype_id == "" ? null : body.interval_subtype_id,
+        interval_subtype_id:
+          body.interval_subtype_id == '' ? null : body.interval_subtype_id,
         account_id: body.account_id,
       },
     });
@@ -124,7 +125,6 @@ router.post('/transactions/input', async (req, res) => {
       return;
     }
   } else {
-
     newTransaction = await prisma.transaction.create({
       data: {
         transaction_name: body.transaction_name,
@@ -135,12 +135,12 @@ router.post('/transactions/input', async (req, res) => {
         category_id: body.category_id,
         type_id: body.type_id,
         interval_id: body.interval_id,
-        interval_subtype_id: body.interval_subtype_id == "" ? null : body.interval_subtype_id,
+        interval_subtype_id:
+          body.interval_subtype_id == '' ? null : body.interval_subtype_id,
         account_id: body.account_id,
       },
     });
   }
-
 
   if (!newTransaction && !updatedTransaction) {
     res.status(400).send();
@@ -161,7 +161,9 @@ router.post('/transactions/input', async (req, res) => {
         },
         data: {
           account_balance: {
-            increment: oldTransaction ? body.transaction_amount - oldTransaction.transaction_amount : body.transaction_amount,
+            increment: oldTransaction
+              ? body.transaction_amount - oldTransaction.transaction_amount
+              : body.transaction_amount,
           },
         },
       });
@@ -173,7 +175,9 @@ router.post('/transactions/input', async (req, res) => {
         },
         data: {
           account_balance: {
-            decrement: oldTransaction ? body.transaction_amount - oldTransaction.transaction_amount : body.transaction_amount,
+            decrement: oldTransaction
+              ? body.transaction_amount - oldTransaction.transaction_amount
+              : body.transaction_amount,
           },
         },
       });
@@ -183,24 +187,33 @@ router.post('/transactions/input', async (req, res) => {
       break;
   }
 
-
   // const token = jwt.sign({
   //     userId: user.user_id,
   //     exp: Math.floor(Date.now() / 1000) + (60 * 60)
   // }, <string>process.env.JWT_SECRET);
 
   res.send({
-    transaction_id: (oldTransaction ? updatedTransaction! : newTransaction!).transaction_id,
-    transaction_name: (oldTransaction ? updatedTransaction! : newTransaction!).transaction_name,
-    transaction_amount: (oldTransaction ? updatedTransaction! : newTransaction!).transaction_amount,
+    transaction_id: (oldTransaction ? updatedTransaction! : newTransaction!)
+      .transaction_id,
+    transaction_name: (oldTransaction ? updatedTransaction! : newTransaction!)
+      .transaction_name,
+    transaction_amount: (oldTransaction ? updatedTransaction! : newTransaction!)
+      .transaction_amount,
     date: (oldTransaction ? updatedTransaction! : newTransaction!).date,
-    description: (oldTransaction ? updatedTransaction! : newTransaction!).description,
+    description: (oldTransaction ? updatedTransaction! : newTransaction!)
+      .description,
     bill_url: (oldTransaction ? updatedTransaction! : newTransaction!).bill_url,
-    category_id: (oldTransaction ? updatedTransaction! : newTransaction!).category_id,
+    category_id: (oldTransaction ? updatedTransaction! : newTransaction!)
+      .category_id,
     type_id: (oldTransaction ? updatedTransaction! : newTransaction!).type_id,
-    interval_id: (oldTransaction ? updatedTransaction! : newTransaction!).interval_id,
-    interval_subtype_id: (oldTransaction ? updatedTransaction! : newTransaction!).interval_subtype_id,
-    account_id: (oldTransaction ? updatedTransaction! : newTransaction!).account_id,
+    interval_id: (oldTransaction ? updatedTransaction! : newTransaction!)
+      .interval_id,
+    interval_subtype_id: (oldTransaction
+      ? updatedTransaction!
+      : newTransaction!
+    ).interval_subtype_id,
+    account_id: (oldTransaction ? updatedTransaction! : newTransaction!)
+      .account_id,
   });
 });
 
@@ -377,6 +390,41 @@ router.get('/transactions/fivelatest/:user_id', async (req, res) => {
   });
 
   res.send(transactions);
+});
+
+router.get('/transactions/budget/:budget_id', async (req, res) => {
+  const budget_id = req.params.budget_id;
+
+  const curr_budget = await prisma.budget.findUnique({
+    where: { budget_id: budget_id },
+    include: {
+      categories: true,
+    },
+  });
+
+  const transactions = await prisma.transaction.findMany({
+    where: {
+      date: {
+        lte: curr_budget?.enddate,
+        gte: curr_budget?.startdate,
+      },
+      category: {
+        budgets: {
+          some: {
+            budget_id: budget_id,
+          },
+        },
+      },
+      type_id: '2',
+    },
+    orderBy: { date: 'desc' },
+  });
+
+  const transactionSum = transactions.reduce(
+    (sum, transaction) => sum + transaction.transaction_amount,
+    0
+  );
+  res.send({ transactions, transactionSum });
 });
 
 router.get('/transactions/account/:id', async (req, res) => {
