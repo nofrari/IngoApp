@@ -341,7 +341,7 @@ class _AccountCardState extends State<AccountCard> {
                           textAlign: TextAlign.center,
                           keyboardType: TextInputType.number,
                           decoration: InputDecoration(
-                            hintText: "Betrag ...",
+                            hintText: "Ausgansbetrag ...",
                             hintStyle: TextStyle(
                               color: AppColor.neutral300,
                               fontSize: 16,

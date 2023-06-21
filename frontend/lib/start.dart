@@ -4,6 +4,7 @@ import 'dart:ffi';
 import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:frontend/pages/budget/budget.dart';
 import 'package:frontend/pages/categories/categories.dart';
 import 'package:frontend/services/profile_service.dart';
 import 'package:internet_connection_checker/internet_connection_checker.dart';
@@ -18,7 +19,7 @@ import 'constants/fonts.dart';
 //menu-pages import
 import 'pages/home.dart';
 import 'pages/accounts/accounts.dart';
-import 'pages/budget.dart';
+// import 'pages/budget/budget.dart';
 import 'pages/finances.dart';
 import 'pages/profile/profile.dart';
 import 'pages/scanner.dart';
@@ -64,7 +65,8 @@ class _StartState extends State<Start> {
           );
           break;
         case 4:
-          currentTab = 4;
+          currentTab = 3;
+          currentScreen = Budget();
           break;
         case 3:
           currentTab = 1;
@@ -109,6 +111,7 @@ class _StartState extends State<Start> {
     Accounts(),
     const Categories(),
     Finances(),
+    const Budget(),
     const Profile(),
     const Scanner(),
     const ScannerCamera(),
@@ -300,7 +303,7 @@ class _StartState extends State<Start> {
                   onPressed: () {
                     setState(() {
                       currentTab = 3;
-                      currentScreen = const Categories();
+                      currentScreen = const Budget();
                     });
                   },
                   child: Column(
@@ -313,7 +316,7 @@ class _StartState extends State<Start> {
                             : AppColor.neutral100,
                       ),
                       Text(
-                        Strings.menuCategories,
+                        Strings.menuBudget,
                         style: TextStyle(
                           color: AppColor.neutral100,
                         ),

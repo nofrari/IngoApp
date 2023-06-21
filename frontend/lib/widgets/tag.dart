@@ -2,11 +2,20 @@ import 'package:flutter/material.dart';
 import '../constants/colors.dart';
 
 class Tag extends StatelessWidget {
-  const Tag({required this.btnText, this.onTap, this.isCategory, super.key});
+  const Tag({
+    required this.btnText,
+    this.onTap,
+    this.isCategory,
+    this.noIcon = false,
+    this.isSmall,
+    super.key,
+  });
 
   final String btnText;
   final void Function()? onTap;
   final bool? isCategory;
+  final bool? noIcon;
+  final bool? isSmall;
 
   @override
   Widget build(BuildContext context) {
@@ -16,35 +25,38 @@ class Tag extends StatelessWidget {
         : AppColor.blueActive;
 
     return IntrinsicWidth(
-      child: Container(
-        child: ElevatedButton(
-          onPressed: onTap,
-          style: ElevatedButton.styleFrom(
-            backgroundColor: backgroundColor,
-            padding: const EdgeInsets.symmetric(vertical: 10),
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(15),
-            ),
+      child: ElevatedButton(
+        onPressed: onTap,
+        style: ElevatedButton.styleFrom(
+          backgroundColor: backgroundColor,
+          padding: isSmall == true
+              ? const EdgeInsets.symmetric(vertical: 0, horizontal: 0)
+              : const EdgeInsets.symmetric(vertical: 10),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(15),
           ),
-          child: Container(
-            padding: const EdgeInsets.symmetric(horizontal: 5),
-            child: Row(
-              crossAxisAlignment: CrossAxisAlignment.center,
-              children: [
-                Text(
-                  btnText,
-                  style: TextStyle(
-                    fontWeight: FontWeight.normal,
-                    color: AppColor.neutral600,
-                  ),
+        ),
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 8.0),
+          child: Row(
+            crossAxisAlignment: CrossAxisAlignment.center,
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Text(
+                btnText,
+                style: TextStyle(
+                  fontWeight: FontWeight.normal,
+                  color: AppColor.neutral600,
                 ),
-                Icon(
-                  Icons.close,
-                  color: AppColor.neutral500,
-                  size: 18,
-                ),
-              ],
-            ),
+              ),
+              noIcon != true
+                  ? Icon(
+                      Icons.close,
+                      color: AppColor.neutral500,
+                      size: 18,
+                    )
+                  : Container()
+            ],
           ),
         ),
       ),

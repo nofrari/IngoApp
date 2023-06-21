@@ -29,6 +29,12 @@ class Fonts {
     fontWeight: FontWeight.normal,
   );
 
+  static TextStyle textError = GoogleFonts.josefinSans(
+    color: AppColor.redLight,
+    fontSize: 10,
+    fontWeight: FontWeight.normal,
+  );
+
   static TextStyle textTransactionName = GoogleFonts.josefinSans(
     color: AppColor.neutral100,
     fontSize: 13,
@@ -110,4 +116,27 @@ class Fonts {
   //MANUAL ENTRY
   static TextStyle disabledDate = GoogleFonts.josefinSans(
       color: AppColor.neutral300, fontSize: 18, fontWeight: FontWeight.normal);
+
+  //Budget
+  static TextStyle budgetName = GoogleFonts.josefinSans(
+    color: AppColor.blueActive,
+    fontSize: 18,
+    fontWeight: FontWeight.normal,
+  );
+  static TextStyle budgetLimits = GoogleFonts.josefinSans(
+    color: AppColor.neutral100,
+    fontSize: 15,
+    fontWeight: FontWeight.normal,
+  );
+  static TextStyle budgetLimitsOver = GoogleFonts.josefinSans(
+    color: AppColor.redLight,
+    fontSize: 15,
+    fontWeight: FontWeight.bold,
+  );
+
+  static TextStyle budgetTags = GoogleFonts.josefinSans(
+    color: AppColor.neutral100,
+    fontSize: 12,
+    fontWeight: FontWeight.normal,
+  );
 }

@@ -11,6 +11,7 @@ import 'package:frontend/widgets/input_fields/dropdown_field_multi.dart';
 import 'package:frontend/widgets/transactions/transaction_list.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
+import '../constants/values.dart';
 import '../models/account.dart';
 import '../models/transaction.dart';
 import '../services/initial_service.dart';
@@ -313,7 +314,11 @@ class _FinancesState extends State<Finances> {
                       setValues: (value) {
                         onCategorySelected(value);
                       },
-                      label: "Kategorie",
+                      hintText: "Kategorie",
+                      width: (MediaQuery.of(context).size.width -
+                                  Values.bigCardMargin.horizontal) /
+                              2 -
+                          5,
                       selectedTags: selectedCategoryTags,
                       onTagsChanged: handleCategoryTagsChanged,
                     ),
@@ -329,7 +334,11 @@ class _FinancesState extends State<Finances> {
                       setValues: (value) {
                         onAccountSelected(value);
                       },
-                      label: "Konto",
+                      hintText: "Konto",
+                      width: (MediaQuery.of(context).size.width -
+                                  Values.bigCardMargin.horizontal) /
+                              2 -
+                          5,
                       selectedTags: selectedAccountTags,
                       onTagsChanged: handleAccountTagsChanged,
                     ),

@@ -34,17 +34,18 @@ model Account {
 }
 
 model Category {
-  category_id   String        @id @unique @default(cuid())
-  category_name String
-  is_white      Boolean
-  user_id       String
-  icon_id       String
-  color_id      String
-  color         Color         @relation(fields: [color_id], references: [color_id], onDelete: Cascade)
-  icon          Icon          @relation(fields: [icon_id], references: [icon_id], onDelete: Cascade)
-  user          User          @relation(fields: [user_id], references: [user_id], onDelete: Cascade)
-  transactions  Transaction[]
-  budgets       Budget[]      @relation("BudgetToCategory")
+  category_id      String             @id @unique @default(cuid())
+  category_name    String
+  is_white         Boolean
+  user_id          String
+  icon_id          String
+  color_id         String
+  color            Color              @relation(fields: [color_id], references: [color_id], onDelete: Cascade)
+  icon             Icon               @relation(fields: [icon_id], references: [icon_id], onDelete: Cascade)
+  user             User               @relation(fields: [user_id], references: [user_id], onDelete: Cascade)
+  transactions     Transaction[]
+  budgets          Budget[]           @relation("BudgetToCategory")
+  BudgetToCategory BudgetToCategory[]
 
   @@index([color_id], map: "Category_color_id_fkey")
   @@index([icon_id], map: "Category_icon_id_fkey")
@@ -60,14 +61,12 @@ model Type {
 model Interval {
   interval_id   String        @id @unique @default(cuid())
   interval_name String
-  budgets       Budget[]
   transactions  Transaction[]
 }
 
 model IntervalSubtype {
   interval_subtype_id   String        @id @unique @default(cuid())
   interval_subtype_name String
-  budgets               Budget[]
   transactions          Transaction[]
 }
 
@@ -100,21 +99,26 @@ model Transaction {
 }
 
 model Budget {
-  budget_id           String           @id @unique @default(cuid())
-  budget_name         String
-  budget_amount       Float
-  startdate           DateTime
-  enddate             DateTime
-  user_id             String
-  interval_id         String
-  interval_subtype_id String?
-  interval_subtype    IntervalSubtype? @relation(fields: [interval_subtype_id], references: [interval_subtype_id], onDelete: Cascade)
-  interval            Interval         @relation(fields: [interval_id], references: [interval_id], onDelete: Cascade)
-  user                User             @relation(fields: [user_id], references: [user_id], onDelete: Cascade)
-  categories          Category[]       @relation("BudgetToCategory")
+  budget_id        String             @id @unique @default(cuid())
+  budget_name      String
+  budget_amount    Float
+  startdate        DateTime
+  enddate          DateTime
+  user_id          String
+  user             User               @relation(fields: [user_id], references: [user_id], onDelete: Cascade)
+  categories       Category[]         @relation("BudgetToCategory")
+  BudgetToCategory BudgetToCategory[]
 
-  @@index([interval_id], map: "Budget_interval_id_fkey")
   @@index([user_id], map: "Budget_user_id_fkey")
+}
+
+model BudgetToCategory {
+  budget_id   String
+  category_id String
+  budget      Budget   @relation(fields: [budget_id], references: [budget_id])
+  category    Category @relation(fields: [category_id], references: [category_id])
+
+  @@id([budget_id, category_id])
 }
 
 model Icon {

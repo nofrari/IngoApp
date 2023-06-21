@@ -15,6 +15,7 @@ class AppColor {
   static Color neutral300 = HexColor("#9e9e9e");
   static Color neutral400 = HexColor("#626262");
   static Color neutral500 = HexColor("#3b3b3b");
+  static Color neutral550 = Color.fromRGBO(40, 40, 40, 0.308);
   static Color neutral600 = HexColor("#121212");
   static Color neutral700 = HexColor("#585550");
   static Color activeMenu = HexColor("#48BABF");
@@ -27,6 +28,7 @@ class AppColor {
   static Color greenLight = HexColor("#77B737");
   static Color greenAcid = HexColor("#BCC924");
   static Color redDark = HexColor("#A34242");
+  static Color redLight = HexColor("#Ae1e12");
   static Color pink = HexColor("#B73786");
   static Color orange = HexColor("#E07B16");
   static Color violett = HexColor("#9886C1");

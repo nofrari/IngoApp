@@ -126,6 +126,7 @@ class _TransactionListState extends State<TransactionList> {
     //for long lists use ListView
     return filteredTransactions.isNotEmpty
         ? Container(
+            // height: filteredTransactions.length * 55,
             margin: const EdgeInsets.only(top: 10),
             padding: const EdgeInsets.symmetric(vertical: 10),
             decoration: BoxDecoration(
@@ -138,6 +139,7 @@ class _TransactionListState extends State<TransactionList> {
               color: AppColor.neutral500,
             ),
             child: ListView.builder(
+              padding: EdgeInsets.all(0),
               physics: const NeverScrollableScrollPhysics(),
               shrinkWrap: true,
               itemCount: filteredTransactions.length,
@@ -149,7 +151,14 @@ class _TransactionListState extends State<TransactionList> {
           )
         : Padding(
             padding: const EdgeInsets.only(top: 30),
-            child: Text("Kein Ergebnis gefunden", style: Fonts.text300),
+            child: Container(
+              width: double.infinity,
+              child: Text(
+                "Kein Ergebnis gefunden",
+                style: Fonts.text300,
+                textAlign: TextAlign.center,
+              ),
+            ),
           );
   }
 }

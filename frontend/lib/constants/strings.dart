@@ -3,6 +3,7 @@ class Strings {
   Strings._();
   static const String menuHome = "Start";
   static const String menuCategories = "Kategorien";
+  static const String menuBudget = "Budget";
   static const String menuFinance = "Finanzen";
   static const String menuAccounts = "Konten";
 
@@ -56,6 +57,14 @@ class Strings {
   static const String accountsButton = "KONTO HINZUFÜGEN";
   static const String accountsDelete = "KONTO LÖSCHEN";
 
+  //Budget
+  static const String budgetHeading = "BUDGETÜBERSICHT";
+  static const String budgetButton = "BUDGET HINZUFÜGEN";
+  static const String budgetStart = "Beginn";
+  static const String budgetEnd = "Ende";
+  static const String budgetCategory = "Budget für";
+  static const String budgetTransactionsList = "Transaktionsliste";
+
   //Profile
   static const String profileAccount = "KONTO";
   static const String profileName = "NAME";
@@ -81,5 +90,5 @@ class Strings {
   //Transactions
   static const String transactionsReccuringHeading =
       "Wiederkehrende\nTransaktionen";
-  static const String transactionsAdd = "Transaktion hinzuügen";
+  static const String transactionsAdd = "Transaktion hinzufügen";
 }

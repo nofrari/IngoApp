@@ -24,6 +24,7 @@ const prisma = new PrismaClient();
 //const imgToPDF = require('image-to-pdf');
 // const PDFDocument = require('pdfkit');
 // const sharp = require('sharp');
+import budgetsRouter from './routes/budget';
 
 const app = express();
 const mindeeClient = new mindee.Client({
@@ -35,6 +36,7 @@ app.use(usersRouter);
 app.use(transactionsRouter);
 app.use(accountsRouter);
 app.use(categoriesRouter);
+app.use(budgetsRouter);
 
 var storage = multer.diskStorage({
   destination: function (req, file, cb) {
