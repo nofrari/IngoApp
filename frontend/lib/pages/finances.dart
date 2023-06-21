@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -11,6 +13,7 @@ import 'package:frontend/widgets/input_fields/dropdown_field_multi.dart';
 import 'package:frontend/widgets/transactions/transaction_list.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
+import 'package:fl_chart/fl_chart.dart';
 import '../constants/values.dart';
 import '../models/account.dart';
 import '../models/transaction.dart';
@@ -162,6 +165,97 @@ class _FinancesState extends State<Finances> {
     return tags;
   }
 
+  List<FlSpot> generateSpots(List<TransactionModel> transactions) {
+    List<FlSpot> spots = [];
+    for (var transaction in transactions) {
+      spots.add(FlSpot(
+        double.parse(transaction.date.millisecondsSinceEpoch.toString()),
+        double.parse(transaction.type_id == "1"
+            ? transaction.transaction_amount.toString()
+            : (transaction.transaction_amount * -1).toString()),
+      ));
+    }
+    return spots;
+  }
+
+  double getMinY(List<TransactionModel> transactions) {
+    double min = 0;
+    for (var transaction in transactions) {
+      if (transaction.type_id == "1") {
+        if (transaction.transaction_amount < min) {
+          min = transaction.transaction_amount;
+        }
+      } else {
+        if ((transaction.transaction_amount * -1) < min) {
+          min = transaction.transaction_amount * -1;
+        }
+      }
+    }
+    return min - 20;
+  }
+
+  double getMaxY(List<TransactionModel> transactions) {
+    double max = 0;
+    for (var transaction in transactions) {
+      if (transaction.type_id == "1") {
+        if (transaction.transaction_amount > max) {
+          max = transaction.transaction_amount;
+        }
+      } else {
+        if ((transaction.transaction_amount * -1) > max) {
+          max = transaction.transaction_amount * -1;
+        }
+      }
+    }
+    return max + 20;
+  }
+
+  DateTime getOldesTransaction(List<TransactionModel> transactions) {
+    DateTime oldest = DateTime.now();
+    for (var transaction in transactions) {
+      if (transaction.date.isBefore(oldest)) {
+        oldest = transaction.date;
+      }
+    }
+    return oldest;
+  }
+
+//function that takes the current transactions list and returns a list of transactions, where transactions with the same date are combined
+  List<TransactionModel> combineTransactions(
+      List<TransactionModel> transactions) {
+    List<TransactionModel> combinedTransactions = [];
+    List<DateTime> dates = [];
+    for (var transaction in transactions) {
+      if (!dates.contains(transaction.date)) {
+        dates.add(transaction.date);
+      }
+    }
+    for (var date in dates) {
+      double amount = 0;
+      for (var transaction in transactions) {
+        if (transaction.date == date) {
+          amount = transaction.type_id == "1"
+              ? transaction.transaction_amount + amount
+              : transaction.transaction_amount * -1 + amount;
+          //transactions.remove(transaction);
+        }
+      }
+      combinedTransactions.add(
+        TransactionModel(
+          transaction_id: "1",
+          transaction_name: "Test",
+          transaction_amount: amount,
+          date: date,
+          type_id: amount < 0 ? "2" : "1",
+          category_id: "clirgqhkk0001dy50dboh7b9l",
+          interval_id: "1",
+          account_id: "",
+        ),
+      );
+    }
+    return combinedTransactions;
+  }
+
   @override
   Widget build(BuildContext context) {
     transactions = context.watch<TransactionService>().getTransactions();
@@ -200,6 +294,94 @@ class _FinancesState extends State<Finances> {
       child: SingleChildScrollView(
         child: Column(
           children: [
+            Container(
+                // height: filteredTransactions.length * 55,
+                margin: const EdgeInsets.only(bottom: 10),
+                padding: const EdgeInsets.symmetric(vertical: 10),
+                decoration: BoxDecoration(
+                  border: Border.all(
+                    color: AppColor.neutral500,
+                    width: 0,
+                    style: BorderStyle.solid,
+                  ),
+                  borderRadius: BorderRadius.circular(30),
+                  color: AppColor.neutral500,
+                ),
+                child: Container(
+                  height: 120,
+                  width: double.infinity,
+                  child: LineChart(
+                    LineChartData(
+                      lineTouchData: LineTouchData(
+                        enabled: false,
+                      ),
+                      gridData: FlGridData(
+                        show: false,
+                      ),
+                      titlesData: FlTitlesData(
+                        show: false,
+                      ),
+                      borderData: FlBorderData(
+                        show: false,
+                      ),
+                      minY: getMinY(transactions),
+                      maxY: getMaxY(transactions),
+                      maxX: DateTime.now().millisecondsSinceEpoch.toDouble(),
+                      minX: getOldesTransaction(transactions)
+                          .millisecondsSinceEpoch
+                          .toDouble(),
+                      lineBarsData: [
+                        LineChartBarData(
+                          spots:
+                              generateSpots(combineTransactions(transactions)),
+                          // [
+                          //   FlSpot(0, 0),
+                          //   FlSpot(1, 1),
+                          //   FlSpot(2, 2),
+                          //   FlSpot(3, 3),
+                          //   FlSpot(4, 4),
+                          //   FlSpot(5, -5),
+                          //   FlSpot(6, 6),
+                          //   FlSpot(7, 7),
+                          //   FlSpot(8, 8),
+                          //   FlSpot(9, 9),
+                          //   FlSpot(10, 10),
+                          //   FlSpot(11, 11),
+                          //   FlSpot(12, 12),
+                          //   FlSpot(13, 13),
+                          //   FlSpot(14, 14),
+                          //   FlSpot(15, 15),
+                          //   FlSpot(16, 16),
+                          //   FlSpot(17, 17),
+                          //   FlSpot(18, 18),
+                          //   FlSpot(19, 19),
+                          //   FlSpot(20, 20),
+                          //   FlSpot(21, 21),
+                          //   FlSpot(22, 22),
+                          //   FlSpot(23, 23),
+                          //   FlSpot(24, 24),
+                          //   FlSpot(25, 25),
+                          //   FlSpot(26, 26),
+                          //   FlSpot(27, 27),
+                          //   FlSpot(28, 28),
+                          //   FlSpot(29, 29),
+                          //   FlSpot(30, 30),
+                          //   FlSpot(31, 31),
+                          // ],
+                          isCurved: true,
+                          barWidth: 2,
+                          isStrokeCapRound: true,
+                          dotData: FlDotData(
+                            show: false,
+                          ),
+                          belowBarData: BarAreaData(
+                            show: true,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                )),
             InputField(
               hidePassword: false,
               lblText: "Suche",
@@ -362,7 +544,7 @@ class _FinancesState extends State<Finances> {
                       startDate: selectedStartDate,
                       endDate: selectedEndDate,
                       transactions: filteredTransactions.isEmpty
-                          ? transactions
+                          ? transactions //combineTransactions(transactions) //
                           : filteredTransactions,
                     ),
                   )
