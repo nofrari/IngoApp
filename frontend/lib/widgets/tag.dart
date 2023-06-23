@@ -26,9 +26,10 @@ class Tag extends StatelessWidget {
 
     return IntrinsicWidth(
       child: ElevatedButton(
-        onPressed: onTap,
+        onPressed: onTap != null ? onTap : null,
         style: ElevatedButton.styleFrom(
           backgroundColor: backgroundColor,
+          disabledBackgroundColor: backgroundColor,
           padding: isSmall == true
               ? const EdgeInsets.symmetric(vertical: 0, horizontal: 0)
               : const EdgeInsets.symmetric(vertical: 10),

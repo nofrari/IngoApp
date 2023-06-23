@@ -267,10 +267,8 @@ class _BudgetCardState extends State<BudgetCard> {
                 return Tag(
                   noIcon: true,
                   isSmall: true,
+                  isCategory: true,
                   btnText: category.label,
-                  onTap: () {
-                    // Perform any action when the tag is tapped
-                  },
                 );
               }).toList(),
             ),
